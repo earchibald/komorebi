@@ -113,6 +113,8 @@ When prompted, adopt the specific persona required for the task.
 
 ## 6. Implementation Conventions
 
+See [CONVENTIONS.md](../CONVENTIONS.md) for detailed code patterns and examples.
+
 ### Recursive Summarization (The "Compactor")
 * **Pattern:** Map-Reduce.
 * **Constraint:** Every summary pass must inject the **"System Anchor"** (Project Goal) to prevent context drift.
