@@ -32,7 +32,7 @@ class ChunkEvent:
     event_type: EventType
     chunk_id: UUID
     data: dict[str, Any]
-    timestamp: datetime = None
+    timestamp: Optional[datetime] = None
     
     def __post_init__(self):
         if self.timestamp is None:

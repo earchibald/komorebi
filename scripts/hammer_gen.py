@@ -90,7 +90,8 @@ def generate_random_content() -> str:
     
     # Add some additional context sometimes
     if random.random() > 0.5:
-        content += f"\n\nAdditional context: {' '.join(random.choices(string.ascii_lowercase.split(), k=10))}"
+        words = ["this", "will", "help", "understand", "context", "better", "for", "the", "task", "ahead", "important", "note", "remember"]
+        content += f"\n\nAdditional context: {' '.join(random.choices(words, k=10))}"
     
     return content
 
