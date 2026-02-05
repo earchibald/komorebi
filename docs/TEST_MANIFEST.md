@@ -112,6 +112,82 @@ The benchmark outputs:
 
 ---
 
+## Playwright UI Tests
+
+End-to-end tests for the React dashboard using Playwright. See [PEDAGOGY_PLAYWRIGHT.md](./PEDAGOGY_PLAYWRIGHT.md) for detailed documentation on the testing framework.
+
+### Running Playwright Tests
+
+```bash
+cd frontend
+
+# Install dependencies (first time)
+npm install
+
+# Run all tests (headless)
+npm test
+
+# Run with browser visible
+npm run test:headed
+
+# Run with interactive UI
+npm run test:ui
+
+# Debug mode
+npm run test:debug
+
+# View HTML report
+npm run test:report
+```
+
+### Test File: `frontend/e2e/dashboard.spec.ts`
+
+| Test Suite | Test Name | Description |
+|------------|-----------|-------------|
+| **Dashboard Layout** | `should display the header with title and subtitle` | Verifies header renders correctly |
+| | `should display the stats section with all stat cards` | Verifies 5 stat cards are present |
+| | `should display navigation tabs` | Verifies Inbox, All Chunks, Projects tabs |
+| | `should display the footer` | Verifies footer with version info |
+| **Tab Navigation** | `should start with Inbox tab active` | Inbox is default active tab |
+| | `should switch to All Chunks tab` | Tab switching works |
+| | `should switch to Projects tab` | Tab switching works |
+| | `should switch back to Inbox tab` | Return navigation works |
+| **Stats Display** | `should display numeric values in stat cards` | All values are numbers |
+| | `should display correct stat labels` | Labels match expected text |
+| **Inbox Functionality** | `should have capture input and button` | Input elements present |
+| | `should disable button when input is empty` | Form validation |
+| | `should enable button when input has content` | Form validation |
+| | `should capture a chunk and clear input` | Full capture flow |
+| | `should show empty state when no inbox chunks` | Empty state display |
+| **Chunk List** | `should display filter buttons` | 5 filter buttons present |
+| | `should filter by status` | Filter switching works |
+| | `should highlight active filter button` | Visual feedback |
+| **Project Management** | `should display new project button` | Button present |
+| | `should open create project form` | Form opens on click |
+| | `should close create form on cancel` | Cancel button works |
+| | `should create a new project` | Full creation flow |
+| | `should disable create button when name is empty` | Form validation |
+| **Integration Tests** | `should update stats after capturing a chunk` | Frontend-backend sync |
+| | `should show chunk in All Chunks after capture` | Cross-tab data sync |
+| **Accessibility** | `should have proper heading structure` | H1/H2 structure |
+| | `should have clickable buttons` | Button accessibility |
+| | `should have form inputs with placeholders` | Input accessibility |
+| **Error Handling** | `should handle empty form submission gracefully` | No error on disabled submit |
+
+### Page Object Models
+
+Located in `frontend/e2e/fixtures.ts`:
+
+| Page Object | Purpose |
+|-------------|---------|
+| `DashboardPage` | Main page navigation and layout |
+| `InboxPage` | Quick capture functionality |
+| `ChunkListPage` | All Chunks view with filtering |
+| `ProjectListPage` | Project creation and listing |
+| `ApiHelper` | Backend API interaction for test setup |
+
+---
+
 ## Test Coverage Summary
 
 | Category | Test File | Test Count | Status |
@@ -119,7 +195,8 @@ The benchmark outputs:
 | Models | `test_models.py` | 7 | ✅ Passing |
 | API | `test_api.py` | 9 | ✅ Passing |
 | Benchmark | `hammer_gen.py` | N/A | ✅ Validated |
-| **Total** | | **16** | **All Passing** |
+| UI (Playwright) | `dashboard.spec.ts` | 28 | 🆕 New |
+| **Total** | | **44+** | **Backend Passing** |
 
 ---
 
@@ -160,6 +237,48 @@ async def client():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+```
+
+### Playwright UI Tests
+
+Add tests to `frontend/e2e/dashboard.spec.ts`:
+
+```typescript
+import { test, expect } from './fixtures';
+
+test.describe('Your Feature', () => {
+  test('should do something', async ({ dashboardPage, page }) => {
+    await dashboardPage.goto();
+    
+    // Your test logic
+    await expect(page.locator('.your-element')).toBeVisible();
+  });
+});
+```
+
+### Adding Page Objects
+
+Extend `frontend/e2e/fixtures.ts` with new page objects:
+
+```typescript
+class YourPage {
+  constructor(private page: Page) {}
+
+  get yourElement() {
+    return this.page.locator('.your-selector');
+  }
+
+  async yourAction() {
+    await this.yourElement.click();
+  }
+}
+
+// Add to fixtures
+export const test = base.extend<KomorebiFixtures>({
+  yourPage: async ({ page }, use) => {
+    await use(new YourPage(page));
+  },
+});
 ```
 
 ---

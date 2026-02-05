@@ -212,3 +212,9 @@ komorebi.db-journal
 frontend/node_modules/
 frontend/dist/
 
+komorebi.db-journal
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+frontend/playwright/.cache/
