@@ -611,9 +611,45 @@ Before pushing:
 
 ---
 
-## 12. Resources & References
+## 12. Versioning Governance
+
+### Version Management
+Komorebi follows semantic versioning with strict governance. See [VERSIONING.md](VERSIONING.md) for complete details.
+
+**Quick Reference:**
+- **Development:** Use `{version}+buildN` format during feature development
+- **Release:** Remove `+buildN` when complete and ready
+- **Validation:** Run `./scripts/check-version.sh` before committing
+- **Syncing:** Use `./scripts/sync-versions.sh` to update all version files
+
+**Commit Format (Required):**
+```
+<type>: v<version> - <description>
+
+Examples:
+feat: v0.3.0+build1 - add entity extraction
+fix: v0.2.1+build2 - resolve cold start issue
+release: v0.3.0 - recursive compaction complete
+```
+
+**Version Sources:**
+- `VERSION` file (canonical)
+- `pyproject.toml` (Python package)  
+- `frontend/package.json` (React package)
+- `docs/CHANGELOG.md` (must have entry for releases)
+
+### Pre-commit Validation
+- Version consistency across all files
+- CHANGELOG entry for non-build versions
+- Proper semantic version format
+- Commit message includes version
+
+---
+
+## 13. Resources & References
 
 - See [copilot-instructions.md](.github/copilot-instructions.md) for project vision and directives
+- [VERSIONING.md](VERSIONING.md) - Complete versioning governance
 - FastAPI Docs: https://fastapi.tiangolo.com/
 - SQLAlchemy Async: https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 - Preact Signals: https://preactjs.com/guide/v10/signals/

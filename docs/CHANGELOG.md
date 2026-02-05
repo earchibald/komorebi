@@ -9,10 +9,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Module 3: Advanced MCP aggregation
+- Frontend dashboard enhancements  
+- Production deployment configuration
+- Advanced testing automation
+
+---
+
+## [0.2.0] - 2026-02-05
+
 ### Added
-- Comprehensive documentation suite
-- Playwright UI testing framework
-- Human testing procedures (HT-1 through HT-12)
+
+#### Module 1 - Ollama Integration
+- **Complete Ollama LLM Integration** - Local LLM server with llama3.2 model
+- **Async Ollama Client** - JSON mode support with graceful error handling
+- **Entity Extraction** - LLM-powered extraction of tool_ids, decisions, code_refs
+- **Cold-Start Prevention** - Model pre-warming to prevent concurrent loading failures
+- **Cross-Platform Support** - Installation guides for macOS, Linux, Windows
+- **MODULE_1_VERIFICATION.md** - Comprehensive installation and testing guide
+
+#### Module 2 - Recursive Compaction & Entity Extraction  
+- **Intelligent Project Compaction** - LLM-powered summarization preserving system context
+- **Entity Detection** - Structured extraction from project chunks
+- **Recursive Summarization** - Map-Reduce pattern with system anchor preservation
+- **Background Processing** - FastAPI BackgroundTasks for non-blocking operations
+- **Load Testing Framework** - explosion test achieving 67+ req/sec sustained
+- **MODULE_2_VERIFICATION.md** - Performance benchmarks and validation procedures
+
+#### Testing & Infrastructure
+- **27-Test Suite** - Comprehensive tests covering all modules (100% passing)
+- **Performance Validation** - Entity extraction: 16 entities from 10 chunks  
+- **Load Testing Script** - test_explosion.sh with model pre-warming
+- **Environment Consistency** - Virtual environment usage validation
+- **Benchmark Metrics** - Sub-500ms LLM response times with pre-warming
+
+#### Documentation & Governance
+- **VERSIONING.md** - Semantic versioning governance with build tracking
+- **Version Scripts** - check-version.sh, sync-versions.sh, validate-changelog.sh
+- **Commit Standards** - Version tracking in commit messages
+- **Release Process** - Formal procedures for development → staging → production
+
+### Changed
+- **Environment Management** - Migrated from system Python to consistent venv usage
+- **test_explosion.sh** - Enhanced with model pre-warming and entity validation
+- **Entity Extraction** - Improved JSON parsing with structured output validation
+- **Error Handling** - Enhanced Ollama cold-start scenario management
+- **Database Initialization** - Improved schema creation timing
+
+### Fixed
+- **Environment Mismatch** - Resolved system Python vs venv package conflicts
+- **Ollama Cold-Start** - Fixed concurrent model loading failures via pre-warming
+- **Port Conflicts** - Resolved stale uvicorn processes blocking development
+- **Database Race Conditions** - Fixed schema initialization timing issues
+- **LLM Response Parsing** - Improved error handling for malformed JSON
+
+### Performance
+- **Load Testing:** 67+ requests/second sustained performance
+- **Entity Extraction:** 16 entities extracted from 10 chunks reliably
+- **Model Latency:** Sub-500ms response times with pre-warming
+- **Test Reliability:** 27/27 tests passing consistently
+- **Throughput:** Background task processing without blocking ingestion
+
+### Security
+- **Environment Isolation** - Virtual environment for dependency management
+- **API Key Management** - Environment variable isolation for sensitive data
+- **Process Isolation** - Subprocess management for external tool integration
 
 ---
 
