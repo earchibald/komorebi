@@ -25,8 +25,9 @@ if git rev-parse HEAD >/dev/null 2>&1; then
     COMMIT_MSG=$(git log -1 --pretty=%B | head -n1)
     echo "📝 Current commit: $COMMIT_MSG"
     
-    # Check if commit message contains version
-    if [[ "$COMMIT_MSG" =~ v$CANONICAL_VERSION ]]; then
+    # Check if commit message contains version (escape special regex characters)
+    ESCAPED_VERSION=$(echo "$CANONICAL_VERSION" | sed 's/+/\\+/g')
+    if [[ "$COMMIT_MSG" =~ v$ESCAPED_VERSION ]]; then
         echo -e "${GREEN}✅ Commit message contains version: v$CANONICAL_VERSION${NC}"
     else
         echo -e "${RED}❌ Commit message missing version: v$CANONICAL_VERSION${NC}"
