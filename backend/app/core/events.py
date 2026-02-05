@@ -38,15 +38,18 @@ class ChunkEvent:
         if self.timestamp is None:
             self.timestamp = datetime.utcnow()
     
-    def to_sse(self) -> str:
-        """Format as Server-Sent Event."""
+    def to_sse_dict(self) -> dict:
+        \"\"\"Format as SSE-compatible dictionary.\"\"\"
         payload = {
             "type": self.event_type.value,
             "chunk_id": str(self.chunk_id),
             "data": self.data,
             "timestamp": self.timestamp.isoformat(),
         }
-        return f"data: {json.dumps(payload)}\n\n"
+        return {
+            "event": self.event_type.value,
+            "data": json.dumps(payload),
+        }
 
 
 class EventBus:
@@ -60,20 +63,28 @@ class EventBus:
         self._subscribers: list[asyncio.Queue] = []
         self._lock = asyncio.Lock()
     
-    async def subscribe(self) -> AsyncGenerator[str, None]:
+    async def subscribe(self) -> AsyncGenerator[dict, None]:
         """Subscribe to events and yield SSE-formatted messages."""
         queue: asyncio.Queue = asyncio.Queue()
         
         async with self._lock:
             self._subscribers.append(queue)
         
+        # Send initial connection message
+        yield {"event": "connected", "data": json.dumps({"message": "SSE connection established"})}
+        
         try:
             while True:
-                event = await queue.get()
-                if isinstance(event, ChunkEvent):
-                    yield event.to_sse()
-                else:
-                    yield f"data: {json.dumps(event)}\n\n"
+                try:
+                    # Wait for event with timeout for keep-alive
+                    event = await asyncio.wait_for(queue.get(), timeout=30.0)
+                    if isinstance(event, ChunkEvent):
+                        yield event.to_sse_dict()
+                    else:
+                        yield {"data": json.dumps(event)}
+                except asyncio.TimeoutError:
+                    # Send keep-alive ping
+                    yield {"event": "ping", "data": json.dumps({"message": "keep-alive"})}
         finally:
             async with self._lock:
                 self._subscribers.remove(queue)

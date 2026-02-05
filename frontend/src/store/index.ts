@@ -42,6 +42,35 @@ export interface ChunkStats {
 // API base URL
 const API_URL = '/api/v1'
 
+const STORAGE_PREFIX = 'komorebi-dashboard'
+const STORAGE_KEYS = {
+  chunks: `${STORAGE_PREFIX}:chunks`,
+  projects: `${STORAGE_PREFIX}:projects`,
+  stats: `${STORAGE_PREFIX}:stats`,
+}
+
+function readCache<T>(key: string): T | null {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const raw = window.localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : null
+  } catch {
+    return null
+  }
+}
+
+function writeCache<T>(key: string, value: T): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value))
+    console.log(`💾 Cached data to ${key.split(':')[1]}`)
+  } catch {
+    // Ignore storage failures (quota, private mode, etc.)
+  }
+}
+
 // Signals (reactive state)
 export const chunks = signal<Chunk[]>([])
 export const projects = signal<Project[]>([])
@@ -55,6 +84,11 @@ export const stats = signal<ChunkStats>({
 export const loading = signal(false)
 export const error = signal<string | null>(null)
 
+// Debounce tracking
+let fetchChunksPromise: Promise<void> | null = null
+let fetchStatsPromise: Promise<void> | null = null
+let fetchProjectsPromise: Promise<void> | null = null
+
 // Computed values
 export const inboxChunks = computed(() => 
   chunks.value.filter(c => c.status === 'inbox')
@@ -64,36 +98,72 @@ export const processedChunks = computed(() =>
   chunks.value.filter(c => c.status === 'processed')
 )
 
+const cachedChunks = readCache<Chunk[]>(STORAGE_KEYS.chunks)
+const cachedProjects = readCache<Project[]>(STORAGE_KEYS.projects)
+const cachedStats = readCache<ChunkStats>(STORAGE_KEYS.stats)
+
+if (cachedChunks) {
+  console.log(`📦 Loaded ${cachedChunks.length} chunks from cache`)
+  chunks.value = cachedChunks
+}
+if (cachedProjects) {
+  console.log(`📁 Loaded ${cachedProjects.length} projects from cache`)
+  projects.value = cachedProjects
+}
+if (cachedStats) {
+  console.log(`📊 Loaded stats from cache:`, cachedStats)
+  stats.value = cachedStats
+}
+
 // Actions
 export async function fetchChunks(status?: string, limit = 100) {
+  // Debounce: return existing promise if fetch is in progress
+  if (fetchChunksPromise) return fetchChunksPromise
+  
   loading.value = true
   error.value = null
   
-  try {
-    const params = new URLSearchParams()
-    if (status) params.set('status', status)
-    params.set('limit', String(limit))
-    
-    const response = await fetch(`${API_URL}/chunks?${params}`)
-    if (!response.ok) throw new Error('Failed to fetch chunks')
-    
-    chunks.value = await response.json()
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Unknown error'
-  } finally {
-    loading.value = false
-  }
+  fetchChunksPromise = (async () => {
+    try {
+      const params = new URLSearchParams()
+      if (status) params.set('status', status)
+      params.set('limit', String(limit))
+      
+      const response = await fetch(`${API_URL}/chunks?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch chunks')
+      
+      chunks.value = await response.json()
+      writeCache(STORAGE_KEYS.chunks, chunks.value)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Unknown error'
+    } finally {
+      loading.value = false
+      fetchChunksPromise = null
+    }
+  })()
+  
+  return fetchChunksPromise
 }
 
 export async function fetchStats() {
-  try {
-    const response = await fetch(`${API_URL}/chunks/stats`)
-    if (!response.ok) throw new Error('Failed to fetch stats')
-    
-    stats.value = await response.json()
-  } catch (e) {
-    console.error('Failed to fetch stats:', e)
-  }
+  // Debounce: return existing promise if fetch is in progress
+  if (fetchStatsPromise) return fetchStatsPromise
+  
+  fetchStatsPromise = (async () => {
+    try {
+      const response = await fetch(`${API_URL}/chunks/stats`)
+      if (!response.ok) throw new Error('Failed to fetch stats')
+      
+      stats.value = await response.json()
+      writeCache(STORAGE_KEYS.stats, stats.value)
+    } catch (e) {
+      console.error('Failed to fetch stats:', e)
+    } finally {
+      fetchStatsPromise = null
+    }
+  })()
+  
+  return fetchStatsPromise
 }
 
 export async function captureChunk(content: string, tags: string[] = []) {
@@ -115,9 +185,9 @@ export async function captureChunk(content: string, tags: string[] = []) {
     
     const newChunk = await response.json()
     chunks.value = [newChunk, ...chunks.value]
+    writeCache(STORAGE_KEYS.chunks, chunks.value)
     
-    // Refresh stats
-    await fetchStats()
+    // Stats will be refreshed via SSE event
     
     return newChunk
   } catch (e) {
@@ -129,19 +199,28 @@ export async function captureChunk(content: string, tags: string[] = []) {
 }
 
 export async function fetchProjects() {
+  // Debounce: return existing promise if fetch is in progress
+  if (fetchProjectsPromise) return fetchProjectsPromise
+  
   loading.value = true
   error.value = null
   
-  try {
-    const response = await fetch(`${API_URL}/projects`)
-    if (!response.ok) throw new Error('Failed to fetch projects')
-    
-    projects.value = await response.json()
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Unknown error'
-  } finally {
-    loading.value = false
-  }
+  fetchProjectsPromise = (async () => {
+    try {
+      const response = await fetch(`${API_URL}/projects`)
+      if (!response.ok) throw new Error('Failed to fetch projects')
+      
+      projects.value = await response.json()
+      writeCache(STORAGE_KEYS.projects, projects.value)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Unknown error'
+    } finally {
+      loading.value = false
+      fetchProjectsPromise = null
+    }
+  })()
+  
+  return fetchProjectsPromise
 }
 
 export async function createProject(name: string, description?: string) {
@@ -159,6 +238,7 @@ export async function createProject(name: string, description?: string) {
     
     const newProject = await response.json()
     projects.value = [newProject, ...projects.value]
+    writeCache(STORAGE_KEYS.projects, projects.value)
     
     return newProject
   } catch (e) {
@@ -175,14 +255,22 @@ let eventSource: EventSource | null = null
 export function connectSSE() {
   if (eventSource) return
   
+  console.log('🔌 Connecting to SSE...')
   eventSource = new EventSource(`${API_URL}/sse/events`)
   
+  eventSource.onopen = () => {
+    console.log('✅ SSE connected')
+  }
+  
   eventSource.onmessage = (event) => {
+    console.log('📨 SSE raw event:', event)
     try {
+      if (!event.data || event.data.trim() === '') return
       const data = JSON.parse(event.data)
+      console.log('📨 SSE parsed data:', data)
       handleSSEEvent(data)
     } catch (e) {
-      console.error('Failed to parse SSE event:', e)
+      console.error('Failed to parse SSE event:', e, 'Raw data:', event.data)
     }
   }
   
@@ -200,22 +288,37 @@ export function disconnectSSE() {
   }
 }
 
+// Debounced stats refresh to avoid hammering the API
+let statsRefreshTimeout: number | null = null
+function scheduleStatsRefresh() {
+  if (statsRefreshTimeout) return // Already scheduled
+  statsRefreshTimeout = window.setTimeout(() => {
+    fetchStats()
+    statsRefreshTimeout = null
+  }, 500)
+}
+
 function handleSSEEvent(event: { type: string; chunk_id: string; data: Record<string, unknown> }) {
+  console.log('📡 SSE event:', event.type)
+  
   switch (event.type) {
     case 'chunk.created':
-      // Chunk already added during capture, but refresh just in case
-      fetchStats()
+      // Refetch chunks to show the new one
+      fetchChunks()
+      scheduleStatsRefresh()
       break
     case 'chunk.updated':
       // Update the chunk in the list
       chunks.value = chunks.value.map(c =>
         c.id === event.chunk_id ? { ...c, ...event.data } as Chunk : c
       )
-      fetchStats()
+      writeCache(STORAGE_KEYS.chunks, chunks.value)
+      scheduleStatsRefresh()
       break
     case 'chunk.deleted':
       chunks.value = chunks.value.filter(c => c.id !== event.chunk_id)
-      fetchStats()
+      writeCache(STORAGE_KEYS.chunks, chunks.value)
+      scheduleStatsRefresh()
       break
     default:
       // Other events

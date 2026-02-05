@@ -4,8 +4,8 @@ import { stats, fetchStats } from '../store'
 export function Stats() {
   useEffect(() => {
     fetchStats()
-    // Refresh stats every 30 seconds
-    const interval = setInterval(fetchStats, 30000)
+    // Refresh stats every 60 seconds (reduced from 30)
+    const interval = setInterval(fetchStats, 60000)
     return () => clearInterval(interval)
   }, [])
 

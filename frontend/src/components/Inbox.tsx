@@ -7,6 +7,8 @@ export function Inbox() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    // Fetch inbox chunks and connect to SSE
+    // SSE will handle stats updates, so we don't need to fetch them here
     fetchChunks('inbox')
     connectSSE()
     return () => disconnectSSE()

@@ -197,6 +197,13 @@ komorebi list
 http://localhost:8000/api/v1
 ```
 
+This is a prefix, not a browsable endpoint. Requests must target a concrete path under it, for example:
+
+```
+http://localhost:8000/api/v1/chunks
+http://localhost:8000/api/v1/projects
+```
+
 ### Interactive Documentation
 
 Visit `http://localhost:8000/docs` for Swagger UI documentation.
