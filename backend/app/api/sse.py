@@ -25,7 +25,11 @@ async def stream_events():
     - compaction.completed: Compaction finished
     - mcp.status_changed: MCP server connection status changed
     """
-    return EventSourceResponse(event_bus.subscribe())
+    return EventSourceResponse(
+        event_bus.subscribe(),
+        ping=15,  # Sends a comment line ": ping" every 15 seconds
+        media_type="text/event-stream"
+    )
 
 
 @router.get("/status")

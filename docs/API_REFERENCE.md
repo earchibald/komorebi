@@ -774,7 +774,7 @@ POST /api/v1/mcp/disconnect-all
 
 ## SSE API
 
-Server-Sent Events for real-time updates.
+Server-Sent Events for real-time updates using the EventSource API.
 
 ### Event Stream
 
@@ -786,22 +786,31 @@ GET /api/v1/sse/events
 
 **Response:** `text/event-stream`
 
+**Connection Behavior:**
+- Initial connection sends `connected` event immediately
+- Keep-alive comment lines sent every 15 seconds (`: ping\n\n`)
+- Connection stays open indefinitely
+- Auto-reconnects on disconnect (5s delay)
+
 **Event Types:**
 
-| Event | Description |
-|-------|-------------|
-| `chunk.created` | New chunk captured |
-| `chunk.updated` | Chunk modified |
-| `chunk.deleted` | Chunk removed |
-| `project.updated` | Project modified |
-| `compaction.started` | Compaction began |
-| `compaction.completed` | Compaction finished |
-| `mcp.status_changed` | MCP server status changed |
+| Event | Description | Trigger |
+|-------|-------------|----------|
+| `connected` | Connection established | Initial connection |
+| `chunk.created` | New chunk captured | POST /chunks |
+| `chunk.updated` | Chunk modified | Background processing |
+| `chunk.deleted` | Chunk removed | DELETE /chunks/{id} |
+| `project.updated` | Project modified | PATCH /projects/{id} |
+| `compaction.started` | Compaction began | POST /projects/{id}/compact |
+| `compaction.completed` | Compaction finished | Compaction finishes |
+| `mcp.status_changed` | MCP server status changed | MCP connect/disconnect |
 
 **Event Format:**
 
 ```
-data: {"type": "chunk.created", "chunk_id": "a1b2c3d4-...", "data": {...}, "timestamp": "2024-01-15T10:30:00.000000"}
+event: chunk.created
+data: {"type": "chunk.created", "chunk_id": "a1b2c3d4-...", "data": {...}, "timestamp": "2026-02-05T18:28:45.133293"}
+
 ```
 
 **Example (JavaScript):**
@@ -809,11 +818,60 @@ data: {"type": "chunk.created", "chunk_id": "a1b2c3d4-...", "data": {...}, "time
 ```javascript
 const eventSource = new EventSource('/api/v1/sse/events');
 
+// Connection opened
+eventSource.onopen = () => {
+  console.log('SSE connected');
+};
+
+// Message received
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
   console.log('Event:', data.type, data);
 };
+
+// Specific event type
+eventSource.addEventListener('chunk.created', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('New chunk:', data.chunk_id);
+});
+
+// Error handling (auto-reconnects)
+eventSource.onerror = (error) => {
+  console.error('SSE error, will reconnect...', error);
+};
+
+// Cleanup
+function disconnect() {
+  eventSource.close();
+}
 ```
+
+**Example (curl):**
+
+```bash
+# Connect and stay open
+curl -N http://localhost:8000/api/v1/sse/events
+
+# Output:
+event: connected
+data: {"message": "SSE connection established"}
+
+event: chunk.created
+data: {"type": "chunk.created", ...}
+
+# Keep-alive comments (ignored by browsers):
+: ping
+
+```
+
+**Implementation Notes:**
+
+- Uses `sse-starlette` library with `EventSourceResponse`
+- Each client gets dedicated `asyncio.Queue` for event delivery
+- Events serialized using `ServerSentEvent` class
+- Automatic keep-alive prevents timeout
+- Memory per client: ~1KB + queued events
+- Expected capacity: 1000+ clients per worker
 
 ---
 

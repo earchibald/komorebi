@@ -7,6 +7,7 @@ A cognitive infrastructure service providing:
 - Real-time SSE streaming
 """
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -14,6 +15,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api import chunks_router, projects_router, mcp_router, sse_router
 from .db import init_db
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 
 @asynccontextmanager
