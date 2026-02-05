@@ -542,4 +542,13 @@ cd frontend && npm test
 
 ---
 
+## Related Documentation
+
+- [Getting Started](./GETTING_STARTED.md) - Installation and usage
+- [API Reference](./API_REFERENCE.md) - Complete API documentation
+- [Architecture](./ARCHITECTURE.md) - Technical deep dive
+- [Test Manifest](./TEST_MANIFEST.md) - Testing documentation
+
+---
+
 *Thank you for contributing to Komorebi! Your help makes this project better for everyone.*

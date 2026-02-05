@@ -699,4 +699,22 @@ docker-compose restart backend
 
 ---
 
-*For configuration details, see [CONFIGURATION.md](./CONFIGURATION.md). For architecture overview, see [ARCHITECTURE.md](./ARCHITECTURE.md).*
+## Quick Start Commands
+
+```bash
+# Development
+python -m cli.main serve --reload
+
+# Production (local)
+gunicorn backend.app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+
+# Docker
+docker-compose up -d
+
+# Health check
+curl http://localhost:8000/health
+```
+
+---
+
+*For configuration details, see [CONFIGURATION.md](./CONFIGURATION.md). For architecture overview, see [ARCHITECTURE.md](./ARCHITECTURE.md). For security, see [SECURITY.md](./SECURITY.md).*
