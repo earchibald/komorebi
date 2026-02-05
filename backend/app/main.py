@@ -1,0 +1,67 @@
+"""Komorebi Backend - Main FastAPI Application.
+
+A cognitive infrastructure service providing:
+- Fast chunk capture and processing
+- Recursive summarization and context management
+- MCP server aggregation
+- Real-time SSE streaming
+"""
+
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .api import chunks_router, projects_router, mcp_router, sse_router
+from .db import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan handler for startup/shutdown."""
+    # Startup
+    await init_db()
+    yield
+    # Shutdown
+    from .mcp import mcp_registry
+    await mcp_registry.disconnect_all()
+
+
+app = FastAPI(
+    title="Komorebi",
+    description="Cognitive infrastructure for capture, compaction, and context management",
+    version="0.1.0",
+    lifespan=lifespan,
+)
+
+# CORS configuration for frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(chunks_router, prefix="/api/v1")
+app.include_router(projects_router, prefix="/api/v1")
+app.include_router(mcp_router, prefix="/api/v1")
+app.include_router(sse_router, prefix="/api/v1")
+
+
+@app.get("/")
+async def root():
+    """Root endpoint with service information."""
+    return {
+        "name": "Komorebi",
+        "version": "0.1.0",
+        "description": "Cognitive infrastructure service",
+        "docs": "/docs",
+    }
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint."""
+    return {"status": "healthy"}

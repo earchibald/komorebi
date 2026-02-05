@@ -1,0 +1,265 @@
+"""Repository pattern for data access.
+
+Provides clean abstractions over database operations,
+enabling easy testing and potential backend swaps.
+"""
+
+from datetime import datetime
+from typing import Optional
+from uuid import UUID
+
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
+from ..models import Project, ProjectCreate, ProjectUpdate
+from .database import ChunkTable, ProjectTable
+
+
+class ChunkRepository:
+    """Repository for Chunk operations."""
+    
+    def __init__(self, session: AsyncSession):
+        self.session = session
+    
+    async def create(self, chunk_create: ChunkCreate) -> Chunk:
+        """Create a new chunk from capture data."""
+        chunk = Chunk(
+            content=chunk_create.content,
+            project_id=chunk_create.project_id,
+            tags=chunk_create.tags,
+            source=chunk_create.source,
+            status=ChunkStatus.INBOX,
+        )
+        
+        db_chunk = ChunkTable(
+            id=str(chunk.id),
+            content=chunk.content,
+            summary=chunk.summary,
+            project_id=str(chunk.project_id) if chunk.project_id else None,
+            tags=chunk.tags,
+            status=chunk.status.value,
+            source=chunk.source,
+            token_count=chunk.token_count,
+            created_at=chunk.created_at,
+            updated_at=chunk.updated_at,
+        )
+        
+        self.session.add(db_chunk)
+        await self.session.commit()
+        await self.session.refresh(db_chunk)
+        
+        return chunk
+    
+    async def get(self, chunk_id: UUID) -> Optional[Chunk]:
+        """Get a chunk by ID."""
+        result = await self.session.execute(
+            select(ChunkTable).where(ChunkTable.id == str(chunk_id))
+        )
+        db_chunk = result.scalar_one_or_none()
+        
+        if not db_chunk:
+            return None
+        
+        return self._to_model(db_chunk)
+    
+    async def list(
+        self,
+        status: Optional[ChunkStatus] = None,
+        project_id: Optional[UUID] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[Chunk]:
+        """List chunks with optional filters."""
+        query = select(ChunkTable)
+        
+        if status:
+            query = query.where(ChunkTable.status == status.value)
+        if project_id:
+            query = query.where(ChunkTable.project_id == str(project_id))
+        
+        query = query.order_by(ChunkTable.created_at.desc())
+        query = query.limit(limit).offset(offset)
+        
+        result = await self.session.execute(query)
+        return [self._to_model(row) for row in result.scalars().all()]
+    
+    async def update(self, chunk_id: UUID, chunk_update: ChunkUpdate) -> Optional[Chunk]:
+        """Update a chunk."""
+        result = await self.session.execute(
+            select(ChunkTable).where(ChunkTable.id == str(chunk_id))
+        )
+        db_chunk = result.scalar_one_or_none()
+        
+        if not db_chunk:
+            return None
+        
+        update_data = chunk_update.model_dump(exclude_unset=True)
+        
+        for field, value in update_data.items():
+            if field == "status" and value:
+                setattr(db_chunk, field, value.value if hasattr(value, 'value') else value)
+            elif field == "project_id" and value:
+                setattr(db_chunk, field, str(value))
+            else:
+                setattr(db_chunk, field, value)
+        
+        db_chunk.updated_at = datetime.utcnow()
+        
+        await self.session.commit()
+        await self.session.refresh(db_chunk)
+        
+        return self._to_model(db_chunk)
+    
+    async def delete(self, chunk_id: UUID) -> bool:
+        """Delete a chunk."""
+        result = await self.session.execute(
+            select(ChunkTable).where(ChunkTable.id == str(chunk_id))
+        )
+        db_chunk = result.scalar_one_or_none()
+        
+        if not db_chunk:
+            return False
+        
+        await self.session.delete(db_chunk)
+        await self.session.commit()
+        return True
+    
+    async def count(self, status: Optional[ChunkStatus] = None) -> int:
+        """Count chunks, optionally filtered by status."""
+        query = select(func.count(ChunkTable.id))
+        if status:
+            query = query.where(ChunkTable.status == status.value)
+        result = await self.session.execute(query)
+        return result.scalar_one()
+    
+    def _to_model(self, db_chunk: ChunkTable) -> Chunk:
+        """Convert database row to Pydantic model."""
+        return Chunk(
+            id=UUID(db_chunk.id),
+            content=db_chunk.content,
+            summary=db_chunk.summary,
+            project_id=UUID(db_chunk.project_id) if db_chunk.project_id else None,
+            tags=db_chunk.tags or [],
+            status=ChunkStatus(db_chunk.status),
+            source=db_chunk.source,
+            token_count=db_chunk.token_count,
+            created_at=db_chunk.created_at,
+            updated_at=db_chunk.updated_at,
+        )
+
+
+class ProjectRepository:
+    """Repository for Project operations."""
+    
+    def __init__(self, session: AsyncSession):
+        self.session = session
+    
+    async def create(self, project_create: ProjectCreate) -> Project:
+        """Create a new project."""
+        project = Project(
+            name=project_create.name,
+            description=project_create.description,
+        )
+        
+        db_project = ProjectTable(
+            id=str(project.id),
+            name=project.name,
+            description=project.description,
+            context_summary=project.context_summary,
+            chunk_count=project.chunk_count,
+            created_at=project.created_at,
+            updated_at=project.updated_at,
+        )
+        
+        self.session.add(db_project)
+        await self.session.commit()
+        await self.session.refresh(db_project)
+        
+        return project
+    
+    async def get(self, project_id: UUID) -> Optional[Project]:
+        """Get a project by ID."""
+        result = await self.session.execute(
+            select(ProjectTable).where(ProjectTable.id == str(project_id))
+        )
+        db_project = result.scalar_one_or_none()
+        
+        if not db_project:
+            return None
+        
+        return self._to_model(db_project)
+    
+    async def list(self, limit: int = 100, offset: int = 0) -> list[Project]:
+        """List all projects."""
+        query = select(ProjectTable).order_by(ProjectTable.created_at.desc())
+        query = query.limit(limit).offset(offset)
+        
+        result = await self.session.execute(query)
+        return [self._to_model(row) for row in result.scalars().all()]
+    
+    async def update(self, project_id: UUID, project_update: ProjectUpdate) -> Optional[Project]:
+        """Update a project."""
+        result = await self.session.execute(
+            select(ProjectTable).where(ProjectTable.id == str(project_id))
+        )
+        db_project = result.scalar_one_or_none()
+        
+        if not db_project:
+            return None
+        
+        update_data = project_update.model_dump(exclude_unset=True)
+        
+        for field, value in update_data.items():
+            setattr(db_project, field, value)
+        
+        db_project.updated_at = datetime.utcnow()
+        
+        await self.session.commit()
+        await self.session.refresh(db_project)
+        
+        return self._to_model(db_project)
+    
+    async def delete(self, project_id: UUID) -> bool:
+        """Delete a project."""
+        result = await self.session.execute(
+            select(ProjectTable).where(ProjectTable.id == str(project_id))
+        )
+        db_project = result.scalar_one_or_none()
+        
+        if not db_project:
+            return False
+        
+        await self.session.delete(db_project)
+        await self.session.commit()
+        return True
+    
+    async def update_chunk_count(self, project_id: UUID) -> None:
+        """Update the chunk count for a project."""
+        count_result = await self.session.execute(
+            select(func.count(ChunkTable.id)).where(
+                ChunkTable.project_id == str(project_id)
+            )
+        )
+        count = count_result.scalar_one()
+        
+        result = await self.session.execute(
+            select(ProjectTable).where(ProjectTable.id == str(project_id))
+        )
+        db_project = result.scalar_one_or_none()
+        
+        if db_project:
+            db_project.chunk_count = count
+            await self.session.commit()
+    
+    def _to_model(self, db_project: ProjectTable) -> Project:
+        """Convert database row to Pydantic model."""
+        return Project(
+            id=UUID(db_project.id),
+            name=db_project.name,
+            description=db_project.description,
+            context_summary=db_project.context_summary,
+            chunk_count=db_project.chunk_count,
+            created_at=db_project.created_at,
+            updated_at=db_project.updated_at,
+        )
