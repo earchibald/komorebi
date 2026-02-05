@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db import get_db, ChunkRepository, ProjectRepository
+from ..db import get_db, ChunkRepository, ProjectRepository, EntityRepository
 from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
 from ..core import CompactorService
 from ..core.events import event_bus, ChunkEvent, EventType
@@ -26,6 +26,11 @@ async def get_chunk_repo(db: AsyncSession = Depends(get_db)) -> ChunkRepository:
 async def get_project_repo(db: AsyncSession = Depends(get_db)) -> ProjectRepository:
     """Dependency to get project repository."""
     return ProjectRepository(db)
+
+
+async def get_entity_repo(db: AsyncSession = Depends(get_db)) -> EntityRepository:
+    """Dependency to get entity repository."""
+    return EntityRepository(db)
 
 
 @router.post("", response_model=Chunk, status_code=201)
@@ -69,7 +74,8 @@ async def _process_chunk_background(chunk_id: UUID) -> None:
     async with async_session() as session:
         chunk_repo = ChunkRepository(session)
         project_repo = ProjectRepository(session)
-        compactor = CompactorService(chunk_repo, project_repo)
+        entity_repo = EntityRepository(session)
+        compactor = CompactorService(chunk_repo, project_repo, entity_repo)
         
         result = await compactor.process_chunk(chunk_id)
         
@@ -185,9 +191,10 @@ async def process_inbox(
     batch_size: int = 10,
     chunk_repo: ChunkRepository = Depends(get_chunk_repo),
     project_repo: ProjectRepository = Depends(get_project_repo),
+    entity_repo: EntityRepository = Depends(get_entity_repo),
 ) -> dict:
     """Manually trigger processing of inbox chunks."""
-    compactor = CompactorService(chunk_repo, project_repo)
+    compactor = CompactorService(chunk_repo, project_repo, entity_repo)
     processed = await compactor.process_inbox(batch_size)
     
     return {

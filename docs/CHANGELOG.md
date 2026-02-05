@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-02-05
+
+### Added
+- **Documentation Governance Rule** - Pre-1.0.0 requirement to keep CURRENT_STATUS.md and entire documentation suite up to date
+- Added documentation maintenance guidelines to .github/copilot-instructions.md
+
+### Changed
+- Updated governance to emphasize documentation synchronization with implementation
+
+---
+
 ## [0.2.0] - 2026-02-05
 
 ### Added

@@ -13,7 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
 from ..models import Project, ProjectCreate, ProjectUpdate
-from .database import ChunkTable, ProjectTable
+from ..models import Entity, EntityCreate, EntityType
+from .database import ChunkTable, ProjectTable, EntityTable
 
 
 class ChunkRepository:
@@ -167,6 +168,8 @@ class ProjectRepository:
             name=project.name,
             description=project.description,
             context_summary=project.context_summary,
+            compaction_depth=project.compaction_depth,
+            last_compaction_at=project.last_compaction_at,
             chunk_count=project.chunk_count,
             created_at=project.created_at,
             updated_at=project.updated_at,
@@ -259,7 +262,76 @@ class ProjectRepository:
             name=db_project.name,
             description=db_project.description,
             context_summary=db_project.context_summary,
+            compaction_depth=db_project.compaction_depth or 0,
+            last_compaction_at=db_project.last_compaction_at or db_project.updated_at,
             chunk_count=db_project.chunk_count,
             created_at=db_project.created_at,
             updated_at=db_project.updated_at,
+        )
+
+
+class EntityRepository:
+    """Repository for Entity operations."""
+    
+    def __init__(self, session: AsyncSession):
+        self.session = session
+    
+    async def create_many(self, entities: list[EntityCreate]) -> list[Entity]:
+        """Create multiple entities in a single transaction."""
+        if not entities:
+            return []
+        
+        db_entities = []
+        for entity in entities:
+            db_entity = EntityTable(
+                chunk_id=str(entity.chunk_id),
+                project_id=str(entity.project_id),
+                entity_type=entity.entity_type.value,
+                value=entity.value,
+                confidence=entity.confidence,
+                context_snippet=entity.context_snippet,
+                created_at=datetime.utcnow(),
+            )
+            db_entities.append(db_entity)
+            self.session.add(db_entity)
+        
+        await self.session.commit()
+        for db_entity in db_entities:
+            await self.session.refresh(db_entity)
+        
+        return [self._to_model(db_entity) for db_entity in db_entities]
+    
+    async def list_by_project(
+        self,
+        project_id: UUID,
+        entity_type: Optional[EntityType] = None,
+        min_confidence: float = 0.0,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[Entity]:
+        """List entities for a project with optional filters."""
+        query = select(EntityTable).where(EntityTable.project_id == str(project_id))
+        
+        if entity_type:
+            query = query.where(EntityTable.entity_type == entity_type.value)
+        if min_confidence > 0.0:
+            query = query.where(EntityTable.confidence >= min_confidence)
+        
+        query = query.order_by(EntityTable.created_at.desc())
+        query = query.limit(limit).offset(offset)
+        
+        result = await self.session.execute(query)
+        return [self._to_model(row) for row in result.scalars().all()]
+    
+    def _to_model(self, db_entity: EntityTable) -> Entity:
+        """Convert database row to Pydantic model."""
+        return Entity(
+            id=db_entity.id,
+            chunk_id=UUID(db_entity.chunk_id),
+            project_id=UUID(db_entity.project_id),
+            entity_type=EntityType(db_entity.entity_type),
+            value=db_entity.value,
+            confidence=db_entity.confidence,
+            context_snippet=db_entity.context_snippet,
+            created_at=db_entity.created_at,
         )

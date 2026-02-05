@@ -11,10 +11,12 @@ from .chunks import router as chunks_router
 from .projects import router as projects_router
 from .mcp import router as mcp_router
 from .sse import router as sse_router
+from .entities import router as entities_router
 
 __all__ = [
     "chunks_router",
     "projects_router", 
     "mcp_router",
     "sse_router",
+    "entities_router",
 ]

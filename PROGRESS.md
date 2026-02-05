@@ -53,6 +53,62 @@
 - ✅ hammer_gen.py runs successfully against backend
 - ✅ All 53 requests successful, 0 failures
 
+### Phase 6: Module 1 - Core Intelligence (Ollama Integration)
+- ✅ Added `ollama` dependency to pyproject.toml
+- ✅ Created `backend/app/core/ollama_client.py` with KomorebiLLM class
+  - Async AsyncClient initialization with host/model from environment
+  - `is_available()` health check
+  - `summarize()` method for LLM-powered text summarization
+  - `stream_summary()` for real-time UI feedback
+- ✅ Updated `backend/app/models/chunk.py` ChunkUpdate schema
+  - Added `token_count` field to ChunkUpdate
+- ✅ Integrated LLM into `backend/app/core/compactor.py`
+  - `process_chunk()` now uses KomorebiLLM for intelligent summaries (Map step)
+  - Graceful fallback to simple summarization if Ollama unavailable
+  - `compact_project()` now uses Map-Reduce pattern with LLM (Reduce step)
+  - System anchor injection to maintain context fidelity
+- ✅ API endpoints ready for testing:
+  - POST `/api/v1/chunks` → triggers background `process_chunk` via CompactorService
+  - POST `/api/v1/projects/{project_id}/compact` → triggers Map-Reduce compaction
+
+### Phase 7: Module 2 - Recursive Compaction & Entity Extraction
+- ✅ Database schema migration applied successfully
+  - Created `entities` table with indexes on chunk_id, project_id, entity_type
+  - Added `compaction_depth` and `last_compaction_at` columns to projects
+- ✅ Created Entity model (`backend/app/models/entity.py`)
+  - EntityType enum: ERROR, URL, TOOL_ID, DECISION, CODE_REF
+  - Entity and EntityCreate schemas
+- ✅ Extended Project model with compaction tracking
+  - `compaction_depth`: 0=Raw, 1=Summarized, 2=Meta-Summarized
+  - `last_compaction_at`: timestamp for scheduling
+- ✅ Enhanced Ollama client with JSON extraction
+  - `extract_entities()` method using Ollama's JSON mode
+  - Parses structured entity data from LLM responses
+- ✅ Integrated recursive compaction logic
+  - `recursive_reduce()` handles large contexts (>12KB threshold)
+  - Batching with configurable size (5 summaries per batch)
+  - Depth tracking prevents infinite loops
+- ✅ Entity extraction pipeline
+  - Non-blocking extraction after chunk processing
+  - Bulk entity creation via EntityRepository
+  - Filtering by type and confidence threshold
+- ✅ Added entity API endpoints
+  - GET `/api/v1/entities/projects/{project_id}` - list with filters
+  - GET `/api/v1/entities/projects/{project_id}/aggregations` - counts by type
+- ✅ Hammer explosion mode
+  - `--mode explosion` flag for context explosion testing
+  - Generates 50x 1KB chunks to force recursive compaction
+  - Verified 51/51 requests successful at 72 req/sec
+- ✅ Comprehensive test coverage
+  - 6 new Module 2 tests (entity CRUD, recursive reduce, compaction depth)
+  - All 27 tests passing (100% pass rate)
+  - Test fixtures for in-memory database testing
+- ✅ Documentation updates
+  - Added Ollama installation instructions to MODULE_1_VERIFICATION.md
+  - Added Ollama to GETTING_STARTED.md prerequisites
+  - Created MODULE_2_VERIFICATION.md with comprehensive testing guide
+  - Updated docs/README.md to reference verification guides
+
 ## Benchmark Results
 
 ```

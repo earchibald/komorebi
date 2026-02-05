@@ -34,6 +34,8 @@
 |----------|-------------|
 | [**TEST_MANIFEST.md**](./TEST_MANIFEST.md) | All tests including human verification |
 | [**PEDAGOGY_PLAYWRIGHT.md**](./PEDAGOGY_PLAYWRIGHT.md) | UI testing framework guide |
+| [**MODULE_1_VERIFICATION.md**](./MODULE_1_VERIFICATION.md) | Ollama Integration verification guide |
+| [**MODULE_2_VERIFICATION.md**](./MODULE_2_VERIFICATION.md) | Recursive Compaction & Entity Extraction verification guide |
 
 ### Operations
 

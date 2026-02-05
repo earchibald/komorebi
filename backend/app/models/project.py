@@ -24,6 +24,8 @@ class ProjectUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255, description="Updated name")
     description: Optional[str] = Field(None, description="Updated description")
     context_summary: Optional[str] = Field(None, description="AI-generated context summary")
+    compaction_depth: Optional[int] = Field(None, description="Compaction depth level")
+    last_compaction_at: Optional[datetime] = Field(None, description="Last compaction timestamp")
 
 
 class Project(BaseModel):
@@ -37,6 +39,11 @@ class Project(BaseModel):
     name: str = Field(..., description="Project name")
     description: Optional[str] = Field(None, description="Project description")
     context_summary: Optional[str] = Field(None, description="Compacted context from all chunks")
+    compaction_depth: int = Field(default=0, description="0=Raw, 1=Summarized, 2=Meta-Summarized")
+    last_compaction_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        description="Last compaction timestamp",
+    )
     chunk_count: int = Field(default=0, description="Number of chunks in this project")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Creation timestamp")
     updated_at: datetime = Field(default_factory=datetime.utcnow, description="Last update timestamp")

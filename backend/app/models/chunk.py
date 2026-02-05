@@ -43,6 +43,7 @@ class ChunkUpdate(BaseModel):
     tags: Optional[list[str]] = Field(None, description="Updated tags")
     status: Optional[ChunkStatus] = Field(None, description="Updated status")
     summary: Optional[str] = Field(None, description="AI-generated summary")
+    token_count: Optional[int] = Field(None, description="Estimated token count")
 
 
 class Chunk(BaseModel):

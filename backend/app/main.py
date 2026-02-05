@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import chunks_router, projects_router, mcp_router, sse_router
+from .api import chunks_router, projects_router, mcp_router, sse_router, entities_router
 from .db import init_db
 
 # Configure logging
@@ -55,6 +55,7 @@ app.include_router(chunks_router, prefix="/api/v1")
 app.include_router(projects_router, prefix="/api/v1")
 app.include_router(mcp_router, prefix="/api/v1")
 app.include_router(sse_router, prefix="/api/v1")
+app.include_router(entities_router, prefix="/api/v1")
 
 
 @app.get("/")

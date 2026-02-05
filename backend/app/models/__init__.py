@@ -8,6 +8,7 @@ This module provides the core data models following Pydantic v2 conventions:
 
 from .chunk import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
 from .project import Project, ProjectCreate, ProjectUpdate
+from .entity import Entity, EntityCreate, EntityType
 from .mcp import MCPServerConfig, MCPServerStatus
 
 __all__ = [
@@ -18,6 +19,9 @@ __all__ = [
     "Project",
     "ProjectCreate",
     "ProjectUpdate",
+    "Entity",
+    "EntityCreate",
+    "EntityType",
     "MCPServerConfig",
     "MCPServerStatus",
 ]

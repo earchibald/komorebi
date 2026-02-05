@@ -96,6 +96,17 @@ def generate_random_content() -> str:
     return content
 
 
+def generate_explosion_content(index: int, target_size: int = 1024) -> str:
+    """Generate padded content to force context explosion."""
+    base = (
+        f"Log entry {index}: pipeline spike detected. "
+        f"[ERROR] Traceback {index} at worker.py:{index}. "
+        "Retrying with exponential backoff. "
+    )
+    padding_size = max(0, target_size - len(base))
+    return base + ("x" * padding_size)
+
+
 def generate_random_tags() -> list[str]:
     """Generate random tags."""
     available_tags = [
@@ -344,6 +355,92 @@ class KomorebiHammer:
         
         return result
 
+    async def run_explosion(
+        self,
+        num_chunks: int = 50,
+        concurrent_requests: int = 10,
+    ) -> HammerResult:
+        """Generate a burst of chunks for a single project to force recursion."""
+        print("💥 Komorebi Hammer - Explosion mode...")
+        print(f"   Chunks: {num_chunks}, Concurrency: {concurrent_requests}")
+        print()
+        
+        self.latencies = []
+        self.successes = 0
+        self.failures = 0
+        
+        start_time = time.perf_counter()
+        
+        print("🏥 Checking server health...")
+        if not await self.check_health():
+            print("❌ Server is not healthy!")
+            return HammerResult(
+                total_requests=1,
+                successful_requests=0,
+                failed_requests=1,
+                total_time_seconds=0,
+                requests_per_second=0,
+                avg_latency_ms=0,
+                min_latency_ms=0,
+                max_latency_ms=0,
+            )
+        print("✅ Server is healthy")
+        print()
+        
+        project_id = await self.create_project(
+            name="Hammer Explosion Project",
+            description="Force recursive compaction with 50 chunks",
+        )
+        if not project_id:
+            print("❌ Failed to create explosion project")
+            return HammerResult(
+                total_requests=1,
+                successful_requests=0,
+                failed_requests=1,
+                total_time_seconds=0,
+                requests_per_second=0,
+                avg_latency_ms=0,
+                min_latency_ms=0,
+                max_latency_ms=0,
+            )
+        
+        print("📝 Capturing explosion chunks...")
+        
+        async def capture_explosion_chunk(index: int) -> bool:
+            content = generate_explosion_content(index)
+            return await self.capture_chunk(content, project_id, tags=["explosion"])
+        
+        for batch_start in range(0, num_chunks, concurrent_requests):
+            batch_size = min(concurrent_requests, num_chunks - batch_start)
+            tasks = [
+                capture_explosion_chunk(i)
+                for i in range(batch_start, batch_start + batch_size)
+            ]
+            await asyncio.gather(*tasks)
+            progress = min(batch_start + batch_size, num_chunks)
+            print(f"   Progress: {progress}/{num_chunks} chunks")
+        
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        
+        total_requests = self.successes + self.failures
+        rps = total_requests / total_time if total_time > 0 else 0
+        
+        avg_latency = sum(self.latencies) / len(self.latencies) if self.latencies else 0
+        min_latency = min(self.latencies) if self.latencies else 0
+        max_latency = max(self.latencies) if self.latencies else 0
+        
+        return HammerResult(
+            total_requests=total_requests,
+            successful_requests=self.successes,
+            failed_requests=self.failures,
+            total_time_seconds=total_time,
+            requests_per_second=rps,
+            avg_latency_ms=avg_latency,
+            min_latency_ms=min_latency,
+            max_latency_ms=max_latency,
+        )
+
 
 async def main():
     parser = argparse.ArgumentParser(description="Komorebi Hammer - Load testing tool")
@@ -370,15 +467,27 @@ async def main():
         default=5,
         help="Number of concurrent requests",
     )
+    parser.add_argument(
+        "--mode",
+        choices=["standard", "explosion"],
+        default="standard",
+        help="Run mode: standard benchmark or explosion test",
+    )
     
     args = parser.parse_args()
     
     hammer = KomorebiHammer(args.base_url)
-    result = await hammer.run_benchmark(
-        num_projects=args.projects,
-        num_chunks=args.chunks,
-        concurrent_requests=args.concurrency,
-    )
+    if args.mode == "explosion":
+        result = await hammer.run_explosion(
+            num_chunks=args.chunks,
+            concurrent_requests=args.concurrency,
+        )
+    else:
+        result = await hammer.run_benchmark(
+            num_projects=args.projects,
+            num_chunks=args.chunks,
+            concurrent_requests=args.concurrency,
+        )
     
     print(result)
     
