@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { chunks, loading, fetchChunks } from '../store'
 import type { Chunk } from '../store'
 
@@ -7,13 +7,16 @@ type StatusFilter = 'all' | 'inbox' | 'processed' | 'compacted' | 'archived'
 export function ChunkList() {
   const [filter, setFilter] = useState<StatusFilter>('all')
 
+  // Fetch ALL chunks once on mount - no status filter
   useEffect(() => {
-    fetchChunks(filter === 'all' ? undefined : filter)
-  }, [filter])
+    fetchChunks(undefined, 500) // Fetch up to 500 chunks
+  }, []) // Only runs once on mount
 
-  const filteredChunks = filter === 'all' 
-    ? chunks.value 
-    : chunks.value.filter(c => c.status === filter)
+  // Client-side filtering - instant, no network call
+  const filteredChunks = useMemo(() => {
+    if (filter === 'all') return chunks.value
+    return chunks.value.filter(c => c.status === filter)
+  }, [chunks.value, filter])
 
   return (
     <div>
@@ -30,7 +33,8 @@ export function ChunkList() {
         ))}
       </div>
 
-      {loading.value && filteredChunks.length === 0 ? (
+      {/* Show loader only if we have no data at all and are loading */}
+      {loading.value && chunks.value.length === 0 ? (
         <div className="loading">Loading chunks...</div>
       ) : filteredChunks.length === 0 ? (
         <div className="empty-state">

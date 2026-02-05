@@ -117,6 +117,11 @@ if (cachedStats) {
 
 // Actions
 export async function fetchChunks(status?: string, limit = 100) {
+  // NOTE: New pattern (Feb 2026) - Fetch-All-Filter-Client
+  // Components should call fetchChunks(undefined, 500) to get all chunks,
+  // then filter client-side for instant tab switching.
+  // Only pass a status filter if you specifically need server-side filtering.
+  
   // Debounce: return existing promise if fetch is in progress
   if (fetchChunksPromise) return fetchChunksPromise
   
