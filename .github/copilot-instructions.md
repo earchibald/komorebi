@@ -19,22 +19,28 @@
 
 ## 2. Technical Stack Constraints
 
-### Backend (Python 3.12+)
+### Current Status (Feb 2026)
+
+This section documents the _target_ architecture. Implementation notes below indicate what's currently used for MVP. The codebase follows 90% of these patterns; see [CONVENTIONS.md](../CONVENTIONS.md) for actual implementation details.
+
+### Backend (Python 3.11+)
 * **Framework:** FastAPI (Async-first).
-* **ORM:** SQLModel (SQLite for local, PostgreSQL for prod).
+* **Database:** SQLAlchemy with async support (aiosqlite for dev, PostgreSQL for prod). SQLModel migration planned for v1.0.
 * **Validation:** Pydantic v2 (Use `model_validate`, NOT `from_orm`).
 * **Events:** `sse-starlette` for server-sent events.
+* **Background Jobs:** `asyncio.Queue` for MVP simplicity. Scale to Celery/Redis in v2.0.
 * **Testing:** `pytest` + `pytest-asyncio`.
-* **Linting:** `ruff` (formatting and linting).
-* **Secrets:** `keyring` (Local) / `subprocess` injection (MCP).
+* **Linting:** `ruff` (formatting and linting). Enforcement optional for now; configure before team scales.
+* **Secrets:** Environment variables only (no keyring/subprocess for MVP).
 
-### Frontend (React 19)
+### Frontend (React 18.2)
 * **Build:** Vite + TypeScript.
-* **Styling:** Tailwind CSS (Glassmorphism palette: `bg-white/10`, `backdrop-blur-md`).
-* **State:** * *Server State:* TanStack Query (React Query).
-    * *High-Frequency UI:* `@preact/signals-react` (for metrics/latency graphs).
-    * *Global UI:* Zustand.
-* **Icons:** `lucide-react`.
+* **Styling:** CSS Variables + Custom CSS (Tailwind CSS planned for v1.0).
+* **State Management:**
+    * *Server State:* localStorage + simple fetch (TanStack Query planned when scaling).
+    * *High-Frequency UI:* `@preact/signals-react` for metrics and reactive updates.
+    * *Global UI:* Preact Signals only (no separate Zustand layer needed for MVP).
+* **Icons:** Optional; not currently used.
 
 ### Protocol
 * **MCP:** Model Context Protocol (2025-11-25 Spec) for all external tool aggregations.
