@@ -1,9 +1,9 @@
 ---
 name: debug-issue
-description: Systematic debugging workflow for complex issues using hypothesis-driven approach
-tier: premium
-model: opus
-version: 1.0.0
+description: Systematic debugging workflow for complex issues using hypothesis-driven approach. Use for race conditions, async bugs, performance issues.
+agent: agent
+model: Claude Opus 4
+tools: ['search/codebase', 'editFiles', 'runTerminalCommand']
 ---
 
 # Debug Issue

@@ -1,7 +1,32 @@
 # Komorebi: Current Status & Next Steps
 
 **Date:** February 5, 2026  
-**Version:** 0.2.2 (Pre-1.0.0 Development)
+**Version:** 0.2.3 (Pre-1.0.0 Development)
+
+---
+
+## 🆕 Latest Update: VS Code Prompts & Skills
+
+### What's New
+
+**VS Code Custom Prompts:** 5 prompts for common workflows
+- `/implement-feature` - TDD-driven feature development
+- `/write-tests` - Comprehensive test generation
+- `/debug-issue` - Systematic debugging (Premium tier)
+- `/review-pr` - Security-focused PR reviews
+- `/update-docs` - Documentation sync (Economy tier)
+
+**Agent Skills:** 2 skills with scripts
+- `feature-implementer` - Full-stack scaffold generator
+- `code-formatter` - Ruff formatting commands
+
+**Telemetry:** Usage and cost tracking
+- `scripts/telemetry/telemetry_tracker.py`
+- Log, report, and cost analysis commands
+
+**Documentation:**
+- [PROMPT_GUIDE.md](./PROMPT_GUIDE.md) - Quick reference
+- [PROMPTS_AND_SKILLS_PROPOSAL.md](./PROMPTS_AND_SKILLS_PROPOSAL.md) - Full strategy
 
 ---
 

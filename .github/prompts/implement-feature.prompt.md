@@ -1,9 +1,8 @@
 ---
 name: implement-feature
-description: Fast-track feature implementation from specification to working code using TDD workflow
-tier: standard
-model: auto
-version: 1.0.0
+description: Fast-track feature implementation from specification to working code using TDD workflow. Use for new CRUD features, API endpoints, React components.
+agent: agent
+tools: ['search/codebase', 'editFiles']
 ---
 
 # Implement Feature

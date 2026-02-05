@@ -1,9 +1,8 @@
 ---
 name: write-tests
-description: Generate comprehensive test suites for existing code following pytest and async patterns
-tier: standard
-model: auto
-version: 1.0.0
+description: Generate comprehensive test suites for existing code following pytest and async patterns. Use for unit tests, integration tests, API tests.
+agent: agent
+tools: ['search/codebase', 'editFiles']
 ---
 
 # Write Tests

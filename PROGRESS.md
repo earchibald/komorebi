@@ -53,7 +53,25 @@
 - ✅ hammer_gen.py runs successfully against backend
 - ✅ All 53 requests successful, 0 failures
 
-### Phase 6: Module 1 - Core Intelligence (Ollama Integration)
+### Phase 6: Developer Experience - VS Code Prompts & Skills
+- ✅ Created VS Code custom prompts (`.github/prompts/`)
+  - `implement-feature.prompt.md` - Full-stack TDD workflow (Standard tier)
+  - `write-tests.prompt.md` - Pytest patterns and coverage (Standard tier)
+  - `debug-issue.prompt.md` - 6-phase debugging (Premium/Opus tier)
+  - `review-pr.prompt.md` - Comprehensive PR review (Standard tier)
+  - `update-docs.prompt.md` - Documentation governance (Economy/Haiku tier)
+- ✅ Created agent skills (`.github/skills/`)
+  - `feature-implementer` - Scaffold generator with validation scripts
+  - `code-formatter` - Ruff formatting and linting commands
+- ✅ Created telemetry infrastructure (`scripts/telemetry/`)
+  - Usage tracking with cost analysis
+  - Report generation by time period
+- ✅ Comprehensive documentation
+  - `docs/PROMPTS_AND_SKILLS_PROPOSAL.md` - Full strategy document
+  - `docs/PROMPTS_SKILLS_AUDIT.md` - Audit and recommendations
+  - `docs/PROMPT_GUIDE.md` - Usage guide for all prompts/skills
+
+### Phase 7: Module 1 - Core Intelligence (Ollama Integration)
 - ✅ Added `ollama` dependency to pyproject.toml
 - ✅ Created `backend/app/core/ollama_client.py` with KomorebiLLM class
   - Async AsyncClient initialization with host/model from environment

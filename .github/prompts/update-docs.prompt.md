@@ -1,9 +1,9 @@
 ---
 name: update-docs
-description: Synchronize documentation with code changes following Pre-1.0.0 governance requirements
-tier: economy
-model: haiku
-version: 1.0.0
+description: Synchronize documentation with code changes following Pre-1.0.0 governance requirements. Use after implementing features or fixing bugs.
+agent: agent
+model: Claude 3.5 Haiku
+tools: ['editFiles']
 ---
 
 # Update Documentation
