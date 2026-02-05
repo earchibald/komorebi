@@ -254,7 +254,7 @@ The `playwright.config.ts` automatically:
 ```typescript
 webServer: [
   {
-    command: 'cd .. && python -m cli.main serve',
+    command: 'cd .. && komorebi serve',
     url: 'http://localhost:8000/health',
   },
   {

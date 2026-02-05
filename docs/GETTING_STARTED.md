@@ -125,6 +125,15 @@ This installs:
 - httpx (HTTP client)
 - pytest (testing)
 
+**After installation, the `komorebi` CLI command becomes available:**
+
+```bash
+# Verify installation
+komorebi --help
+```
+
+> ⚠️ **Important:** If you see `ModuleNotFoundError: No module named 'cli'`, you need to run `pip install -e ".[dev]"` first. See [Troubleshooting](TROUBLESHOOTING.md#modulenotfounderror-no-module-named-cli) for details.
+
 ### 3. (Optional) Install Frontend Dependencies
 
 ```bash
@@ -141,7 +150,7 @@ cd ..
 
 ```bash
 # Using the CLI
-python -m cli.main serve
+komorebi serve
 
 # Or directly with uvicorn
 uvicorn backend.app.main:app --reload
@@ -165,7 +174,7 @@ curl -X POST http://localhost:8000/api/v1/chunks \
   -d '{"content": "My first thought!", "source": "curl"}'
 
 # Using the CLI
-python -m cli.main capture "My first thought!"
+komorebi capture "My first thought!"
 ```
 
 ### View Your Chunks
@@ -175,7 +184,7 @@ python -m cli.main capture "My first thought!"
 curl http://localhost:8000/api/v1/chunks
 
 # Using the CLI
-python -m cli.main list
+komorebi list
 ```
 
 ---
@@ -274,7 +283,7 @@ The CLI is built with [Typer](https://typer.tiangolo.com/) and [Rich](https://ri
 ### Commands Overview
 
 ```bash
-python -m cli.main --help
+komorebi --help
 ```
 
 ### `capture` - Quick Capture
@@ -283,33 +292,33 @@ Instantly capture a thought to the inbox.
 
 ```bash
 # Basic capture
-python -m cli.main capture "Fix the login bug"
+komorebi capture "Fix the login bug"
 
 # With project association
-python -m cli.main capture "Add validation" --project <project-id>
+komorebi capture "Add validation" --project <project-id>
 
 # With tags
-python -m cli.main capture "Research Redis caching" --tags "research,backend"
+komorebi capture "Research Redis caching" --tags "research,backend"
 ```
 
 ### `list` - View Chunks
 
 ```bash
 # List all chunks (default: 20)
-python -m cli.main list
+komorebi list
 
 # Filter by status
-python -m cli.main list --status inbox
-python -m cli.main list --status processed
+komorebi list --status inbox
+komorebi list --status processed
 
 # Limit results
-python -m cli.main list --limit 50
+komorebi list --limit 50
 ```
 
 ### `stats` - View Statistics
 
 ```bash
-python -m cli.main stats
+komorebi stats
 ```
 
 Output:
@@ -330,26 +339,26 @@ Output:
 ### `projects` - List Projects
 
 ```bash
-python -m cli.main projects
+komorebi projects
 ```
 
 ### `compact` - Compact a Project
 
 ```bash
-python -m cli.main compact <project-id>
+komorebi compact <project-id>
 ```
 
 ### `serve` - Start the Server
 
 ```bash
 # Default settings
-python -m cli.main serve
+komorebi serve
 
 # Custom host and port
-python -m cli.main serve --host 0.0.0.0 --port 9000
+komorebi serve --host 0.0.0.0 --port 9000
 
 # With auto-reload (development)
-python -m cli.main serve --reload
+komorebi serve --reload
 ```
 
 ### Environment Variables
@@ -516,7 +525,7 @@ For complete confidence, run all tests HT-1 through HT-12.
 lsof -i :8000
 
 # Try a different port
-python -m cli.main serve --port 9000
+komorebi serve --port 9000
 ```
 
 ### Database Errors

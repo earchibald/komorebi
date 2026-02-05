@@ -329,7 +329,7 @@ Before running human tests, ensure:
 
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Run `python -m cli.main serve` | Server starts without errors | ☐ |
+| 1 | Run `komorebi serve` | Server starts without errors | ☐ |
 | 2 | Observe terminal output | Shows "Uvicorn running on http://0.0.0.0:8000" | ☐ |
 | 3 | Open browser to `http://localhost:8000` | Returns JSON with name "Komorebi" | ☐ |
 | 4 | Open browser to `http://localhost:8000/health` | Returns `{"status": "healthy"}` | ☐ |
@@ -347,9 +347,9 @@ Before running human tests, ensure:
 
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Run `python -m cli.main capture "Test thought from CLI"` | Shows "✅ Captured: [id]..." with status "inbox" | ☐ |
-| 2 | Run `python -m cli.main capture "Another thought" --tags "test,manual"` | Shows success with tags | ☐ |
-| 3 | Run `python -m cli.main list` | Table shows both captured chunks | ☐ |
+| 1 | Run `komorebi capture "Test thought from CLI"` | Shows "✅ Captured: [id]..." with status "inbox" | ☐ |
+| 2 | Run `komorebi capture "Another thought" --tags "test,manual"` | Shows success with tags | ☐ |
+| 3 | Run `komorebi list` | Table shows both captured chunks | ☐ |
 | 4 | Verify first chunk shows status "inbox" or "processed" | Status column displays correctly | ☐ |
 | 5 | Verify second chunk shows tags "test, manual" | Tags column shows the tags | ☐ |
 
@@ -363,7 +363,7 @@ Before running human tests, ensure:
 
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Run `python -m cli.main stats` | Statistics table displays | ☐ |
+| 1 | Run `komorebi stats` | Statistics table displays | ☐ |
 | 2 | Check "Inbox" or "Processed" count | Count is ≥ 2 (from previous test) | ☐ |
 | 3 | Check "Total" count | Total matches sum of all statuses | ☐ |
 
@@ -394,7 +394,7 @@ Before running human tests, ensure:
 |------|--------|-----------------|---|
 | 1 | Run: `curl -X POST http://localhost:8000/api/v1/projects -H "Content-Type: application/json" -d '{"name": "Test Project", "description": "For manual testing"}'` | Returns project JSON with id | ☐ |
 | 2 | Copy the project `id` from the response | ID is a UUID format | ☐ |
-| 3 | Run: `python -m cli.main projects` | Table shows "Test Project" | ☐ |
+| 3 | Run: `komorebi projects` | Table shows "Test Project" | ☐ |
 | 4 | Run: `curl http://localhost:8000/api/v1/projects` | Returns array with the project | ☐ |
 
 ---
@@ -409,7 +409,7 @@ Before running human tests, ensure:
 |------|--------|-----------------|---|
 | 1 | Run: `curl -X POST http://localhost:8000/api/v1/chunks -H "Content-Type: application/json" -d '{"content": "Chunk for project", "project_id": "<PROJECT_ID>"}'` | Chunk created with project_id set | ☐ |
 | 2 | Run: `curl "http://localhost:8000/api/v1/chunks?project_id=<PROJECT_ID>"` | Returns only chunks for that project | ☐ |
-| 3 | Run: `python -m cli.main capture "CLI project chunk" --project <PROJECT_ID>` | Success message shown | ☐ |
+| 3 | Run: `komorebi capture "CLI project chunk" --project <PROJECT_ID>` | Success message shown | ☐ |
 
 ---
 
@@ -422,7 +422,7 @@ Before running human tests, ensure:
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
 | 1 | In Terminal 1, run: `curl -N http://localhost:8000/api/v1/sse/events` | Connection stays open, waiting for events | ☐ |
-| 2 | In Terminal 2, run: `python -m cli.main capture "SSE test event"` | Capture succeeds | ☐ |
+| 2 | In Terminal 2, run: `komorebi capture "SSE test event"` | Capture succeeds | ☐ |
 | 3 | Check Terminal 1 | Shows `data: {...}` with chunk.created event | ☐ |
 | 4 | Press `Ctrl+C` in Terminal 1 | SSE connection closes cleanly | ☐ |
 
@@ -474,11 +474,11 @@ Before running human tests, ensure:
 
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
-| 1 | Run: `python -m cli.main stats` | Note the total count | ☐ |
+| 1 | Run: `komorebi stats` | Note the total count | ☐ |
 | 2 | Stop the server (`Ctrl+C`) | Server stops | ☐ |
-| 3 | Restart: `python -m cli.main serve` | Server starts again | ☐ |
-| 4 | Run: `python -m cli.main stats` | Same total count as step 1 | ☐ |
-| 5 | Run: `python -m cli.main list` | Previous chunks still exist | ☐ |
+| 3 | Restart: `komorebi serve` | Server starts again | ☐ |
+| 4 | Run: `komorebi stats` | Same total count as step 1 | ☐ |
+| 5 | Run: `komorebi list` | Previous chunks still exist | ☐ |
 
 ---
 
@@ -489,7 +489,7 @@ Before running human tests, ensure:
 | Step | Action | Expected Result | ✓ |
 |------|--------|-----------------|---|
 | 1 | Stop the server if running | Server stopped | ☐ |
-| 2 | Run: `python -m cli.main capture "Test"` | Shows "Error: Could not connect to server" | ☐ |
+| 2 | Run: `komorebi capture "Test"` | Shows "Error: Could not connect to server" | ☐ |
 | 3 | Start the server again | Server running | ☐ |
 | 4 | Run: `curl http://localhost:8000/api/v1/chunks/invalid-uuid` | Returns 404 or validation error | ☐ |
 | 5 | Run: `curl -X POST http://localhost:8000/api/v1/chunks -H "Content-Type: application/json" -d '{}'` | Returns 422 validation error (content required) | ☐ |
@@ -504,9 +504,9 @@ Before running human tests, ensure:
 |------|--------|-----------------|---|
 | 1 | Stop the server | Server stopped | ☐ |
 | 2 | Run: `rm komorebi.db` | Database file deleted | ☐ |
-| 3 | Start server: `python -m cli.main serve` | Server starts, creates new DB | ☐ |
-| 4 | Run: `python -m cli.main stats` | All counts are 0 | ☐ |
-| 5 | Run: `python -m cli.main list` | Shows "No chunks found" | ☐ |
+| 3 | Start server: `komorebi serve` | Server starts, creates new DB | ☐ |
+| 4 | Run: `komorebi stats` | All counts are 0 | ☐ |
+| 5 | Run: `komorebi list` | Shows "No chunks found" | ☐ |
 
 ---
 

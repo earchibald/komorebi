@@ -77,7 +77,7 @@ python -m pytest  # Should pass all tests
 
 ```bash
 # Start backend (with hot reload)
-python -m cli.main serve --reload
+komorebi serve --reload
 
 # In another terminal, start frontend
 cd frontend
@@ -517,7 +517,7 @@ Current maintainers:
 pip install -e ".[dev]"
 
 # Run backend
-python -m cli.main serve --reload
+komorebi serve --reload
 
 # Run tests
 python -m pytest -v

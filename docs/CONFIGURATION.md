@@ -174,7 +174,7 @@ The database is automatically initialized when the server starts.
 
 ```bash
 # Using CLI
-python -m cli.main serve --host 0.0.0.0 --port 8000 --reload
+komorebi serve --host 0.0.0.0 --port 8000 --reload
 
 # Using uvicorn directly
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -250,7 +250,7 @@ For production, configure log shipping:
 
 ```bash
 # Write logs to file
-python -m cli.main serve 2>&1 | tee /var/log/komorebi/app.log
+komorebi serve 2>&1 | tee /var/log/komorebi/app.log
 
 # Or configure structured JSON logging (requires modification)
 KOMOREBI_LOG_FORMAT=json
@@ -451,7 +451,7 @@ KOMOREBI_LOG_LEVEL=DEBUG
 
 Start the server:
 ```bash
-python -m cli.main serve --reload
+komorebi serve --reload
 ```
 
 ### Production Settings
@@ -483,7 +483,7 @@ KOMOREBI_CORS_ORIGINS=https://yourdomain.com
 
 ```bash
 # Just run it - defaults are fine
-python -m cli.main serve
+komorebi serve
 ```
 
 ### Docker Compose
@@ -592,7 +592,7 @@ Configuration is loaded automatically from environment variables. To use a `.env
 pip install python-dotenv
 
 # The app automatically loads .env if present
-python -m cli.main serve
+komorebi serve
 ```
 
 Or load explicitly:
@@ -630,7 +630,7 @@ asyncio.run(test())
 "
 
 # 3. Test the server starts
-python -m cli.main serve &
+komorebi serve &
 sleep 2
 curl http://localhost:8000/health
 kill %1
@@ -640,7 +640,7 @@ kill %1
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `Connection refused` | Server not running | Start with `python -m cli.main serve` |
+| `Connection refused` | Server not running | Start with `komorebi serve` |
 | `Database not found` | Invalid DATABASE_URL | Check path and permissions |
 | `CORS error` | Mismatched origins | Add frontend URL to CORS_ORIGINS |
 | `Module not found` | Missing dependencies | Run `pip install -e ".[dev]"` |

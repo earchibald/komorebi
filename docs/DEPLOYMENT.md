@@ -73,7 +73,7 @@ psql --version  # 14+
 
 | Option | Command |
 |--------|---------|
-| Development | `python -m cli.main serve --reload` |
+| Development | `komorebi serve --reload` |
 | Production (local) | `gunicorn backend.app.main:app -w 4 -k uvicorn.workers.UvicornWorker` |
 | Docker | `docker-compose up -d` |
 | Cloud | See platform-specific sections |
@@ -93,7 +93,7 @@ cd komorebi
 pip install -e ".[dev]"
 
 # Start server (with hot reload)
-python -m cli.main serve --reload
+komorebi serve --reload
 ```
 
 ### Production Mode (Local)
@@ -703,7 +703,7 @@ docker-compose restart backend
 
 ```bash
 # Development
-python -m cli.main serve --reload
+komorebi serve --reload
 
 # Production (local)
 gunicorn backend.app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000

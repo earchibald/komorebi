@@ -48,9 +48,43 @@ python -m pytest -v
 
 ## Installation Issues
 
-### "Module not found" errors
+### "ModuleNotFoundError: No module named 'cli'"
 
-**Problem:** Python can't find backend or cli modules.
+**Problem:** Running `python -m cli.main` fails with module not found.
+
+**Cause:** The `komorebi` package is not installed. The CLI requires installation via pip.
+
+**Solution:**
+
+```bash
+# Navigate to the project root directory
+cd /path/to/komorebi
+
+# Install the package in editable mode
+pip install -e ".[dev]"
+
+# Now use the 'komorebi' command (NOT python -m cli.main)
+komorebi serve
+komorebi capture "My first thought!"
+komorebi list
+```
+
+**Verify installation:**
+
+```bash
+# Check komorebi is installed
+pip show komorebi
+
+# Check CLI is available
+which komorebi
+# Should output: /path/to/python/bin/komorebi
+```
+
+> **Note:** After running `pip install -e .`, the `komorebi` command becomes available globally in your Python environment. Always use `komorebi` instead of `python -m cli.main`.
+
+### "Module not found" errors (other modules)
+
+**Problem:** Python can't find backend or other modules.
 
 **Solution:**
 
@@ -76,8 +110,9 @@ python --version
 pyenv install 3.12
 pyenv local 3.12
 
-# Or use python3.11/python3.12 explicitly
-python3.12 -m cli.main serve
+# Then reinstall
+pip install -e ".[dev]"
+komorebi serve
 ```
 
 ### "pip install fails"
@@ -121,13 +156,13 @@ npm install
 
 ```bash
 # Start the server
-python -m cli.main serve
+komorebi serve
 
 # Check if something else is using the port
 lsof -i :8000
 
 # Use a different port
-python -m cli.main serve --port 9000
+komorebi serve --port 9000
 ```
 
 ### "Address already in use"
@@ -142,7 +177,7 @@ lsof -i :8000
 kill -9 <PID>
 
 # Or use a different port
-python -m cli.main serve --port 8001
+komorebi serve --port 8001
 ```
 
 ### Server starts but immediately stops
@@ -168,7 +203,7 @@ python -c "from backend.app.main import app"
 ```bash
 # Delete database and restart
 rm komorebi.db
-python -m cli.main serve
+komorebi serve
 
 # Check for locked database
 fuser komorebi.db
@@ -206,7 +241,7 @@ rm komorebi.db komorebi.db-journal
 rm komorebi.db
 
 # Restart server
-python -m cli.main serve
+komorebi serve
 ```
 
 ### Database file too large
@@ -258,7 +293,7 @@ curl http://localhost:8000/health
 export KOMOREBI_API_URL=http://localhost:8000/api/v1
 
 # Verify
-python -m cli.main stats
+komorebi stats
 ```
 
 ### "CLI shows error: Could not connect"
@@ -319,7 +354,7 @@ node --version  # Should be 18+
 
 ```bash
 # Start backend first
-python -m cli.main serve
+komorebi serve
 
 # Then start frontend
 cd frontend
@@ -404,7 +439,7 @@ curl -X POST http://localhost:8000/api/v1/chunks \
 journalctl -u komorebi -n 50
 
 # Enable debug mode for more info
-KOMOREBI_DEBUG=true python -m cli.main serve
+KOMOREBI_DEBUG=true komorebi serve
 ```
 
 ---
@@ -514,7 +549,7 @@ curl -X POST http://localhost:8000/api/v1/mcp/servers/{id}/connect
 
 ```bash
 # Enable SQL debugging
-KOMOREBI_DEBUG=true python -m cli.main serve
+KOMOREBI_DEBUG=true komorebi serve
 
 # Check for N+1 queries in logs
 # Add database indexes if needed
@@ -564,7 +599,7 @@ cd frontend
 rm -rf node_modules/.cache
 
 # Restart
-python -m cli.main serve
+komorebi serve
 ```
 
 ### How do I backup my data?
@@ -581,10 +616,10 @@ pg_dump -h localhost -U postgres komorebi > backup.sql
 
 ```bash
 # CLI flag
-python -m cli.main serve --port 9000
+komorebi serve --port 9000
 
 # Environment variable
-KOMOREBI_PORT=9000 python -m cli.main serve
+KOMOREBI_PORT=9000 komorebi serve
 
 # Update CLI API URL too
 export KOMOREBI_API_URL=http://localhost:9000/api/v1
@@ -594,7 +629,7 @@ export KOMOREBI_API_URL=http://localhost:9000/api/v1
 
 ```bash
 export KOMOREBI_DEBUG=true
-python -m cli.main serve --reload
+komorebi serve --reload
 ```
 
 ### Where are logs stored?
