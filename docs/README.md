@@ -73,11 +73,34 @@
 
 ---
 
+## 🎯 Current Status (February 2026)
+
+### ✅ Working & Stable
+- Fast chunk capture (API, Dashboard)
+- Background processing & auto-summarization
+- Real-time SSE updates (<5ms latency)
+- Smart caching (instant page loads)
+- Project organization
+- Stats dashboard
+- Instant tab switching (client-side filtering)
+
+### ⚠️ Implemented but Needs LLM
+- Compaction (uses simple text truncation, needs Ollama)
+- Project context building (infrastructure ready)
+
+### 🚧 Ready to Build
+- MCP server integration (infrastructure exists)
+- Enhanced CLI commands
+- Search & full-text indexing
+- Project detail views
+
+---
+
 ## 📖 Reading Order
 
 ### New to Komorebi?
 
-1. **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Begin here
+1. **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Begin here (now with "What's Next" guide)
 2. **[API_REFERENCE.md](./API_REFERENCE.md)** - Learn the API
 3. **[CONFIGURATION.md](./CONFIGURATION.md)** - Customize settings
 

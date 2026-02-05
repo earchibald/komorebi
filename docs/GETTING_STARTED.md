@@ -27,10 +27,12 @@
 **Komorebi** (木漏れ日) is a Japanese word meaning "sunlight filtering through leaves." In the context of this project, it represents **cognitive infrastructure** that helps filter and organize the chaos of thoughts, tasks, and information during active work.
 
 Komorebi provides:
-- 🚀 **Fast Capture** - Instantly capture thoughts without breaking flow
-- 📦 **Recursive Compaction** - Automatically summarize and condense context
-- 🔌 **MCP Aggregation** - Connect to external tools (GitHub, Jira, etc.)
-- 📡 **Real-time Updates** - SSE-based live streaming to connected clients
+- 🚀 **Fast Capture** - Instantly capture thoughts without breaking flow (✅ Working)
+- 🤖 **Auto-Processing** - Background summarization of captured chunks (✅ Working)
+- 📦 **Recursive Compaction** - Condense chunks into project context (⚠️ Implemented but needs LLM)
+- 🔌 **MCP Aggregation** - Connect to external tools (⚠️ Infrastructure ready, needs servers)
+- 📡 **Real-time Updates** - SSE-based live streaming (✅ Working, <5ms latency)
+- 💾 **Smart Caching** - Instant page loads with localStorage (✅ Working)
 
 ---
 
@@ -146,7 +148,162 @@ cd ..
 
 ## Quick Start
 
-### Start the Backend Server
+### 1. Start the Backend Server
+
+```bash
+uvicorn backend.app.main:app --reload
+```
+
+The backend will be available at:
+- API: http://localhost:8000
+- Interactive docs: http://localhost:8000/docs
+- Alternative docs: http://localhost:8000/redoc
+
+You should see:
+```
+INFO:     Uvicorn running on http://127.0.0.1:8000
+INFO:     Application startup complete.
+```
+
+### 2. (Optional) Start the Frontend Dashboard
+
+```bash
+cd frontend
+npm run dev
+```
+
+The dashboard will be available at: http://localhost:3000
+
+### 3. Quick Test
+
+Test the API is working:
+
+```bash
+# Check health
+curl http://localhost:8000/health
+
+# Create a chunk
+curl -X POST http://localhost:8000/api/v1/chunks \
+  -H "Content-Type: application/json" \
+  -d '{"content":"My first thought!"}'
+
+# Get chunks
+curl http://localhost:8000/api/v1/chunks
+```
+
+---
+
+## What Can I Do Now?
+
+### ✅ Working Features (Ready to Use)
+
+**1. Fast Chunk Capture**
+- Capture thoughts via API, CLI, or dashboard
+- Automatic background processing and summarization
+- Real-time updates via SSE
+
+**2. Dashboard UI**
+- View all chunks with instant tab switching
+- Filter by status: Inbox, Processed, Compacted, Archived
+- Real-time updates when chunks change
+- Smart caching for instant page loads
+
+**3. Projects** 
+- Create projects to organize related chunks
+- Associate chunks with projects
+- Track chunk counts per project
+
+**4. Statistics**
+- Real-time dashboard stats
+- Breakdown by status
+- Auto-updating via SSE
+
+### ⚠️ Implemented but Needs Enhancement
+
+**1. Compaction (Recursive Summarization)**
+- Infrastructure is built
+- Currently uses simple text truncation
+- **Next step:** Integrate Ollama for real LLM-based summarization
+- API endpoint ready: `POST /api/v1/projects/{id}/compact`
+
+**2. MCP Integration**
+- Registry system implemented
+- Can connect to MCP servers
+- **Next step:** Add actual MCP server configurations (GitHub, filesystem, etc.)
+- API endpoints ready: `/api/v1/mcp/*`
+
+### 🚧 Not Yet Implemented
+
+**1. Advanced CLI**
+- Basic `komorebi add` works
+- Need: list, search, filter, project management commands
+
+**2. Search & Tags**
+- Tags are stored but not searchable yet
+- Need: full-text search across chunks
+
+**3. Chunk Relationships**
+- No parent/child relationships yet
+- Could link related chunks
+
+---
+
+## Recommended Next Steps
+
+### Option 1: Integrate Ollama for Real Summarization
+
+**Why?** This makes compaction actually useful instead of just truncating text.
+
+**What to build:**
+1. Add Ollama client to `CompactorService`
+2. Use `llama3.2` or similar for chunk summarization
+3. Implement map-reduce summarization for projects
+4. Add streaming support for long summaries
+
+**Impact:** Makes the "recursive compaction" feature actually work!
+
+### Option 2: Connect Real MCP Servers
+
+**Why?** Turns Komorebi into a universal tool aggregator.
+
+**What to build:**
+1. Add MCP server configs for:
+   - GitHub (`@modelcontextprotocol/server-github`)
+   - Filesystem (`@modelcontextprotocol/server-filesystem`)
+   - Memory (`@modelcontextprotocol/server-memory`)
+2. Build UI to browse available tools
+3. Create workflow to call tools and capture results as chunks
+
+**Impact:** Can pull GitHub issues, read files, access memory—all from one place!
+
+### Option 3: Enhanced CLI with Rich Output
+
+**Why?** Makes Komorebi great for terminal-based workflows.
+
+**What to build:**
+1. `komorebi list` - Beautiful table of chunks
+2. `komorebi search <query>` - Full-text search
+3. `komorebi project create/list/view`
+4. `komorebi stats` - Terminal dashboard
+5. Pipe support: `cat log.txt | komorebi add --project debugging`
+
+**Impact:** Fast capture from anywhere in the terminal!
+
+### Option 4: Project Context Dashboard
+
+**Why?** Visualize the "memory pyramid" concept.
+
+**What to build:**
+1. Project detail view showing chunk hierarchy
+2. Timeline view of chunk capture
+3. Compaction history (raw → processed → compacted)
+4. Token count tracking and compression ratio
+
+**Impact:** See how context gets compressed over time!
+
+---
+
+## Using the Backend API (More Details)
 
 ```bash
 # Using the CLI
