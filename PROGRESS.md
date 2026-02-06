@@ -348,6 +348,48 @@
 - [ ] **Performance monitoring**: Add search latency metrics to Stats dashboard
 - [ ] **Future FTS5 migration**: When >10k chunks, switch to SQLite FTS5 for relevance ranking (transparent upgrade, no breaking changes)
 
+### Phase 13: Module 6 — User Data API & Search Fix (v0.7.0)
+
+✅ **Complete user-facing data exploration features** using TDD (Red → Green → Refactor)
+
+#### Bug Fix: Signal Controlled Input Race Condition
+- ✅ **Root Cause**: `@preact/signals-react` v2 intercepts `.value` access in JSX render path, causing React controlled input race condition (input lag, lost keystrokes)
+- ✅ **Fix**: Local `useState` bridge pattern — local state for immediate UI, signal for store sync
+- ✅ **SearchBar.tsx**: Fixed with `localQuery` useState bridge
+- ✅ **FilterPanel.tsx**: Fixed all 6 filter inputs (localStatus, localProjectId, localEntityType, localEntityValue, localCreatedAfter, localCreatedBefore)
+- ✅ **Documented**: Added "Signal-to-Input Bridge Pattern" to CONVENTIONS.md
+
+#### Backend: Enhanced Stats, Timeline, Related Chunks
+- ✅ **TDD Red Phase**: 37 tests written across 3 test files, verified failing (commit d4b9958)
+  - `test_module6_stats.py` (9 tests): Weekly trends, insights, per-project breakdown
+  - `test_module6_timeline.py` (11 tests): Granularity, project filter, buckets, status breakdown
+  - `test_module6_related.py` (17 tests): 12 TFIDFService unit tests + 5 API endpoint tests
+- ✅ **TDD Green Phase**: All 37 tests passing, 0 regressions (commit a2674fb)
+- ✅ **TFIDFService** (`backend/app/core/similarity.py`): Pure Python TF-IDF cosine similarity
+  - Tokenization with stopword filtering, 3-char minimum
+  - Cosine similarity with 0.01 threshold
+  - find_related() with top_k support and shared term extraction
+- ✅ **Enhanced Stats**: `GET /chunks/stats` → DashboardStats (weekly trends, insights, per-project)
+- ✅ **Timeline**: `GET /chunks/timeline` with day/week/month granularity, project filter
+- ✅ **Related Chunks**: `GET /chunks/{id}/related` with similarity scores and shared terms
+- ✅ **7 new Pydantic models**: DashboardStats, WeekBucket, TimelineGranularity, TimelineBucket, TimelineResponse, RelatedChunk, RelatedChunksResponse
+- ✅ **5 new repository methods**: count_by_week, oldest_inbox, timeline, get_all_content, EntityRepo.count_all
+
+#### Frontend: Dashboard, Timeline, Inbox, Related Chunks
+- ✅ **StatsDashboard.tsx** (new): Weekly bar chart, insights panel, per-project breakdown
+- ✅ **TimelineView.tsx** (new): Granularity toggle, project filter, expandable buckets with status-colored segments
+- ✅ **Inbox.tsx** (enhanced): Age indicators (🔴🟡🟢), sort toggle, InboxHeader with count/oldest
+- ✅ **ChunkDrawer.tsx** (enhanced): Related chunks section with similarity badges, shared terms, click-to-navigate
+- ✅ **App.tsx** (restructured): 6 tabs (inbox, all, dashboard, timeline, projects, mcp), removed Stats, footer → v0.7.0
+- ✅ **Store** (extended): DashboardStats type, timeline/relatedChunks signals, fetchTimeline/fetchRelatedChunks functions
+- ✅ **CSS** (appended): ~250 lines for dashboard, timeline, inbox header, related chunks styling
+
+#### Quality Gates
+- ✅ **Backend Tests**: 75 passed, 3 skipped, 0 failures
+- ✅ **Ruff Lint**: All checks passed (16 unused imports auto-fixed)
+- ✅ **Frontend Build**: `tsc && vite build` clean
+- ✅ **Documentation**: CHANGELOG, CONVENTIONS, PROGRESS, CURRENT_STATUS updated
+
 ## Benchmark Results
 
 ### Module 2 - Recursive Compaction

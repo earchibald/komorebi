@@ -1,21 +1,44 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 7, 2026  
-**Version:** 0.5.0 (Pre-1.0.0 Development)
+**Date:** February 8, 2026  
+**Version:** 0.7.0 (Pre-1.0.0 Development)
 
 ---
 
 ## 🆕 Latest Updates
 
-### v0.5.0 Release - System Enhancements & Developer Experience
+### v0.7.0 Release - Module 6: User Data API & Search Fix
 
-**Developer Tooling (Feb 7, 2026):**
-- All custom prompts now have full tool access (agent, edit, execute, read, search, todo, vscode, web, fetch, githubRepo)
-- New integrate-feature.prompt.md for feature integration workflow
-- Enhanced implement-feature.prompt.md with handoff template
-- Added git commit hygiene governance rules (mandatory frequent commits, clean tree enforcement)
-- MCP server configuration expanded (GitKraken, Playwright added)
-- Documentation enhanced with MCP Tool Ecosystem section
+**Search Bug Fix (Critical):**
+- Fixed `@preact/signals-react` v2 race condition with controlled inputs
+- Root cause: signal `.value` access intercepted during JSX render, causing input lag/loss
+- Fix: Local `useState` bridge pattern in SearchBar.tsx and FilterPanel.tsx (6 fields)
+- Documented as mandatory pattern in CONVENTIONS.md
+
+**Enhanced Dashboard Stats:**
+- `GET /chunks/stats` now returns `DashboardStats` with weekly activity trends, insights (oldest inbox age, most active project, entity count), and per-project breakdown
+- New `StatsDashboard` component with weekly bar chart, insights panel, project breakdown
+
+**Timeline View:**
+- New `GET /chunks/timeline` endpoint with day/week/month granularity and project filter
+- `TimelineView` component with granularity toggle, expandable time buckets, status-colored segments
+
+**Related Chunks (TF-IDF):**
+- New `GET /chunks/{id}/related` endpoint using pure Python TF-IDF cosine similarity
+- Similarity scores, shared terms, click-to-navigate in ChunkDrawer
+- Zero external dependencies, O(N) per request, suitable for ≤10k chunks
+
+**Inbox Enhancements:**
+- Age indicators: 🔴 (>7 days), 🟡 (2-7 days), 🟢 (<2 days)
+- Sort toggle (Newest/Oldest), InboxHeader with count and oldest age
+
+**Tab Restructure:**
+- Expanded from 4 tabs to 6: Inbox, All Chunks, Dashboard, Timeline, Projects, MCP Tools
+- Removed always-visible Stats section from header
+
+**Test Coverage:**
+- 37 new tests (9 stats, 11 timeline, 17 related/TF-IDF)
+- Full regression: 75 passed, 3 skipped, 0 failures
 
 ### Module 4: Search & Entity Filtering — Full Stack Complete
 

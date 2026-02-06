@@ -117,6 +117,40 @@ export async function fetchChunks(projectId?: string, limit = 100) {
 ### Component Local State
 Use React hooks only for UI-specific state (filters, modals, temporary UI state):
 
+#### Signal-to-Input Bridge Pattern (MANDATORY for controlled inputs)
+`@preact/signals-react` v2 intercepts `.value` access during JSX render, causing race conditions with React controlled inputs. **Always use a local `useState` bridge** when binding signals to `<input>`, `<select>`, or `<textarea>` elements:
+
+```typescript
+// ✅ CORRECT — Local state bridge
+function SearchBar() {
+  const [localQuery, setLocalQuery] = useState('')
+  
+  // Sync FROM signal when external code resets it
+  useEffect(() => {
+    setLocalQuery(searchQuery.value)
+  }, [searchQuery.value])
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalQuery(e.target.value)        // Immediate UI update
+    searchQuery.value = e.target.value   // Update signal for store
+  }
+  
+  return <input value={localQuery} onChange={handleChange} />
+}
+
+// ❌ WRONG — Direct signal binding causes input lag/loss
+function SearchBar() {
+  return <input value={searchQuery.value} onChange={...} />
+}
+```
+
+**When this pattern applies:**
+- Any `<input>`, `<select>`, or `<textarea>` backed by a Preact signal
+- All filter fields, search inputs, form controls reading from signals
+- Does NOT apply to read-only signal display (`{count.value}` in text is fine)
+
+**Reference implementations:** `SearchBar.tsx`, `FilterPanel.tsx` (6 fields), `Inbox.tsx` (already correct)
+
 ```typescript
 // From frontend/src/components/ChunkList.tsx
 export function ChunkList() {

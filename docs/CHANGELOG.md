@@ -10,9 +10,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Module 6: User Data API — Contextual query features, search improvements, data exploration UI
 - Module 5: Implementation — Docker deployment, bulk operations feature
 - Performance optimization baseline
+
+---
+
+## [0.7.0] - 2026-02-08
+
+### Added
+- **Module 6: User Data API & Search Fix** — Full-stack user-facing data exploration features
+  - **Enhanced Dashboard Stats** — `GET /chunks/stats` now returns `DashboardStats` with weekly activity trends (`by_week`), actionable insights (oldest inbox age, most active project, entity count), and per-project breakdown (`by_project`)
+  - **Timeline View** — New `GET /chunks/timeline` endpoint with day/week/month granularity, project filtering, and status breakdown per time bucket
+  - **Related Chunks** — New `GET /chunks/{id}/related` endpoint using TF-IDF cosine similarity to discover semantically related chunks with similarity scores and shared terms
+  - **TF-IDF Service** — Pure Python `TFIDFService` class (`backend/app/core/similarity.py`) with tokenization, stopword filtering, cosine similarity — zero external dependencies
+  - **StatsDashboard component** — Weekly bar chart, insights panel, per-project breakdown (replaces simple Stats component)
+  - **TimelineView component** — Granularity toggle, project filter, expandable time buckets with status-colored segments
+  - **Inbox Enhancements** — Age indicators (🔴>7d, 🟡2-7d, 🟢<2d), sort toggle (Newest/Oldest), InboxHeader with count and oldest age
+  - **Related Chunks in Drawer** — Similarity badges, shared terms display, click-to-navigate between related chunks
+  - **Tab Restructure** — Expanded from 4 tabs to 6: Inbox, All Chunks, Dashboard, Timeline, Projects, MCP Tools
+
+### Fixed
+- **Search Input Bug** — Fixed `@preact/signals-react` v2 race condition with controlled inputs; signal `.value` access intercepted in JSX render path caused input lag/loss. Fix: local `useState` bridge pattern in `SearchBar.tsx` and `FilterPanel.tsx` (6 filter fields)
+
+### Technical
+- 7 new Pydantic models: `DashboardStats`, `WeekBucket`, `TimelineGranularity`, `TimelineBucket`, `TimelineResponse`, `RelatedChunk`, `RelatedChunksResponse`
+- 5 new repository methods: `count_by_week()`, `oldest_inbox()`, `timeline()`, `get_all_content()`, `EntityRepository.count_all()`
+- 37 new tests (9 stats, 11 timeline, 17 related/TF-IDF) — all passing
+- Full regression: 75 passed, 3 skipped, 0 failures
+- Frontend build clean (tsc + vite)
+- Ruff lint clean (16 auto-fixed unused imports)
 
 ---
 
