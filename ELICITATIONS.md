@@ -201,3 +201,58 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 ```
+---
+
+## [2026-02-05] Module 8: Modular Target Delivery System — Architecture Phase
+
+**Context:** Schema-driven adapter system for dispatching Komorebi chunks to external tools (GitHub Issues, Jira Tickets, Slack Messages, etc.). Goal is zero frontend code changes when adding new targets.
+
+**Architecture Decisions Made:**
+
+1. **Schema-Driven Forms vs. Hardcoded React Components**
+   - **Chose:** Schema-driven dynamic forms (TargetSchema → DynamicForm component)
+   - **Rationale:** New targets require only Python adapter implementation (~30 min). Hardcoded components would require frontend + backend changes (~3 hours per target).
+   - **Trade-off:** Less UI flexibility (constrained by FieldType enum), but acceptable for utility forms. Can add "custom_component" escape hatch if needed.
+   - **Reversibility:** Medium (can add custom components later).
+
+2. **Registry Pattern vs. Plugin System**
+   - **Chose:** Manual registration in `main.py` startup
+   - **Rationale:** Explicit and deterministic. Entry points are overkill for MVP (bounded set of 10-20 targets). Can migrate to auto-discovery post-1.0.
+   - **Reversibility:** Easy (one-line change per adapter).
+
+3. **Sync vs. Async Tool Dispatch**
+   - **Chose:** Async with SSE (reuse existing event infrastructure)
+   - **Rationale:** GitHub API calls take 3-7 seconds (MCP subprocess + network). Blocking violates "Capture First" principle.
+   - **Trade-off:** More complex state management, but better UX.
+   - **Reversibility:** Medium (can add sync mode flag for fast tools like Slack).
+
+4. **Validation: Frontend vs. Backend**
+   - **Chose:** Both (defense in depth)
+   - **Rationale:** Frontend for instant feedback, backend for security.
+   - **Trade-off:** Duplicate validation logic, but best practice.
+   - **Reversibility:** N/A (not reversible).
+
+**Open Questions (Deferred to Implementation/v1.1):**
+
+1. **Authentication:** Should adapters manage OAuth tokens or delegate to MCPService?
+   - **Provisional Decision:** MCPService owns auth. Adapters call `validate_prerequisites()` but don't manage tokens.
+   - **Status:** Not blocking MVP. Can refine during implementation.
+
+2. **Undo Dispatch:** Should there be a "Revert" button after sending to GitHub?
+   - **Provisional Decision:** No undo in MVP. Add "Edit on GitHub" link instead.
+   - **Rationale:** Slack doesn't support deletion after 30 days. Jira requires admin permissions. Inconsistent across tools.
+   - **Status:** Log for v1.1 consideration.
+
+3. **Tool-Specific Features:** How to handle GitHub Projects, Jira Sprints, etc.?
+   - **Provisional Decision:** MVP doesn't support advanced features. Add as "metadata" field or "Advanced Mode" in v1.1.
+   - **Status:** Not blocking. Track in roadmap.
+
+**Testing Strategy:**
+- **Layer 1:** Unit tests for adapters (pure function `data -> mapped_data`)
+- **Layer 2:** Integration tests for dispatch routing (mock MCP service)
+- **Layer 3:** E2E tests for dynamic form rendering (Playwright)
+- **Layer 4:** Hammer load test (50 concurrent dispatches, ≥98% success rate)
+
+**Implementation Estimate:** 12 hours (6h backend, 3h frontend, 3h testing)
+
+**Next Phase:** Implementation via `/implement-feature` following [FEATURE_MODULAR_TARGETS.md](FEATURE_MODULAR_TARGETS.md) task breakdown.
