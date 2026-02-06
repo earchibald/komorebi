@@ -7,8 +7,10 @@ import { ProjectList } from './components/ProjectList'
 import { MCPPanel } from './components/MCPPanel'
 import { ChunkDrawer } from './components/ChunkDrawer'
 import { StagingArea } from './components/StagingArea'
+import { BillingDashboard } from './components/BillingDashboard'
+import { WatcherStatus } from './components/WatcherStatus'
 
-type Tab = 'inbox' | 'all' | 'dashboard' | 'timeline' | 'projects' | 'mcp' | 'dispatch'
+type Tab = 'inbox' | 'all' | 'dashboard' | 'timeline' | 'projects' | 'mcp' | 'dispatch' | 'billing' | 'watcher'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('inbox')
@@ -63,6 +65,18 @@ function App() {
         >
           📤 Dispatch
         </button>
+        <button
+          className={`tab ${activeTab === 'billing' ? 'active' : ''}`}
+          onClick={() => setActiveTab('billing')}
+        >
+          💰 Billing
+        </button>
+        <button
+          className={`tab ${activeTab === 'watcher' ? 'active' : ''}`}
+          onClick={() => setActiveTab('watcher')}
+        >
+          👁️ Watcher
+        </button>
       </nav>
 
       <main className="content">
@@ -73,6 +87,8 @@ function App() {
         {activeTab === 'projects' && <ProjectList />}
         {activeTab === 'mcp' && <MCPPanel />}
         {activeTab === 'dispatch' && <StagingArea />}
+        {activeTab === 'billing' && <BillingDashboard />}
+        {activeTab === 'watcher' && <WatcherStatus />}
       </main>
 
       <footer className="footer">
