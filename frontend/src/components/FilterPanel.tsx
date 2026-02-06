@@ -1,12 +1,33 @@
 /**
  * FilterPanel - Advanced search filters for chunks
+ * 
+ * Uses local React state bridges to avoid signal/React controlled input race condition.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { searchFilters, projects, debouncedSearch, clearSearch } from '../store'
 
 export function FilterPanel() {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  // Local state bridges for all filter inputs
+  const [localStatus, setLocalStatus] = useState(searchFilters.value.status || '')
+  const [localProjectId, setLocalProjectId] = useState(searchFilters.value.projectId || '')
+  const [localEntityType, setLocalEntityType] = useState(searchFilters.value.entityType || '')
+  const [localEntityValue, setLocalEntityValue] = useState(searchFilters.value.entityValue || '')
+  const [localCreatedAfter, setLocalCreatedAfter] = useState(searchFilters.value.createdAfter || '')
+  const [localCreatedBefore, setLocalCreatedBefore] = useState(searchFilters.value.createdBefore || '')
+
+  // Sync signal → local state when signal changes externally (e.g., clearSearch)
+  useEffect(() => {
+    const filters = searchFilters.value
+    setLocalStatus(filters.status || '')
+    setLocalProjectId(filters.projectId || '')
+    setLocalEntityType(filters.entityType || '')
+    setLocalEntityValue(filters.entityValue || '')
+    setLocalCreatedAfter(filters.createdAfter || '')
+    setLocalCreatedBefore(filters.createdBefore || '')
+  }, [searchFilters.value])
 
   const updateFilter = <K extends keyof typeof searchFilters.value>(
     key: K,
@@ -27,6 +48,9 @@ export function FilterPanel() {
   }
 
   const activeFilterCount = Object.keys(searchFilters.value).length
+
+  // Read projects value outside JSX
+  const projectList = projects.value
 
   return (
     <div className="filter-panel">
@@ -49,8 +73,11 @@ export function FilterPanel() {
               <label htmlFor="filter-status">Status</label>
               <select
                 id="filter-status"
-                value={searchFilters.value.status || ''}
-                onChange={(e) => updateFilter('status', e.target.value as any || undefined)}
+                value={localStatus}
+                onChange={(e) => {
+                  setLocalStatus(e.target.value)
+                  updateFilter('status', e.target.value as any || undefined)
+                }}
               >
                 <option value="">All</option>
                 <option value="inbox">Inbox</option>
@@ -65,11 +92,14 @@ export function FilterPanel() {
               <label htmlFor="filter-project">Project</label>
               <select
                 id="filter-project"
-                value={searchFilters.value.projectId || ''}
-                onChange={(e) => updateFilter('projectId', e.target.value || undefined)}
+                value={localProjectId}
+                onChange={(e) => {
+                  setLocalProjectId(e.target.value)
+                  updateFilter('projectId', e.target.value || undefined)
+                }}
               >
                 <option value="">All Projects</option>
-                {projects.value.map(project => (
+                {projectList.map(project => (
                   <option key={project.id} value={project.id}>
                     {project.name}
                   </option>
@@ -82,8 +112,11 @@ export function FilterPanel() {
               <label htmlFor="filter-entity-type">Entity Type</label>
               <select
                 id="filter-entity-type"
-                value={searchFilters.value.entityType || ''}
-                onChange={(e) => updateFilter('entityType', e.target.value as any || undefined)}
+                value={localEntityType}
+                onChange={(e) => {
+                  setLocalEntityType(e.target.value)
+                  updateFilter('entityType', e.target.value as any || undefined)
+                }}
               >
                 <option value="">All Types</option>
                 <option value="error">Error</option>
@@ -101,8 +134,11 @@ export function FilterPanel() {
                 id="filter-entity-value"
                 type="text"
                 placeholder="e.g., ConnectionTimeout"
-                value={searchFilters.value.entityValue || ''}
-                onChange={(e) => updateFilter('entityValue', e.target.value || undefined)}
+                value={localEntityValue}
+                onChange={(e) => {
+                  setLocalEntityValue(e.target.value)
+                  updateFilter('entityValue', e.target.value || undefined)
+                }}
               />
             </div>
 
@@ -112,8 +148,11 @@ export function FilterPanel() {
               <input
                 id="filter-created-after"
                 type="datetime-local"
-                value={searchFilters.value.createdAfter || ''}
-                onChange={(e) => updateFilter('createdAfter', e.target.value || undefined)}
+                value={localCreatedAfter}
+                onChange={(e) => {
+                  setLocalCreatedAfter(e.target.value)
+                  updateFilter('createdAfter', e.target.value || undefined)
+                }}
               />
             </div>
 
@@ -123,8 +162,11 @@ export function FilterPanel() {
               <input
                 id="filter-created-before"
                 type="datetime-local"
-                value={searchFilters.value.createdBefore || ''}
-                onChange={(e) => updateFilter('createdBefore', e.target.value || undefined)}
+                value={localCreatedBefore}
+                onChange={(e) => {
+                  setLocalCreatedBefore(e.target.value)
+                  updateFilter('createdBefore', e.target.value || undefined)
+                }}
               />
             </div>
           </div>

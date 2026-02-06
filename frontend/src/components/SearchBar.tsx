@@ -1,18 +1,37 @@
 /**
  * SearchBar - Text search input with debouncing and result count
+ * 
+ * Uses local React state bridge to avoid signal/React controlled input race condition.
+ * Signal values are read outside JSX to prevent @preact/signals-react v2 reactive binding issues.
  */
 
+import { useState, useEffect } from 'react'
 import { searchQuery, searchResults, searchLoading, debouncedSearch, clearSearch, isSearchActive } from '../store'
 
 export function SearchBar() {
+  const [localQuery, setLocalQuery] = useState(searchQuery.value)
+
+  // Sync signal → local when signal changes externally (e.g., clearSearch)
+  useEffect(() => {
+    setLocalQuery(searchQuery.value)
+  }, [searchQuery.value])
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    searchQuery.value = e.target.value
+    const val = e.target.value
+    setLocalQuery(val)
+    searchQuery.value = val
     debouncedSearch()
   }
 
   const handleClear = () => {
     clearSearch()
+    setLocalQuery('')
   }
+
+  // Read signal values outside JSX to avoid reactive binding issues
+  const isActive = isSearchActive.value
+  const isLoading = searchLoading.value
+  const results = searchResults.value
 
   return (
     <div className="search-bar">
@@ -22,11 +41,11 @@ export function SearchBar() {
           type="text"
           className="search-input"
           placeholder="Search chunks by content..."
-          value={searchQuery.value}
+          value={localQuery}
           onChange={handleInput}
           autoComplete="off"
         />
-        {isSearchActive.value && (
+        {isActive && (
           <button 
             className="search-clear" 
             onClick={handleClear}
@@ -37,20 +56,20 @@ export function SearchBar() {
         )}
       </div>
       
-      {searchLoading.value && (
+      {isLoading && (
         <div className="search-status loading">
           <span className="spinner">⏳</span> Searching...
         </div>
       )}
       
-      {searchResults.value && !searchLoading.value && (
+      {results && !isLoading && (
         <div className="search-status results">
           <span className="result-count">
-            {searchResults.value.total} result{searchResults.value.total !== 1 ? 's' : ''}
+            {results.total} result{results.total !== 1 ? 's' : ''}
           </span>
-          {searchResults.value.query && (
+          {results.query && (
             <span className="result-query">
-              for "{searchResults.value.query}"
+              for "{results.query}"
             </span>
           )}
         </div>
