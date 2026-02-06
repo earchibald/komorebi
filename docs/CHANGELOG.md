@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Module 4 Hammer testing: Load test search endpoint with `--mode search` and varied queries
+- Advanced prompt engineering & skill system enhancements
+- Production deployment configuration
+- Advanced testing automation
+- Performance optimization baseline
+
+---
+
+## [0.5.0] - 2026-02-07
+
 ### Added
 - **Module 4 Frontend: Search UI** — Complete search interface with SearchBar, FilterPanel, and ChunkList integration
 - **SearchBar component** — Real-time text search with 300ms debouncing, result count display, and clear button
@@ -20,12 +31,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Filter count badge** — Visual indicator showing number of active filters on FilterPanel toggle
 - **Search CSS styling** — Responsive dark-theme styles for search bar, filters, and status indicators
 
-### Planned
-- Module 4 Hammer testing: Load test search endpoint with `--mode search` and varied queries
-- Advanced prompt engineering & skill system
-- Production deployment configuration
-- Advanced testing automation
-- Performance optimization baseline
+### Developer Experience
+- **Prompt System Enhancements** — All custom prompts now have full tool access (agent, edit, execute, read, search, todo, vscode, web, fetch, githubRepo)
+- **integrate-feature.prompt.md** — New prompt for feature integration workflow (validation, versioning, git commit, PR creation)
+- **Handoff template** — implement-feature.prompt.md now includes IMPLEMENTATION_HANDOFF.md template for documentation
+- **MCP Server Configuration** — Added GitKraken and Playwright MCP servers to config (disabled by default)
+- **Git Commit Hygiene** — Added mandatory governance rules in copilot-instructions.md for frequent commits and clean tree enforcement
+
+### Technical Improvements
+- **Backend cleanup** — Removed 9 unused imports across backend codebase (linting fixes)
+- **Documentation updates** — CONVENTIONS.md now includes MCP Tool Ecosystem section with security rules
+- **Gitignore** — Added frontend/.vite/ cache directory
 
 ---
 

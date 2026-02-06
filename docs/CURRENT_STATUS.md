@@ -1,11 +1,21 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 5, 2026  
-**Version:** 0.4.0 (Pre-1.0.0 Development)
+**Date:** February 7, 2026  
+**Version:** 0.5.0 (Pre-1.0.0 Development)
 
 ---
 
 ## 🆕 Latest Updates
+
+### v0.5.0 Release - System Enhancements & Developer Experience
+
+**Developer Tooling (Feb 7, 2026):**
+- All custom prompts now have full tool access (agent, edit, execute, read, search, todo, vscode, web, fetch, githubRepo)
+- New integrate-feature.prompt.md for feature integration workflow
+- Enhanced implement-feature.prompt.md with handoff template
+- Added git commit hygiene governance rules (mandatory frequent commits, clean tree enforcement)
+- MCP server configuration expanded (GitKraken, Playwright added)
+- Documentation enhanced with MCP Tool Ecosystem section
 
 ### Module 4: Search & Entity Filtering — Full Stack Complete
 
