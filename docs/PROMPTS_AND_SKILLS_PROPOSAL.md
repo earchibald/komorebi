@@ -148,6 +148,58 @@ Each custom prompt automatically injects critical governance rules:
 - ✅ No incomplete TODO comments
 ```
 
+### 1.4 Agentic Workflow Governance & Document Archival (v0.9.0+)
+
+The three core feature prompts (`architect-feature`, `implement-feature`, `integrate-feature`) enforce a formal multi-stage handoff workflow with document archival:
+
+#### 1.4.1 Workflow Stages
+
+**Stage 1: Architecture (`architect-feature`)**
+- **Input:** `NEW_FEATURE.md` (preferred) or any attached design document
+- **Output:** `NEW_FEATURE_ARCHITECTURE.md` — Formal architecture document
+- **Archival:** Move input document to `docs/archives/YYYYMMDD_NEW_FEATURE.md`
+- **Registry:** Update `docs/archives/ARCHIVED_DOCUMENTS.md` with workflow metadata
+
+**Stage 2: Implementation (`implement-feature`)**
+- **Input:** `NEW_FEATURE_ARCHITECTURE.md` (preferred) or referenced architecture document
+- **Output:** `NEW_IMPLEMENTATION_REFERENCE.md` — Complete implementation reference with test results, file changes, limitations
+- **Archival:** Move input architecture to `docs/archives/YYYYMMDD_NEW_FEATURE_ARCHITECTURE.md`
+- **Registry:** Update archive index and TOC
+
+**Stage 3: Integration (`integrate-feature`)**
+- **Input:** `NEW_IMPLEMENTATION_REFERENCE.md` (preferred) or implementation document
+- **Output:** Versioned release with PR, CHANGELOG, and CURRENT_STATUS updates
+- **Enhancement:** Automatically suggests 3 best next-step options (unordered) with contextual paragraphs
+- **Archival:** Move implementation reference to `docs/archives/YYYYMMDD_NEW_IMPLEMENTATION_REFERENCE.md`
+- **Registry:** Final archive entry with release date and version
+
+#### 1.4.2 Archive Registry (`docs/archives/ARCHIVED_DOCUMENTS.md`)
+
+Maintains comprehensive index of all processed design/implementation documents:
+
+```
+| Date       | Workflow Stage    | Input Document     | Archived Path                                | Generated Output              |
+|------------|-------------------|--------------------|----------------------------------------------|-------------------------------|
+| 2026-02-05 | architect-feature | NEW_FEATURE.md     | docs/archives/20260205_NEW_FEATURE.md        | NEW_FEATURE_ARCHITECTURE.md   |
+| 2026-02-05 | implement-feature | NEW_FEATURE_ARCH...| docs/archives/20260205_NEW_FEATURE_ARCH.md   | NEW_IMPLEMENTATION_REF.md     |
+| 2026-02-05 | integrate-feature | NEW_IMPL_REF.md    | docs/archives/20260205_NEW_IMPL_REF.md       | v0.9.0 Release               |
+```
+
+Benefits:
+- **Traceability:** Full audit trail of design → implementation → release
+- **Context Recovery:** Archived docs provide complete feature history
+- **Pattern Recognition:** Identify common decisions across features
+- **Knowledge Base:** Reference previous design decisions for similar features
+
+#### 1.4.3 Governance Enforcement
+
+All three prompts include mandatory archival steps:
+1. Create output document with full context
+2. Archive input document with date prefix (YYYYMMDD)
+3. Update archive registry index and table of contents
+4. Log workflow decisions in ELICITATIONS.md (if novel trade-offs)
+5. Sync version/changelog via `/integrate-feature` only
+
 ---
 
 ## Section 2: Agent Skills Strategy
