@@ -56,9 +56,9 @@ ruff check .
 - Coverage ≥ 80% for new code
 - No lint or type errors
 
-#### 1.2 Verify Handoff Document
+#### 1.2 Verify Implementation Reference
 
-Check the `IMPLEMENTATION_HANDOFF.md` created during implementation phase:
+Check the `NEW_IMPLEMENTATION_REFERENCE.md` created during implementation phase:
 - [ ] Feature scope clearly defined
 - [ ] All acceptance criteria covered
 - [ ] List of changed files with line ranges

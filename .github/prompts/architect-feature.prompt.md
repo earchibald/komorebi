@@ -28,6 +28,11 @@ Use for features that:
 
 **Do NOT use for:** Simple CRUD, bug fixes, or single-file changes.
 
+## Input Document (Preferred)
+
+- **Should receive:** `NEW_FEATURE.md`
+- **May receive:** Any attached or referenced document that serves the same purpose
+
 ## Architecture Workflow
 
 ### Phase 1: Requirements Analysis
@@ -264,17 +269,19 @@ Before implementing:
 
 Architecture deliverables:
 
-1. **Document in BUILD.md** - Add feature architecture section
-2. **Update CONVENTIONS.md** - If new patterns introduced
-3. **Create feature doc** - For complex features: `docs/FEATURE_NAME.md`
-4. **Log decisions** - Add to `ELICITATIONS.md` if blocking questions arose
+1. **Create `NEW_FEATURE_ARCHITECTURE.md`** - This is the primary architecture deliverable
+2. **Archive the input document** - Move `NEW_FEATURE.md` (or equivalent input) into `docs/archives/` after `NEW_FEATURE_ARCHITECTURE.md` is created
+3. **Update archives index + TOC** - Add the archived input document to `docs/archives/ARCHIVED_DOCUMENTS.md`
+4. **Document in BUILD.md** - Add feature architecture section
+5. **Update CONVENTIONS.md** - If new patterns introduced
+6. **Log decisions** - Add to `ELICITATIONS.md` if blocking questions arose
 
-## Handoff Document
+## Architecture Document
 
-At the end of architecture phase, create `ARCHITECTURE_HANDOFF.md` in the feature branch root:
+At the end of architecture phase, create `NEW_FEATURE_ARCHITECTURE.md` in the feature branch root:
 
 ```markdown
-# Architecture Handoff: [Feature Name]
+# Feature Architecture: [Feature Name]
 
 ## Feature Overview
 [1-2 sentence description of what will be built]
@@ -351,7 +358,7 @@ Create this document at the feature branch level (same as README) and reference 
 
 ## Output Format
 
-Provide a complete architecture document:
+Provide a complete architecture document as `NEW_FEATURE_ARCHITECTURE.md`:
 
 ```markdown
 # Feature Architecture: [Name]

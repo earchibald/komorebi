@@ -660,18 +660,18 @@ Run: `pytest backend/tests/test_items.py` → **Tests pass** ✅
 - Favorite flag for items (PATCH /items/{id}/favorite)
 ```
 
-## Handoff Document
+## Implementation Reference Document
 
-At the end of implementation phase, create `IMPLEMENTATION_HANDOFF.md` in the feature branch root:
+At the end of implementation phase, create `NEW_IMPLEMENTATION_REFERENCE.md` in the feature branch root:
 
 ```markdown
-# Implementation Handoff: [Feature Name]
+# Implementation Reference: [Feature Name]
 
 ## Feature Summary
 [What was built, what problems it solves]
 
 ## Architecture Used
-[Referenced from ARCHITECTURE_HANDOFF.md]
+[Referenced from NEW_FEATURE_ARCHITECTURE.md]
 
 ## Acceptance Criteria
 - [x] Criterion 1 - [evidence]

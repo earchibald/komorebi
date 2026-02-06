@@ -665,7 +665,7 @@ pytest backend/tests/ -v
 
 ### Architecture Docs
 - [BUILD.md](BUILD.md) — Technical blueprint
-- [ARCHITECTURE_HANDOFF.md](ARCHITECTURE_HANDOFF.md) — Deployment design
+- [NEW_FEATURE_ARCHITECTURE.md](NEW_FEATURE_ARCHITECTURE.md) — Deployment design
 - [CONVENTIONS.md](CONVENTIONS.md) — Code patterns (750 lines, definitive)
 - [PROPOSAL.md](PROPOSAL.md) — Module specifications (989 lines)
 

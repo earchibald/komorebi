@@ -1,7 +1,7 @@
 # Komorebi Prompts & Skills Guide
 
 **Version:** 1.1.0  
-**Last Updated:** February 7, 2026
+**Last Updated:** February 5, 2026
 
 This guide explains how to use the custom prompts and agent skills in the Komorebi project.
 
@@ -302,7 +302,7 @@ Design the MCP Tool Browser feature:
 - System design (components, API, data model)
 - Trade-off documentation
 - Task breakdown with estimates
-- ARCHITECTURE_HANDOFF.md for implementation phase
+- `NEW_FEATURE_ARCHITECTURE.md` for implementation phase
 
 ---
 

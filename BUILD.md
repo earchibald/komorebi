@@ -87,7 +87,7 @@ komorebi/
 ├── docs/                        # Full documentation suite
 ├── pyproject.toml               # Python project config (v0.5.0)
 ├── VERSION                      # Single source of truth for version
-└── ARCHITECTURE_HANDOFF.md      # Next-phase design document
+└── NEW_FEATURE_ARCHITECTURE.md  # Next-phase design document
 ```
 
 ---
@@ -170,7 +170,7 @@ See [VERSIONING.md](VERSIONING.md) for full protocol.
 
 Target: **Railway.app** (managed PaaS with persistent volumes).
 
-See [ARCHITECTURE_HANDOFF.md](ARCHITECTURE_HANDOFF.md) for deployment architecture:
+See [NEW_FEATURE_ARCHITECTURE.md](NEW_FEATURE_ARCHITECTURE.md) for deployment architecture:
 - Multi-stage Docker build (Node → Python)
 - Single-container serving (FastAPI + StaticFiles)
 - SQLite on persistent volume
@@ -187,4 +187,4 @@ See [ARCHITECTURE_HANDOFF.md](ARCHITECTURE_HANDOFF.md) for deployment architectu
 5. **Capture-first** — Ingestion never blocks, always returns 202 immediately
 6. **Soft-delete only** — Chunks are archived/deleted by status, never removed from database
 
-See [ARCHITECTURE_HANDOFF.md](ARCHITECTURE_HANDOFF.md) for detailed trade-off analysis.
+See [NEW_FEATURE_ARCHITECTURE.md](NEW_FEATURE_ARCHITECTURE.md) for detailed trade-off analysis.

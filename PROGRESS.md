@@ -266,8 +266,8 @@
 - ✅ Created `integrate-feature.prompt.md` — Integration/finalization workflow
   - Version bumping, changelog sync, PR creation, ship readiness
   - Aliases: `/integrate`, `/finalize`, `/ship`, `/int`
-- ✅ Added ARCHITECTURE_HANDOFF.md template to `architect-feature.prompt.md`
-- ✅ Added IMPLEMENTATION_HANDOFF.md template to `implement-feature.prompt.md`
+- ✅ Added NEW_FEATURE_ARCHITECTURE.md template to `architect-feature.prompt.md`
+- ✅ Added NEW_IMPLEMENTATION_REFERENCE.md template to `implement-feature.prompt.md`
 - ✅ Added `.vite/` to `.gitignore`
 - ✅ Audited and upgraded all 8 prompt tool sets:
   - All prompts now have full builtin tools: `search/codebase`, `editFiles`, `runTerminalCommand`, `githubRepo`, `fetch`

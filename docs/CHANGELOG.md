@@ -13,6 +13,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2026-02-05
+
+### Added
+- **Agentic Workflow Governance** — Formal document handoff system for multi-stage feature development
+  - **architect-feature workflow**: Accepts `NEW_FEATURE.md`, produces `NEW_FEATURE_ARCHITECTURE.md`, archives input
+  - **implement-feature workflow**: Accepts `NEW_FEATURE_ARCHITECTURE.md`, produces `NEW_IMPLEMENTATION_REFERENCE.md`, archives input
+  - **integrate-feature workflow**: Accepts `NEW_IMPLEMENTATION_REFERENCE.md`, archives and suggests 3 best next-step options
+  - **Archive registry**: `docs/archives/ARCHIVED_DOCUMENTS.md` tracks all processed documents with date-based indexing
+  - **Governance updates**: All 3 prompts updated with archival requirements and input/output document specifications
+  - **Documentation sync**: PROMPT_GUIDE.md, IMPLEMENTATION_SUMMARY.md, BUILD.md, PROMPTS_AND_SKILLS_PROPOSAL.md updated to reflect new workflow
+
+### Changed
+- **Prompt governance**: All 3 core feature prompts now enforce: create output doc → archive input doc → update archive index
+- **Handoff document naming**: `ARCHITECTURE_HANDOFF.md` → `NEW_FEATURE_ARCHITECTURE.md`, `IMPLEMENTATION_HANDOFF.md` → `NEW_IMPLEMENTATION_REFERENCE.md`
+- **Integration phase enhancement**: `/integrate-feature` now suggests 3 unordered next-step options with contextual paragraphs
+- **Governance docs updated**: References to old handoff names replaced throughout codebase
+
+### Technical
+- Archive registry supports date-based organization (YYYYMMDD prefix for archived documents)
+- Archive index includes workflow stage, input doc, generated output, and notes columns
+- No breaking changes; all features are additive to existing prompts
+
+---
+
 ## [0.8.1] - 2026-02-05
 
 ### Added
@@ -131,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Developer Experience
 - **Prompt System Enhancements** — All custom prompts now have full tool access (agent, edit, execute, read, search, todo, vscode, web, fetch, githubRepo)
 - **integrate-feature.prompt.md** — New prompt for feature integration workflow (validation, versioning, git commit, PR creation)
-- **Handoff template** — implement-feature.prompt.md now includes IMPLEMENTATION_HANDOFF.md template for documentation
+- **Handoff template** — implement-feature.prompt.md now includes NEW_IMPLEMENTATION_REFERENCE.md template for documentation
 - **MCP Server Configuration** — Added GitKraken and Playwright MCP servers to config (disabled by default)
 - **Git Commit Hygiene** — Added mandatory governance rules in copilot-instructions.md for frequent commits and clean tree enforcement
 

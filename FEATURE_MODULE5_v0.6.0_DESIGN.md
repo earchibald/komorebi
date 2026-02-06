@@ -697,7 +697,7 @@ Before merging:
 ### Schema Review
 - [ ] Pydantic models complete with validators
 - [ ] Database migration tested (fresh DB and existing DB)
-- [ ] API contract documented in ARCHITECTURE_HANDOFF.md
+- [ ] API contract documented in NEW_FEATURE_ARCHITECTURE.md
 
 ### Security Review
 - [ ] No secrets in Dockerfile or docker-compose.yml
