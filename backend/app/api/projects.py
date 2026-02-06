@@ -11,8 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db, ChunkRepository, ProjectRepository, EntityRepository
 from ..models import Project, ProjectCreate, ProjectUpdate
+from ..models.resume import ProjectBriefing
 from ..core import CompactorService
 from ..core.events import event_bus, ChunkEvent, EventType
+from ..core.ollama_client import KomorebiLLM
+from ..core.similarity import TFIDFService
+from ..services.resume_service import ResumeService
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -150,3 +154,45 @@ async def get_project_context(
         "context_summary": project.context_summary,
         "chunk_count": project.chunk_count,
     }
+
+
+@router.get("/{project_id}/resume", response_model=ProjectBriefing)
+async def get_project_resume(
+    project_id: UUID,
+    hours: int = 48,
+    project_repo: ProjectRepository = Depends(get_project_repo),
+    chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+    entity_repo: EntityRepository = Depends(get_entity_repo),
+) -> ProjectBriefing:
+    """Generate a Context Resume briefing for a project.
+
+    Returns an LLM-synthesized 'Morning Briefing' with:
+    - 3-bullet summary (where you left off, key context, next step)
+    - Recent chunks for jump-to navigation
+    - Recent decisions from entities
+    - TF-IDF related context snippets
+
+    Falls back to template-based summary when Ollama is unavailable.
+
+    Args:
+        project_id: The project UUID.
+        hours: Look-back window for recent decisions (default 48).
+    """
+    # Verify project exists
+    project = await project_repo.get(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Wire dependencies
+    tfidf = TFIDFService()
+    llm = KomorebiLLM()
+    service = ResumeService(
+        chunk_repo=chunk_repo,
+        project_repo=project_repo,
+        entity_repo=entity_repo,
+        tfidf_service=tfidf,
+        llm=llm,
+    )
+
+    briefing = await service.generate_briefing(project_id, hours=hours)
+    return briefing

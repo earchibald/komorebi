@@ -15,6 +15,7 @@ from .chunk import (
 from .project import Project, ProjectCreate, ProjectUpdate
 from .entity import Entity, EntityCreate, EntityType
 from .mcp import MCPServerConfig, MCPServerStatus
+from .resume import ProjectBriefing, BriefingSection
 
 __all__ = [
     "Chunk",
@@ -37,4 +38,6 @@ __all__ = [
     "EntityType",
     "MCPServerConfig",
     "MCPServerStatus",
+    "ProjectBriefing",
+    "BriefingSection",
 ]

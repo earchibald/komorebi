@@ -88,6 +88,30 @@ class KomorebiLLM:
         ):
             yield chunk['response']
 
+    async def generate(
+        self,
+        prompt: str,
+        system: Optional[str] = None,
+        max_tokens: int = 500,
+    ) -> str:
+        """General-purpose text generation.
+        
+        Args:
+            prompt: The user prompt.
+            system: Optional system prompt for context anchoring.
+            max_tokens: Approximate max response length (advisory).
+            
+        Returns:
+            Generated text response.
+        """
+        response = await self.client.generate(
+            model=self.model,
+            prompt=prompt,
+            system=system or "You are a concise assistant.",
+            stream=False,
+        )
+        return response['response'].strip()
+
     async def extract_entities(self, content: str) -> dict:
         """Extract structured entities from text using JSON mode.
         

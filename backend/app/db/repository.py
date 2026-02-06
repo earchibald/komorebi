@@ -511,16 +511,28 @@ class EntityRepository:
         project_id: UUID,
         entity_type: Optional[EntityType] = None,
         min_confidence: float = 0.0,
+        since: Optional[datetime] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[Entity]:
-        """List entities for a project with optional filters."""
+        """List entities for a project with optional filters.
+        
+        Args:
+            project_id: Project to filter by.
+            entity_type: Optional entity type filter.
+            min_confidence: Minimum confidence threshold.
+            since: Only return entities created after this datetime.
+            limit: Maximum number of results.
+            offset: Pagination offset.
+        """
         query = select(EntityTable).where(EntityTable.project_id == str(project_id))
         
         if entity_type:
             query = query.where(EntityTable.entity_type == entity_type.value)
         if min_confidence > 0.0:
             query = query.where(EntityTable.confidence >= min_confidence)
+        if since:
+            query = query.where(EntityTable.created_at >= since)
         
         query = query.order_by(EntityTable.created_at.desc())
         query = query.limit(limit).offset(offset)

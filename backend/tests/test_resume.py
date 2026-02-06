@@ -20,8 +20,10 @@ from backend.app.db.repository import (
     EntityRepository,
 )
 from backend.app.models import (
+    Chunk,
     ChunkCreate,
     ProjectCreate,
+    Entity,
     EntityCreate,
     EntityType,
     ChunkStatus,
@@ -229,12 +231,13 @@ async def test_service_ollama_unavailable():
     project.description = "Test project"
     project.context_summary = "Prior summary"
 
-    chunk = MagicMock()
-    chunk.id = chunk_id
-    chunk.content = "Fixed auth bug"
-    chunk.summary = "Auth fix"
-    chunk.status = ChunkStatus.PROCESSED
-    chunk.created_at = datetime.utcnow()
+    chunk = Chunk(
+        id=chunk_id,
+        content="Fixed auth bug",
+        summary="Auth fix",
+        status=ChunkStatus.PROCESSED,
+        project_id=project_id,
+    )
 
     project_repo = AsyncMock(spec=ProjectRepository)
     project_repo.get.return_value = project
@@ -277,18 +280,21 @@ async def test_service_with_decisions():
     project.description = "Has decisions"
     project.context_summary = None
 
-    chunk = MagicMock()
-    chunk.id = chunk_id
-    chunk.content = "Use JWT for auth"
-    chunk.summary = "JWT decision"
-    chunk.status = ChunkStatus.PROCESSED
-    chunk.created_at = datetime.utcnow()
+    chunk = Chunk(
+        id=chunk_id,
+        content="Use JWT for auth",
+        summary="JWT decision",
+        status=ChunkStatus.PROCESSED,
+        project_id=project_id,
+    )
 
-    decision_entity = MagicMock()
-    decision_entity.entity_type = EntityType.DECISION
-    decision_entity.value = "Use RS256 for JWT"
-    decision_entity.confidence = 0.9
-    decision_entity.created_at = datetime.utcnow()
+    decision_entity = Entity(
+        chunk_id=chunk_id,
+        project_id=project_id,
+        entity_type=EntityType.DECISION,
+        value="Use RS256 for JWT",
+        confidence=0.9,
+    )
 
     project_repo = AsyncMock(spec=ProjectRepository)
     project_repo.get.return_value = project
@@ -331,19 +337,21 @@ async def test_service_related_chunks():
     project.description = "Test project"
     project.context_summary = None
 
-    chunk1 = MagicMock()
-    chunk1.id = chunk_id_1
-    chunk1.content = "Authentication service using JWT tokens with RS256 algorithm"
-    chunk1.summary = "Auth JWT"
-    chunk1.status = ChunkStatus.PROCESSED
-    chunk1.created_at = datetime.utcnow()
+    chunk1 = Chunk(
+        id=chunk_id_1,
+        content="Authentication service using JWT tokens with RS256 algorithm",
+        summary="Auth JWT",
+        status=ChunkStatus.PROCESSED,
+        project_id=project_id,
+    )
 
-    chunk2 = MagicMock()
-    chunk2.id = chunk_id_2
-    chunk2.content = "JWT token validation middleware implementing RS256 verification"
-    chunk2.summary = "JWT validation"
-    chunk2.status = ChunkStatus.PROCESSED
-    chunk2.created_at = datetime.utcnow() - timedelta(hours=1)
+    chunk2 = Chunk(
+        id=chunk_id_2,
+        content="JWT token validation middleware implementing RS256 verification",
+        summary="JWT validation",
+        status=ChunkStatus.PROCESSED,
+        project_id=project_id,
+    )
 
     project_repo = AsyncMock(spec=ProjectRepository)
     project_repo.get.return_value = project
@@ -388,12 +396,13 @@ async def test_service_ollama_available():
     project.description = "Test LLM"
     project.context_summary = None
 
-    chunk = MagicMock()
-    chunk.id = chunk_id
-    chunk.content = "Implementing rate limiting for API"
-    chunk.summary = "Rate limiting"
-    chunk.status = ChunkStatus.PROCESSED
-    chunk.created_at = datetime.utcnow()
+    chunk = Chunk(
+        id=chunk_id,
+        content="Implementing rate limiting for API",
+        summary="Rate limiting",
+        status=ChunkStatus.PROCESSED,
+        project_id=project_id,
+    )
 
     project_repo = AsyncMock(spec=ProjectRepository)
     project_repo.get.return_value = project
