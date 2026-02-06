@@ -1,11 +1,13 @@
 import { useEffect, useState, FormEvent } from 'react'
-import { projects, loading, fetchProjects, createProject } from '../store'
+import { projects, loading, fetchProjects, createProject, clearBriefing } from '../store'
 import type { Project } from '../store'
+import { ResumeCard } from './ResumeCard'
 
 export function ProjectList() {
   const [isCreating, setIsCreating] = useState(false)
   const [newName, setNewName] = useState('')
   const [newDescription, setNewDescription] = useState('')
+  const [resumeProjectId, setResumeProjectId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProjects()
@@ -22,6 +24,16 @@ export function ProjectList() {
       setIsCreating(false)
     } catch {
       // Error handled in store
+    }
+  }
+
+  const handleResumeToggle = (projectId: string) => {
+    if (resumeProjectId === projectId) {
+      clearBriefing()
+      setResumeProjectId(null)
+    } else {
+      clearBriefing()
+      setResumeProjectId(projectId)
     }
   }
 
@@ -89,6 +101,23 @@ export function ProjectList() {
                     {project.context_summary.length > 200 && '...'}
                   </p>
                 </div>
+              )}
+              <div style={{ marginTop: '1rem' }}>
+                <button
+                  className="resume-toggle-btn"
+                  onClick={() => handleResumeToggle(project.id)}
+                >
+                  {resumeProjectId === project.id ? '✕ Close Resume' : '▶ Resume'}
+                </button>
+              </div>
+              {resumeProjectId === project.id && (
+                <ResumeCard
+                  projectId={project.id}
+                  onClose={() => {
+                    clearBriefing()
+                    setResumeProjectId(null)
+                  }}
+                />
               )}
             </div>
           ))}

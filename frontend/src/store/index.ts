@@ -189,6 +189,30 @@ export const timelineGranularity = signal<'day' | 'week' | 'month'>('week')
 export const relatedChunks = signal<RelatedChunk[]>([])
 export const relatedLoading = signal(false)
 
+// Resume briefing state (per-project on-demand)
+export interface BriefingSection {
+  heading: string
+  content: string
+  chunk_id: string | null
+}
+
+export interface ProjectBriefing {
+  project_id: string
+  project_name: string
+  generated_at: string
+  summary: string
+  sections: BriefingSection[]
+  recent_chunks: Chunk[]
+  decisions: Entity[]
+  related_context: string[]
+  ollama_available: boolean
+  context_window_usage: number | null
+}
+
+export const briefing = signal<ProjectBriefing | null>(null)
+export const briefingLoading = signal(false)
+export const briefingError = signal<string | null>(null)
+
 const cachedChunks = readCache<Chunk[]>(STORAGE_KEYS.chunks)
 const cachedProjects = readCache<Project[]>(STORAGE_KEYS.projects)
 const cachedStats = readCache<DashboardStats>(STORAGE_KEYS.stats)
@@ -480,6 +504,29 @@ export async function fetchTimeline(
   } finally {
     timelineLoading.value = false
   }
+}
+
+// Resume briefing actions
+export async function fetchBriefing(projectId: string, hours: number = 48): Promise<void> {
+  briefingLoading.value = true
+  briefingError.value = null
+
+  try {
+    const params = new URLSearchParams({ hours: String(hours) })
+    const response = await fetch(`${API_URL}/projects/${projectId}/resume?${params}`)
+    if (!response.ok) throw new Error('Failed to generate briefing')
+    briefing.value = await response.json()
+  } catch (e) {
+    briefingError.value = e instanceof Error ? e.message : 'Briefing error'
+    briefing.value = null
+  } finally {
+    briefingLoading.value = false
+  }
+}
+
+export function clearBriefing(): void {
+  briefing.value = null
+  briefingError.value = null
 }
 
 // SSE connection for real-time updates

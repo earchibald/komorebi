@@ -1329,3 +1329,227 @@ body {
   border-radius: 4px;
   font-family: monospace;
 }
+
+/* ──────────────────────────────────────────────────
+   Context Resume Card
+   ────────────────────────────────────────────────── */
+
+.resume-toggle-btn {
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.resume-toggle-btn:hover {
+  background: var(--accent-purple, #8b5cf6);
+}
+
+.resume-card {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 8px;
+}
+
+.resume-card--error {
+  border-left-color: var(--status-error, #ef4444);
+}
+
+.resume-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.resume-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.resume-timestamp {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.resume-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.resume-close:hover {
+  color: var(--text-primary);
+}
+
+/* Badge */
+.resume-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.resume-badge--fallback {
+  background: var(--status-warning-bg, rgba(245, 158, 11, 0.15));
+  color: var(--status-warning, #f59e0b);
+}
+
+/* Summary */
+.resume-summary {
+  margin-bottom: 1rem;
+}
+
+.resume-summary-line {
+  margin: 0.3rem 0;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Sections grid */
+.resume-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .resume-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resume-section {
+  background: var(--bg-primary);
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.resume-section-heading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.resume-section-content {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Jump button */
+.resume-jump-btn {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: none;
+  border: 1px solid var(--accent-blue);
+  color: var(--accent-blue);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.resume-jump-btn:hover {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+/* Decisions list */
+.resume-decision-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resume-decision-item {
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.resume-decision-item::before {
+  content: '';
+  margin-right: 0.4rem;
+}
+
+/* Related context */
+.resume-related {
+  margin-bottom: 0.75rem;
+}
+
+.resume-related-snippet {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0.25rem 0;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border-color);
+}
+
+/* Meta */
+.resume-meta {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+/* Error + retry */
+.resume-error-text {
+  color: var(--status-error, #ef4444);
+  margin: 0 0 0.75rem;
+}
+
+.resume-retry-btn {
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Skeleton loading animation */
+.resume-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-line {
+  height: 1rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-color) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-line--long { width: 90%; }
+.skeleton-line--medium { width: 65%; }
+.skeleton-line--short { width: 40%; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
