@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 7 new Pydantic models: `DashboardStats`, `WeekBucket`, `TimelineGranularity`, `TimelineBucket`, `TimelineResponse`, `RelatedChunk`, `RelatedChunksResponse`
 - 5 new repository methods: `count_by_week()`, `oldest_inbox()`, `timeline()`, `get_all_content()`, `EntityRepository.count_all()`
 - 37 new tests (9 stats, 11 timeline, 17 related/TF-IDF) — all passing
-- Full regression: 75 passed, 3 skipped, 0 failures
+- Full regression: 85 passed, 3 skipped, 0 failures (88 collected)
 - Frontend build clean (tsc + vite)
 - Ruff lint clean (16 auto-fixed unused imports)
 

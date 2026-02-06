@@ -385,10 +385,18 @@
 - ✅ **CSS** (appended): ~250 lines for dashboard, timeline, inbox header, related chunks styling
 
 #### Quality Gates
-- ✅ **Backend Tests**: 75 passed, 3 skipped, 0 failures
+- ✅ **Backend Tests**: 85 passed, 3 skipped, 0 failures (88 collected)
 - ✅ **Ruff Lint**: All checks passed (16 unused imports auto-fixed)
 - ✅ **Frontend Build**: `tsc && vite build` clean
 - ✅ **Documentation**: CHANGELOG, CONVENTIONS, PROGRESS, CURRENT_STATUS updated
+
+#### Signal Auto-Tracking Root Cause Fix (v0.7.0 continued)
+- ✅ **Root Cause**: `@preact/signals-react` v2 requires `import '@preact/signals-react/auto'` as the first import in `main.tsx` to enable auto-tracking. Without it, `.value` reads are plain property accesses — zero subscription effect, components never re-render.
+- ✅ **Fix**: Added one-line import to `frontend/src/main.tsx`
+- ✅ **Verified**: Playwright browser automation confirmed search "content 5" → 1 result, clear → 10, gibberish → 0 + empty state
+- ✅ **CLI Search**: New `komorebi search "query"` command with text, status, entity, date range filters
+- ✅ **10 New Backend Search Tests**: Distinct results, partial matching, pagination no-overlap, combined filters, date ranges
+- ✅ **Documented**: Added auto-tracking rule to CONVENTIONS.md (mandatory pattern)
 
 ## Benchmark Results
 

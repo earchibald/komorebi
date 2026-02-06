@@ -15,6 +15,19 @@
 - Fix: Local `useState` bridge pattern in SearchBar.tsx and FilterPanel.tsx (6 fields)
 - Documented as mandatory pattern in CONVENTIONS.md
 
+**Signal Auto-Tracking Root Cause Fix (Critical):**
+- True root cause of ALL search/filter UI failures: `@preact/signals-react` v2 requires `import '@preact/signals-react/auto'` as first import in `main.tsx`
+- Without this import, `.value` reads are plain property accesses with zero subscription effect — components never re-render
+- Fix verified via Playwright browser automation end-to-end
+
+**CLI Search Command:**
+- `komorebi search "query"` with text, status, entity, date range filters
+- Verbose/JSON output modes for diagnostics
+
+**10 New Backend Search Tests:**
+- Distinct results, partial matching, pagination no-overlap, combined filters, date ranges
+- Total regression suite: 85 passed, 3 skipped
+
 **Enhanced Dashboard Stats:**
 - `GET /chunks/stats` now returns `DashboardStats` with weekly activity trends, insights (oldest inbox age, most active project, entity count), and per-project breakdown
 - New `StatsDashboard` component with weekly bar chart, insights panel, project breakdown
@@ -38,7 +51,7 @@
 
 **Test Coverage:**
 - 37 new tests (9 stats, 11 timeline, 17 related/TF-IDF)
-- Full regression: 75 passed, 3 skipped, 0 failures
+- Full regression: 85 passed, 3 skipped, 0 failures (88 collected)
 
 ### Module 4: Search & Entity Filtering — Full Stack Complete
 
