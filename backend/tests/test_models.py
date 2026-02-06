@@ -1,13 +1,11 @@
 """Tests for Pydantic models."""
 
-import pytest
 from uuid import UUID
 from datetime import datetime
 
 from backend.app.models import (
     Chunk, ChunkCreate, ChunkUpdate, ChunkStatus,
-    Project, ProjectCreate, ProjectUpdate,
-    MCPServerConfig, MCPServerStatus,
+    Project, ProjectCreate, MCPServerConfig, MCPServerStatus,
 )
 
 

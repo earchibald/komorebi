@@ -5,10 +5,9 @@ development and single-instance deployments.
 """
 
 import os
-from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from sqlalchemy import Column, DateTime, Enum, Integer, String, Text, Boolean, Float
+from sqlalchemy import Column, DateTime, Integer, String, Text, Boolean, Float
 from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base

@@ -6,7 +6,6 @@ Implements the "Recursive Compactor" pattern:
 - Map-reduce summarization for large context
 """
 
-import asyncio
 from datetime import datetime
 from typing import Optional
 from uuid import UUID

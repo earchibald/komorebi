@@ -1,19 +1,15 @@
 """Tests for Module 2: Entity Extraction and Recursive Compaction."""
 
 import pytest
-from uuid import uuid4
 
 from backend.app.models import (
-    Entity,
     EntityCreate,
     EntityType,
-    Project,
     ProjectCreate,
-    Chunk,
     ChunkCreate,
     ChunkStatus,
 )
-from backend.app.core.compactor import CompactorService, MAX_CONTEXT_WINDOW
+from backend.app.core.compactor import CompactorService
 from backend.app.db.repository import EntityRepository, ChunkRepository, ProjectRepository
 
 
@@ -157,7 +153,7 @@ async def test_recursive_reduce_large_context(test_db):
     with patch.object(compactor.llm, 'summarize', new_callable=AsyncMock) as mock_summarize:
         mock_summarize.return_value = "Batch summary"
         
-        result = await compactor.recursive_reduce(texts, depth=1)
+        await compactor.recursive_reduce(texts, depth=1)
         
         # Should call summarize multiple times (batching + final reduce)
         # 10 texts / batch_size(5) = 2 batches + 1 final = 3 calls

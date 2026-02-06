@@ -4,7 +4,6 @@ Provides management of projects - containers for organizing
 chunks and maintaining aggregate context.
 """
 
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks

@@ -7,15 +7,14 @@ This test verifies:
 4. Project compaction completes successfully
 """
 
-import asyncio
 from uuid import uuid4
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from backend.app.core.ollama_client import KomorebiLLM
 from backend.app.core.compactor import CompactorService
-from backend.app.models import Chunk, ChunkStatus, ChunkCreate, Project, ProjectCreate
+from backend.app.models import Chunk, ChunkStatus, Project
 from backend.app.db.repository import ChunkRepository, ProjectRepository
 
 
