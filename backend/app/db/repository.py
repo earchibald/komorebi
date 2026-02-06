@@ -4,11 +4,13 @@ Provides clean abstractions over database operations,
 enabling easy testing and potential backend swaps.
 """
 
-from datetime import datetime
+from __future__ import annotations
+
+from datetime import datetime, timedelta
 from typing import Optional, Tuple, List
 from uuid import UUID
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
@@ -208,6 +210,127 @@ class ChunkRepository:
             query = query.where(ChunkTable.status == status.value)
         result = await self.session.execute(query)
         return result.scalar_one()
+
+    async def count_by_week(self, weeks: int = 8) -> list[tuple[str, int]]:
+        """Count chunks created per week for the past N weeks.
+        
+        Returns:
+            List of (week_start_date_str, count) tuples ordered chronologically.
+        """
+        cutoff = datetime.utcnow() - timedelta(weeks=weeks)
+        
+        # Use strftime for SQLite date bucketing
+        result = await self.session.execute(
+            text(
+                "SELECT strftime('%Y-%W', created_at) as week_key, "
+                "MIN(date(created_at, 'weekday 1', '-7 days')) as week_start, "
+                "COUNT(*) as cnt "
+                "FROM chunks "
+                "WHERE created_at >= :cutoff "
+                "GROUP BY week_key "
+                "ORDER BY week_key"
+            ),
+            {"cutoff": cutoff},
+        )
+        rows = result.fetchall()
+        return [(str(row[1]), int(row[2])) for row in rows]
+
+    async def oldest_inbox(self) -> Optional[datetime]:
+        """Get creation date of oldest inbox chunk."""
+        result = await self.session.execute(
+            select(func.min(ChunkTable.created_at)).where(
+                ChunkTable.status == ChunkStatus.INBOX.value
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def timeline(
+        self,
+        granularity: str = "week",
+        weeks: int = 8,
+        project_id: Optional[UUID] = None,
+    ) -> list[dict]:
+        """Group chunks by time bucket for timeline view.
+        
+        Args:
+            granularity: 'day', 'week', or 'month'
+            weeks: Number of weeks to look back
+            project_id: Optional project filter
+            
+        Returns:
+            List of bucket dicts with label, start, count, status breakdown, and chunk IDs.
+        """
+        cutoff = datetime.utcnow() - timedelta(weeks=weeks)
+        
+        # Date format based on granularity
+        format_map = {
+            "day": "%Y-%m-%d",
+            "week": "%Y-%W",
+            "month": "%Y-%m",
+        }
+        date_format = format_map.get(granularity, "%Y-%W")
+        
+        # Build raw SQL for grouping
+        where_clauses = ["created_at >= :cutoff"]
+        params: dict = {"cutoff": cutoff}
+        
+        if project_id:
+            where_clauses.append("project_id = :project_id")
+            params["project_id"] = str(project_id)
+        
+        where_sql = " AND ".join(where_clauses)
+        
+        # Get chunk details grouped by time bucket
+        result = await self.session.execute(
+            text(
+                f"SELECT id, status, created_at, "
+                f"strftime('{date_format}', created_at) as bucket_key "
+                f"FROM chunks "
+                f"WHERE {where_sql} "
+                f"ORDER BY created_at"
+            ),
+            params,
+        )
+        rows = result.fetchall()
+        
+        # Group into buckets
+        buckets: dict[str, dict] = {}
+        for row in rows:
+            chunk_id, status, created_at, bucket_key = row
+            if bucket_key not in buckets:
+                # Generate human-readable label
+                if granularity == "day":
+                    label = str(created_at)[:10]
+                elif granularity == "week":
+                    label = f"Week {bucket_key}"
+                else:
+                    label = str(created_at)[:7]
+                
+                buckets[bucket_key] = {
+                    "bucket_label": label,
+                    "bucket_start": str(created_at),
+                    "chunk_count": 0,
+                    "by_status": {},
+                    "chunk_ids": [],
+                }
+            
+            bucket = buckets[bucket_key]
+            bucket["chunk_count"] += 1
+            bucket["by_status"][status] = bucket["by_status"].get(status, 0) + 1
+            bucket["chunk_ids"].append(str(chunk_id))
+        
+        return list(buckets.values())
+
+    async def get_all_content(self) -> list[tuple[str, str]]:
+        """Get all chunk IDs and content for similarity computation.
+        
+        Returns:
+            List of (chunk_id, content) tuples.
+        """
+        result = await self.session.execute(
+            select(ChunkTable.id, ChunkTable.content)
+        )
+        return [(str(row[0]), str(row[1])) for row in result.fetchall()]
     
     def _to_model(self, db_chunk: ChunkTable) -> Chunk:
         """Convert database row to Pydantic model."""
@@ -350,6 +473,13 @@ class EntityRepository:
     
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def count_all(self) -> int:
+        """Count total entities across all chunks."""
+        result = await self.session.execute(
+            select(func.count(EntityTable.id))
+        )
+        return result.scalar_one()
     
     async def create_many(self, entities: list[EntityCreate]) -> list[Entity]:
         """Create multiple entities in a single transaction."""

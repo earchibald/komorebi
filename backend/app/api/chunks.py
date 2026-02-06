@@ -4,6 +4,7 @@ Provides fast capture and management of chunks - the
 fundamental unit of information in Komorebi.
 """
 
+import time
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
@@ -12,9 +13,15 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db, ChunkRepository, ProjectRepository, EntityRepository
-from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus, SearchResult
+from ..models import (
+    Chunk, ChunkCreate, ChunkUpdate, ChunkStatus, SearchResult,
+    DashboardStats, WeekBucket,
+    TimelineGranularity, TimelineBucket, TimelineResponse,
+    RelatedChunk, RelatedChunksResponse,
+)
 from ..core import CompactorService
 from ..core.events import event_bus, ChunkEvent, EventType
+from ..core.similarity import TFIDFService
 
 router = APIRouter(prefix="/chunks", tags=["chunks"])
 
@@ -162,23 +169,101 @@ async def list_inbox(
     )
 
 
-@router.get("/stats")
+@router.get("/stats", response_model=DashboardStats)
 async def get_stats(
     chunk_repo: ChunkRepository = Depends(get_chunk_repo),
-) -> dict:
-    """Get chunk statistics."""
+    project_repo: ProjectRepository = Depends(get_project_repo),
+    entity_repo: EntityRepository = Depends(get_entity_repo),
+) -> DashboardStats:
+    """Get enhanced chunk statistics with trends and insights."""
+    # Basic counters
     inbox_count = await chunk_repo.count(ChunkStatus.INBOX)
     processed_count = await chunk_repo.count(ChunkStatus.PROCESSED)
     compacted_count = await chunk_repo.count(ChunkStatus.COMPACTED)
     archived_count = await chunk_repo.count(ChunkStatus.ARCHIVED)
     
-    return {
-        "inbox": inbox_count,
-        "processed": processed_count,
-        "compacted": compacted_count,
-        "archived": archived_count,
-        "total": inbox_count + processed_count + compacted_count + archived_count,
-    }
+    # Weekly trends
+    weekly_data = await chunk_repo.count_by_week(weeks=8)
+    by_week = [
+        WeekBucket(week_start=week_start, count=count)
+        for week_start, count in weekly_data
+    ]
+    
+    # Insights: oldest inbox
+    oldest_created = await chunk_repo.oldest_inbox()
+    oldest_age: Optional[int] = None
+    if oldest_created:
+        delta = datetime.utcnow() - oldest_created
+        oldest_age = delta.days
+    
+    # Insights: most active project
+    projects = await project_repo.list(limit=1000)
+    most_active_name: Optional[str] = None
+    most_active_count = 0
+    by_project: list[dict] = []
+    for proj in projects:
+        if proj.chunk_count > 0:
+            by_project.append({
+                "name": proj.name,
+                "chunk_count": proj.chunk_count,
+                "id": str(proj.id),
+            })
+        if proj.chunk_count > most_active_count:
+            most_active_count = proj.chunk_count
+            most_active_name = proj.name
+    
+    # Entity count
+    entity_count = await entity_repo.count_all()
+    
+    return DashboardStats(
+        inbox=inbox_count,
+        processed=processed_count,
+        compacted=compacted_count,
+        archived=archived_count,
+        total=inbox_count + processed_count + compacted_count + archived_count,
+        by_week=by_week,
+        oldest_inbox_age_days=oldest_age,
+        most_active_project=most_active_name,
+        most_active_project_count=most_active_count,
+        entity_count=entity_count,
+        by_project=by_project,
+    )
+
+
+@router.get("/timeline", response_model=TimelineResponse)
+async def get_timeline(
+    granularity: TimelineGranularity = Query(
+        TimelineGranularity.WEEK, description="Time bucket granularity"
+    ),
+    weeks: int = Query(8, ge=1, le=52, description="Number of weeks to look back"),
+    project_id: Optional[UUID] = Query(None, description="Optional project filter"),
+    chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+) -> TimelineResponse:
+    """Get chunks grouped by time bucket for timeline view."""
+    raw_buckets = await chunk_repo.timeline(
+        granularity=granularity.value,
+        weeks=weeks,
+        project_id=project_id,
+    )
+    
+    buckets = [
+        TimelineBucket(
+            bucket_label=b["bucket_label"],
+            bucket_start=b["bucket_start"],
+            chunk_count=b["chunk_count"],
+            by_status=b["by_status"],
+            chunk_ids=b["chunk_ids"],
+        )
+        for b in raw_buckets
+    ]
+    
+    total = sum(b.chunk_count for b in buckets)
+    
+    return TimelineResponse(
+        granularity=granularity.value,
+        buckets=buckets,
+        total_chunks=total,
+    )
 
 
 @router.get("/{chunk_id}", response_model=Chunk)
@@ -191,6 +276,46 @@ async def get_chunk(
     if not chunk:
         raise HTTPException(status_code=404, detail="Chunk not found")
     return chunk
+
+
+@router.get("/{chunk_id}/related", response_model=RelatedChunksResponse)
+async def get_related_chunks(
+    chunk_id: UUID,
+    limit: int = Query(5, ge=1, le=20, description="Max related chunks to return"),
+    chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+) -> RelatedChunksResponse:
+    """Find chunks similar to the given chunk using TF-IDF cosine similarity."""
+    # Verify chunk exists
+    target_chunk = await chunk_repo.get(chunk_id)
+    if not target_chunk:
+        raise HTTPException(status_code=404, detail="Chunk not found")
+    
+    # Get all chunk content for TF-IDF
+    start_time = time.monotonic()
+    all_content = await chunk_repo.get_all_content()
+    
+    # Compute related chunks
+    tfidf = TFIDFService()
+    related_raw = tfidf.find_related(str(chunk_id), all_content, top_k=limit)
+    
+    computation_ms = int((time.monotonic() - start_time) * 1000)
+    
+    # Fetch full chunk objects for results
+    related: list[RelatedChunk] = []
+    for doc_id, similarity, shared_terms in related_raw:
+        related_chunk = await chunk_repo.get(UUID(doc_id))
+        if related_chunk:
+            related.append(RelatedChunk(
+                chunk=related_chunk,
+                similarity=round(similarity, 4),
+                shared_terms=shared_terms,
+            ))
+    
+    return RelatedChunksResponse(
+        source_chunk_id=str(chunk_id),
+        related=related,
+        computation_ms=computation_ms,
+    )
 
 
 @router.patch("/{chunk_id}", response_model=Chunk)

@@ -88,3 +88,75 @@ class SearchResult(BaseModel):
     limit: int = Field(..., description="Page size used")
     offset: int = Field(..., description="Page offset used")
     query: Optional[str] = Field(None, description="Search query used")
+
+
+# --- Module 6: Enhanced Stats ---
+
+class WeekBucket(BaseModel):
+    """A week's chunk activity."""
+    week_start: str = Field(..., description="ISO date e.g. '2026-02-03'")
+    count: int = Field(..., description="Chunks created that week")
+
+
+class DashboardStats(BaseModel):
+    """Enhanced dashboard statistics with trends and insights."""
+    
+    # Existing counters
+    inbox: int = Field(0, description="Inbox chunk count")
+    processed: int = Field(0, description="Processed chunk count")
+    compacted: int = Field(0, description="Compacted chunk count")
+    archived: int = Field(0, description="Archived chunk count")
+    total: int = Field(0, description="Total chunk count")
+    
+    # Trends
+    by_week: list[WeekBucket] = Field(default_factory=list, description="Past 8 weeks of activity")
+    
+    # Insights
+    oldest_inbox_age_days: Optional[int] = Field(None, description="Days since oldest inbox chunk")
+    most_active_project: Optional[str] = Field(None, description="Name of project with most chunks")
+    most_active_project_count: int = Field(0, description="Chunk count for most active project")
+    entity_count: int = Field(0, description="Total entities extracted")
+    
+    # Per-project breakdown
+    by_project: list[dict] = Field(default_factory=list, description="Per-project chunk counts")
+
+
+# --- Module 6: Timeline ---
+
+class TimelineGranularity(str, Enum):
+    """Supported timeline granularity levels."""
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+
+
+class TimelineBucket(BaseModel):
+    """A time bucket with its chunks."""
+    bucket_label: str = Field(..., description="Human-readable label e.g. 'Feb 3-9'")
+    bucket_start: str = Field(..., description="ISO datetime of bucket start")
+    chunk_count: int = Field(0, description="Number of chunks in this bucket")
+    by_status: dict[str, int] = Field(default_factory=dict, description="Status breakdown")
+    chunk_ids: list[str] = Field(default_factory=list, description="Chunk IDs in this bucket")
+
+
+class TimelineResponse(BaseModel):
+    """Timeline of chunks grouped by date bucket."""
+    granularity: str = Field(..., description="Granularity used")
+    buckets: list[TimelineBucket] = Field(default_factory=list, description="Time buckets")
+    total_chunks: int = Field(0, description="Total chunks across all buckets")
+
+
+# --- Module 6: Related Chunks ---
+
+class RelatedChunk(BaseModel):
+    """A chunk with its similarity score."""
+    chunk: Chunk = Field(..., description="The related chunk")
+    similarity: float = Field(..., description="Cosine similarity 0.0-1.0")
+    shared_terms: list[str] = Field(default_factory=list, description="Top contributing terms")
+
+
+class RelatedChunksResponse(BaseModel):
+    """Response from related chunks endpoint."""
+    source_chunk_id: str = Field(..., description="ID of the source chunk")
+    related: list[RelatedChunk] = Field(default_factory=list, description="Related chunks")
+    computation_ms: int = Field(0, description="Computation time in milliseconds")
