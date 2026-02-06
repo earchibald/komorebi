@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { chunks, loading, fetchChunks } from '../store'
+import { chunks, loading, fetchChunks, selectChunk } from '../store'
 import type { Chunk } from '../store'
 
 type StatusFilter = 'all' | 'inbox' | 'processed' | 'compacted' | 'archived'
@@ -44,12 +44,14 @@ export function ChunkList() {
       ) : (
         <div className="chunk-list">
           {filteredChunks.map((chunk: Chunk) => (
-            <div key={chunk.id} className="chunk-item">
+            <div key={chunk.id} className="chunk-item chunk-item-clickable" onClick={() => selectChunk(chunk)}>
               <div className="chunk-header">
                 <span className="chunk-id">{chunk.id.slice(0, 8)}...</span>
                 <span className={`chunk-status ${chunk.status}`}>{chunk.status}</span>
               </div>
-              <div className="chunk-content">{chunk.content}</div>
+              <div className="chunk-content" title={chunk.content}>
+                {chunk.content.length > 200 ? chunk.content.slice(0, 200) + '...' : chunk.content}
+              </div>
               {chunk.summary && (
                 <div style={{ color: 'var(--accent-green)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
                   💡 {chunk.summary}

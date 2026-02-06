@@ -9,7 +9,7 @@ Provides access to extracted entities from chunks:
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db, EntityRepository
@@ -41,6 +41,26 @@ async def list_project_entities(
         project_id=project_id,
         entity_type=entity_type,
         min_confidence=min_confidence,
+        limit=limit,
+        offset=offset,
+    )
+
+
+@router.get("/chunks/{chunk_id}", response_model=list[Entity])
+async def list_chunk_entities(
+    chunk_id: UUID,
+    entity_type: Optional[EntityType] = None,
+    limit: int = 100,
+    offset: int = 0,
+    entity_repo: EntityRepository = Depends(get_entity_repo),
+) -> list[Entity]:
+    """List entities extracted from a specific chunk.
+
+    Filter by entity type (error, url, tool_id, decision, code_ref).
+    """
+    return await entity_repo.list_by_chunk(
+        chunk_id=chunk_id,
+        entity_type=entity_type,
         limit=limit,
         offset=offset,
     )

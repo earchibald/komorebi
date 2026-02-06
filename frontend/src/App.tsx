@@ -4,6 +4,7 @@ import { ChunkList } from './components/ChunkList'
 import { Stats } from './components/Stats'
 import { ProjectList } from './components/ProjectList'
 import { MCPPanel } from './components/MCPPanel'
+import { ChunkDrawer } from './components/ChunkDrawer'
 
 type Tab = 'inbox' | 'all' | 'projects' | 'mcp'
 
@@ -56,6 +57,8 @@ function App() {
       <footer className="footer">
         <p>Komorebi v0.1.0 - Capture Now, Refine Later</p>
       </footer>
+
+      <ChunkDrawer />
     </div>
   )
 }

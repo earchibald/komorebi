@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react'
-import { chunks, loading, captureChunk, fetchChunks, connectSSE, disconnectSSE } from '../store'
+import { chunks, loading, captureChunk, fetchChunks, connectSSE, disconnectSSE, selectChunk } from '../store'
 import type { Chunk } from '../store'
 
 export function Inbox() {
@@ -62,12 +62,14 @@ export function Inbox() {
       ) : (
         <div className="chunk-list">
           {inboxChunks.map((chunk: Chunk) => (
-            <div key={chunk.id} className="chunk-item">
+            <div key={chunk.id} className="chunk-item chunk-item-clickable" onClick={() => selectChunk(chunk)}>
               <div className="chunk-header">
                 <span className="chunk-id">{chunk.id.slice(0, 8)}...</span>
                 <span className={`chunk-status ${chunk.status}`}>{chunk.status}</span>
               </div>
-              <div className="chunk-content">{chunk.content}</div>
+              <div className="chunk-content" title={chunk.content}>
+                {chunk.content.length > 200 ? chunk.content.slice(0, 200) + '...' : chunk.content}
+              </div>
               {chunk.tags.length > 0 && (
                 <div className="chunk-tags">
                   {chunk.tags.map(tag => (

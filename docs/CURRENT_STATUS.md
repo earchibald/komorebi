@@ -1,7 +1,7 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 6, 2026  
-**Version:** 0.3.0 (Pre-1.0.0 Development)
+**Date:** February 5, 2026  
+**Version:** 0.2.1 (Pre-1.0.0 Development)
 
 ---
 
@@ -69,6 +69,10 @@ komorebi add "My thought"
 - ✅ Stats dashboard (auto-updating)
 
 **Recent Fixes (Feb 5, 2026):**
+- Added Chunk Detail Drawer — click any chunk to view full content, summary, tags, and extracted entities
+- Added per-chunk entity API endpoint (`GET /entities/chunks/{chunk_id}`)
+- Fixed chunk card content overflow — long strings now truncated with 3-line visual clamp
+- Fixed Inbox content truncation parity with All Chunks tab
 - Fixed SSE connection issues (<5ms event delivery now)
 - Eliminated empty-state flicker on tab switch
 - Implemented Fetch-All-Filter-Client pattern

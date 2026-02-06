@@ -2,7 +2,7 @@
 name: implement-feature
 description: Fast-track feature implementation from specification to working code using TDD workflow. Use for new CRUD features, API endpoints, React components.
 agent: agent
-tools: ['search/codebase', 'editFiles']
+tools: ['search/codebase', 'editFiles', 'runTerminalCommand']
 ---
 
 # Implement Feature
@@ -514,26 +514,28 @@ Before writing any code:
 
 ### Step 5: Verify Governance Compliance
 
-Before committing, check:
-- [ ] `CURRENT_STATUS.md` updated with version/date (if release)
-- [ ] `CHANGELOG.md` entry added (if user-facing change)
-- [ ] `CONVENTIONS.md` updated (if new pattern introduced)
-- [ ] `PROGRESS.md` updated (if major milestone)
-- [ ] No hardcoded secrets or API keys
-- [ ] Type hints on all functions
-- [ ] Imports organized
-- [ ] Tests pass: `pytest`
-- [ ] Linting passes: `ruff check .`
-- [ ] Frontend builds: `npm run build` (if frontend changes)
+Update these documentation files (edit them directly, do not skip):
+- `CURRENT_STATUS.md` — update version/date if this is a release
+- `CHANGELOG.md` — add entry if user-facing change
+- `CONVENTIONS.md` — update if new pattern introduced
+- `PROGRESS.md` — update if major milestone
+- `ELICITATIONS.md` — log any design decisions or trade-offs
 
-### Step 6: Prepare for Review
+Verify code quality (review the code you wrote):
+- No hardcoded secrets or API keys
+- Type hints on all functions
+- Imports organized (stdlib, third-party, local)
 
-1. Run full test suite: `pytest`
-2. Run linter: `ruff check . && ruff format .`
-3. Run frontend build (if applicable): `cd frontend && npm run build`
-4. Review git diff to ensure only intended changes
-5. Update `PROGRESS.md` with feature status
-6. Log any design decisions or trade-offs in `ELICITATIONS.md`
+### Step 6: Run Verification Commands
+
+**You MUST execute these commands in the terminal — do not list them for the user.**
+
+1. Run the feature tests: `pytest backend/tests/test_<feature_name>.py -v`
+2. Run linting: `ruff check backend/`
+3. Run frontend build (if frontend changes): `cd frontend && npm run build`
+4. If any command fails, fix the issue and re-run until green.
+
+**Do NOT end your turn by listing commands for the user to run.** If you cannot run a command (e.g., terminal tools unavailable), state that explicitly and explain why, rather than presenting commands as a "Verify with:" block.
 
 ---
 
@@ -557,12 +559,14 @@ Before committing, check:
    - `PROGRESS.md` update (if major milestone)
    - `ELICITATIONS.md` entry (if design decisions made)
 
-4. **Summary:**
-   - Brief description of changes
-   - Any design decisions or trade-offs
-   - Any known limitations or future work
+4. **Verification Results:**
+   - Test results (pass/fail count from terminal output)
+   - Lint results (clean or issues found)
+   - Build results (success or errors)
+   - If a verification step cannot be run, state why explicitly
 
 **Do NOT provide:**
+- A "Verify with:" section listing commands for the user to run
 - Incomplete TODO comments (implement fully or use `NotImplementedError`)
 - Hardcoded secrets or API keys
 - Non-async FastAPI endpoints

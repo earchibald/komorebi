@@ -188,6 +188,34 @@
   - Capture pipeline validated (27 → 28 chunks)
   - Hammer test: 50/50 successful, 0 zombies
 
+### Phase 9: Chunk Detail Drawer + Entity Panel
+- ✅ Per-chunk entity API (`backend/app/api/entities.py`)
+  - GET `/api/v1/entities/chunks/{chunk_id}` - list entities by chunk with type filter
+  - `EntityRepository.list_by_chunk()` with type filtering, pagination
+- ✅ TDD test suite (`backend/tests/test_chunk_entities.py`)
+  - 6 tests: list_by_chunk, type filter, empty case, chunk isolation, API endpoint, API filter
+- ✅ Chunk Detail Drawer (`frontend/src/components/ChunkDrawer.tsx`)
+  - Slide-out 560px panel with overlay
+  - Full chunk content, summary, tags display
+  - Entity panel grouped by type with confidence bars
+  - Type-specific badges (🐛 error, 🔗 url, 🔧 tool_id, ⚖️ decision, 💻 code_ref)
+  - Close on overlay click, Escape key, or ✕ button
+- ✅ Store signals (`frontend/src/store/index.ts`)
+  - `selectedChunk`, `chunkEntities`, `entitiesLoading` signals
+  - `selectChunk()`, `closeDrawer()`, `fetchChunkEntities()` actions
+- ✅ Component wiring
+  - ChunkList.tsx: clickable chunk cards with selectChunk
+  - Inbox.tsx: clickable chunk cards + 200-char content truncation fix
+  - App.tsx: ChunkDrawer rendered globally
+- ✅ CSS styling (`frontend/src/theme/styles.css`)
+  - Drawer overlay with fade-in animation
+  - Panel with slide-in animation
+  - Entity badges, confidence bars, context snippets
+- ✅ Documentation updates
+  - ELICITATIONS.md: drawer design decisions
+  - CURRENT_STATUS.md: new features listed
+  - CHANGELOG.md: v0.3.1 entry added
+
 ## Benchmark Results
 
 ### Module 2 - Recursive Compaction

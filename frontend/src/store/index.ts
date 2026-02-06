@@ -39,6 +39,17 @@ export interface ChunkStats {
   total: number
 }
 
+export interface Entity {
+  id: number
+  chunk_id: string
+  project_id: string
+  entity_type: 'error' | 'url' | 'tool_id' | 'decision' | 'code_ref'
+  value: string
+  confidence: number
+  context_snippet: string | null
+  created_at: string
+}
+
 // API base URL
 const API_URL = '/api/v1'
 
@@ -97,6 +108,11 @@ export const inboxChunks = computed(() =>
 export const processedChunks = computed(() =>
   chunks.value.filter(c => c.status === 'processed')
 )
+
+// Drawer state
+export const selectedChunk = signal<Chunk | null>(null)
+export const chunkEntities = signal<Entity[]>([])
+export const entitiesLoading = signal(false)
 
 const cachedChunks = readCache<Chunk[]>(STORAGE_KEYS.chunks)
 const cachedProjects = readCache<Project[]>(STORAGE_KEYS.projects)
@@ -251,6 +267,33 @@ export async function createProject(name: string, description?: string) {
     throw e
   } finally {
     loading.value = false
+  }
+}
+
+// Drawer actions
+export function selectChunk(chunk: Chunk): void {
+  selectedChunk.value = chunk
+  chunkEntities.value = []
+  fetchChunkEntities(chunk.id)
+}
+
+export function closeDrawer(): void {
+  selectedChunk.value = null
+  chunkEntities.value = []
+  entitiesLoading.value = false
+}
+
+export async function fetchChunkEntities(chunkId: string): Promise<void> {
+  entitiesLoading.value = true
+  try {
+    const response = await fetch(`${API_URL}/entities/chunks/${chunkId}`)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    chunkEntities.value = await response.json()
+  } catch (e) {
+    console.error('Failed to fetch chunk entities:', e)
+    chunkEntities.value = []
+  } finally {
+    entitiesLoading.value = false
   }
 }
 

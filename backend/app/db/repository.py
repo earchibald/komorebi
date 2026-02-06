@@ -322,6 +322,25 @@ class EntityRepository:
         
         result = await self.session.execute(query)
         return [self._to_model(row) for row in result.scalars().all()]
+
+    async def list_by_chunk(
+        self,
+        chunk_id: UUID,
+        entity_type: Optional[EntityType] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[Entity]:
+        """List entities extracted from a specific chunk."""
+        query = select(EntityTable).where(EntityTable.chunk_id == str(chunk_id))
+
+        if entity_type:
+            query = query.where(EntityTable.entity_type == entity_type.value)
+
+        query = query.order_by(EntityTable.created_at.desc())
+        query = query.limit(limit).offset(offset)
+
+        result = await self.session.execute(query)
+        return [self._to_model(row) for row in result.scalars().all()]
     
     def _to_model(self, db_entity: EntityTable) -> Entity:
         """Convert database row to Pydantic model."""

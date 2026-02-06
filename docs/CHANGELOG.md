@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.1] - 2026-02-05
+
+### Added
+- **Chunk Detail Drawer** — Click any chunk card to open a slide-out panel showing full content, summary, tags, and extracted entities
+- **Per-Chunk Entity API** — `GET /entities/chunks/{chunk_id}` endpoint for fetching entities by chunk
+- **EntityRepository.list_by_chunk()** — Repository method with type filtering for chunk-level entity queries
+- **Entity Panel** — Grouped entity display with type badges, confidence bars, and context snippets
+- **Inbox content truncation** — Inbox chunk cards now truncate to 200 chars (parity with All Chunks tab)
+
+---
+
 ## [0.3.0] - 2026-02-05
 
 ### Added
@@ -166,6 +177,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated governance to emphasize documentation synchronization with implementation
+
+---
+
+## [0.2.1] - 2026-02-05
+
+### Fixed
+- **Dashboard:** Chunk card content overflow — long strings (e.g., hammer explosion padding) now truncated to 200 chars with CSS word-break and 3-line clamp
 
 ---
 
