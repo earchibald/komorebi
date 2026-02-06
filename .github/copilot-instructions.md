@@ -91,6 +91,48 @@ Agents must respect `pre-commit` config:
 * Ensure imports are sorted (`isort` via Ruff).
 * Ensure Pydantic models are valid.
 
+### D. Git Commit Hygiene (MANDATORY)
+
+**Rule:** Git is an essential part of every workflow. Never leave uncommitted files.
+
+**Commit Frequency:**
+* **After TDD Red Phase:** Commit failing tests with message "test: Add failing tests for [feature]"
+* **After TDD Green Phase:** Commit working implementation with message "feat: Implement [feature]"
+* **After Refactor Phase:** Commit cleanup with message "refactor: Clean up [area]"
+* **After Documentation:** Commit docs with message "docs: Update [files]"
+* **Before Long Operations:** Commit before running hammer tests or migrations
+* **End of Session:** ALWAYS check `git status` and commit everything before finishing
+
+**Commit Message Format:**
+```
+<type>: <subject>
+
+[optional body with details]
+[optional footer]
+```
+
+**Types:** `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `perf`, `ci`, `release`
+
+**Workflow Pattern:**
+1. Check `git status` at start of task
+2. Implement feature/fix in small chunks
+3. After each logical unit: `git add <files> && git commit -m "..."`
+4. Before finishing: `git status` (must be clean)
+5. Push to remote: `git push origin <branch>`
+
+**NEVER:**
+* Leave modified files uncommitted when task is "complete"
+* Commit all files at once without logical grouping
+* Skip commit messages or use generic "Update files"
+* Forget to push commits to remote
+
+**If uncommitted files found:**
+1. Review changes with `git diff`
+2. Group logically (prompts, backend, frontend, docs, tests)
+3. Commit each group separately with descriptive messages
+4. Verify with `git status` (should show clean tree)
+5. Push all commits
+
 ---
 
 ## 4. Test-Driven Development (TDD) Strategy
