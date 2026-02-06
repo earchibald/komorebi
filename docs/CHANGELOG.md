@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Search Input Bug** — Fixed `@preact/signals-react` v2 race condition with controlled inputs; signal `.value` access intercepted in JSX render path caused input lag/loss. Fix: local `useState` bridge pattern in `SearchBar.tsx` and `FilterPanel.tsx` (6 filter fields)
+- **Search results never display** — Signal `.value` reads inside `useMemo` callbacks in `ChunkList.tsx` did not create proper subscriptions; component never re-rendered when `searchResults` signal changed. Fix: read all signal values in render body, pass as plain deps.
+- **Clearing filters leaves no results** — Same root cause as above; `clearSearch()` correctly reset signals but `useMemo` never re-evaluated.
+- **Status filter hides tab buttons** — `FilterPanel` status dropdown set `isSearchActive=true`, hiding ChunkList's 5 status tab buttons. Fix: removed duplicate status dropdown from FilterPanel; ChunkList tabs now always visible and apply client-side on top of search results.
+- **Enter key does nothing in search** — Added `onKeyDown` handler and `triggerImmediateSearch()` store function for instant search on Enter (cancels debounce timer).
 
 ### Technical
 - 7 new Pydantic models: `DashboardStats`, `WeekBucket`, `TimelineGranularity`, `TimelineBucket`, `TimelineResponse`, `RelatedChunk`, `RelatedChunksResponse`

@@ -111,3 +111,52 @@
 - ✅ Both disabled by default — no security risk until explicitly enabled
 - ❌ GitKraken requires API key setup — acceptable for opt-in tool
 - ❌ Playwright MCP spawns a browser process — resource-intensive, use judiciously
+
+---
+
+## [2026-02-05] Fixed: Search/Filter UI bugs (3 interconnected issues)
+
+**Context:** After Module 6 frontend implementation, three interconnected bugs in the search/filter UI on the "All Chunks" tab.
+
+### Bug 1: Search input produces no results (typing or pressing Enter)
+
+**Root Cause:** `ChunkList.tsx` read signal `.value` inside `useMemo` callback.
+With `@preact/signals-react` v2, reading `.value` inside `useMemo` does NOT properly subscribe the component to signal changes. When `searchResults.value` changed, the component never re-rendered, so `useMemo` never re-computed `displayChunks`.
+
+**Fix:** Read all signal values in the component render body (outside `useMemo`), then pass them as plain deps to `useMemo`. Additionally, added `onKeyDown` handler + `triggerImmediateSearch()` store function for immediate search on Enter.
+
+### Bug 2: Clearing all filters leaves the UI with no results
+
+**Same root cause** as Bug 1. `clearSearch()` correctly set `searchResults.value = null` and `isSearchActive` back to false, but `useMemo` was never re-invoked because signal subscriptions were never established.
+
+### Bug 3: Selecting a status filter hides all ChunkList tab buttons
+
+**Root Cause:** `FilterPanel` had a "Status" dropdown that set `searchFilters.value.status`, which made `isSearchActive = true` (because `Object.keys(searchFilters.value).length > 0`). ChunkList conditionally rendered status tabs with `{!isSearchActive.value && (...)}`, causing all 5 tab buttons to vanish.
+
+**Fix:**
+1. Removed the Status dropdown from `FilterPanel` (it duplicated ChunkList's tab buttons).
+2. Made ChunkList status tabs always visible.
+3. Tabs now apply client-side filtering on top of search results (both work together).
+
+### Pattern established: Signal reads in React hooks
+
+**Rule:** With `@preact/signals-react` v2, ALWAYS read signal `.value` in the component render body, then pass to `useMemo`/`useCallback` as deps. Reading `.value` inside hook callbacks does not create subscriptions.
+
+```tsx
+// ✅ CORRECT — reads in render body, subscriptions established
+const allChunks = chunks.value
+const results = searchResults.value
+const displayChunks = useMemo(() => {
+  if (results) return results.items
+  return allChunks
+}, [allChunks, results])
+
+// ❌ WRONG — reads inside useMemo callback, no subscription
+const displayChunks = useMemo(() => {
+  if (searchResults.value) return searchResults.value.items  // won't trigger re-render
+  return chunks.value
+}, [chunks.value, searchResults.value])  // deps appear correct but component won't re-render
+```
+
+**Files Changed:** `ChunkList.tsx`, `FilterPanel.tsx`, `SearchBar.tsx`, `store/index.ts`
+**Regression Tests:** `e2e/search-regression.spec.ts` (5 Playwright tests)

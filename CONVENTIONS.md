@@ -149,31 +149,45 @@ function SearchBar() {
 - All filter fields, search inputs, form controls reading from signals
 - Does NOT apply to read-only signal display (`{count.value}` in text is fine)
 
-**Reference implementations:** `SearchBar.tsx`, `FilterPanel.tsx` (6 fields), `Inbox.tsx` (already correct)
+**Reference implementations:** `SearchBar.tsx`, `FilterPanel.tsx` (5 fields), `Inbox.tsx` (already correct)
+
+#### Signal Reads in useMemo/useCallback (MANDATORY)
+`@preact/signals-react` v2 does NOT create subscriptions for `.value` reads inside `useMemo` or `useCallback` callbacks. **Always read signal values in the component render body**, then pass them as plain deps:
 
 ```typescript
-// From frontend/src/components/ChunkList.tsx
-export function ChunkList() {
-  const [filter, setFilter] = useState<StatusFilter>('all')
-  
-  useEffect(() => {
-    fetchChunks(undefined, 500) // Call store function once on mount
-  }, [])
-  
-  const filteredChunks = useMemo(() => {
-    if (filter === 'all') return chunks.value
-    return chunks.value.filter(c => c.status === filter)
-  }, [chunks.value, filter])
-  
-  return (...)
+// ✅ CORRECT — Signals read in render body, subscriptions established
+function ChunkList() {
+  const allChunks = chunks.value          // subscription created here
+  const results = searchResults.value     // subscription created here
+  const searchActive = isSearchActive.value
+
+  const displayChunks = useMemo(() => {
+    if (searchActive && results) return results.items
+    return allChunks
+  }, [allChunks, searchActive, results])  // plain values, React tracks changes
+
+  return <div>{displayChunks.map(...)}</div>
+}
+
+// ❌ WRONG — Reads inside useMemo, no subscription, component never re-renders
+function ChunkList() {
+  const displayChunks = useMemo(() => {
+    if (searchResults.value) return searchResults.value.items  // no subscription!
+    return chunks.value                                         // no subscription!
+  }, [searchResults.value, chunks.value])  // deps look right but won't trigger
+
+  return <div>{displayChunks.map(...)}</div>
 }
 ```
+
+**Reference implementations:** `ChunkList.tsx` (searchActive, results, allChunks read in render body)
 
 **Rules:**
 - useState for local UI state (filters, tab selection)
 - useEffect on mount to trigger data fetching from store functions
 - useMemo for derived/filtered data to avoid re-renders
 - Never use useEffect for data fetching with dependencies that cause loops
+- **Always read signal `.value` in render body, never inside hook callbacks**
 
 ---
 
