@@ -4,16 +4,26 @@ Provides management of MCP server connections and
 unified access to aggregated tools.
 """
 
-from typing import Any
+import logging
+from typing import Any, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..db import get_db, ChunkRepository
 from ..models.mcp import MCPServerConfig, MCPServerStatus, MCPTool
 from ..mcp import mcp_registry
+from ..services.mcp_service import MCPService
 from ..core.events import event_bus, ChunkEvent, EventType
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/mcp", tags=["mcp"])
+
+
+def _get_service(db: AsyncSession = Depends(get_db)) -> MCPService:
+    """DI: build MCPService with a chunk_repo for capture."""
+    return MCPService(mcp_registry, ChunkRepository(db))
 
 
 @router.get("/servers", response_model=list[MCPServerConfig])
@@ -74,10 +84,13 @@ async def connect_server(server_id: UUID) -> dict:
             detail=f"Failed to connect: {server.last_error}",
         )
     
+    client = mcp_registry._clients.get(server_id)
+    tool_names = [t.name for t in client.tools] if client else []
+    
     return {
         "server_id": str(server_id),
         "status": server.status.value,
-        "tools": [t.name for t in mcp_registry._clients[server_id].tools],
+        "tools": tool_names,
     }
 
 
@@ -105,6 +118,32 @@ async def disconnect_server(server_id: UUID) -> dict:
     }
 
 
+@router.post("/{server_name}/reconnect")
+async def reconnect_server(server_name: str) -> dict:
+    """Disconnect then reconnect a server by name."""
+    # Find server by name
+    for config in mcp_registry.list_servers():
+        if config.name == server_name:
+            await mcp_registry.disconnect(config.id)
+            success = await mcp_registry.connect(config.id)
+            await event_bus.publish(ChunkEvent(
+                event_type=EventType.MCP_STATUS_CHANGED,
+                chunk_id=config.id,
+                data={
+                    "server_id": str(config.id),
+                    "status": config.status.value,
+                    "connected": success,
+                },
+            ))
+            return {
+                "server_id": str(config.id),
+                "name": server_name,
+                "status": config.status.value,
+                "connected": success,
+            }
+    raise HTTPException(status_code=404, detail=f"Server not found: {server_name}")
+
+
 @router.get("/tools", response_model=list[MCPTool])
 async def list_tools() -> list[MCPTool]:
     """List all available tools from connected MCP servers."""
@@ -112,14 +151,36 @@ async def list_tools() -> list[MCPTool]:
 
 
 @router.post("/tools/{tool_name}/call")
-async def call_tool(tool_name: str, arguments: dict[str, Any]) -> dict:
-    """Call a tool by name with the provided arguments."""
+async def call_tool(
+    tool_name: str,
+    arguments: dict[str, Any],
+    capture: bool = Query(False, description="Auto-capture result as chunk"),
+    project_id: Optional[UUID] = Query(None, description="Project to associate captured chunk with"),
+    service: MCPService = Depends(_get_service),
+) -> dict:
+    """Call a tool by name with the provided arguments.
+    
+    With capture=true, the tool result is automatically saved as an
+    INBOX chunk for compaction.
+    """
     try:
-        result = await mcp_registry.call_tool(tool_name, arguments)
-        return {
-            "tool": tool_name,
-            "result": result,
-        }
+        result = await service.call_tool(
+            server_name=None,
+            tool_name=tool_name,
+            arguments=arguments,
+            project_id=project_id,
+            capture=capture,
+        )
+
+        # Publish SSE event if chunk was captured
+        if "chunk_id" in result:
+            await event_bus.publish(ChunkEvent(
+                event_type=EventType.CHUNK_CREATED,
+                chunk_id=UUID(result["chunk_id"]),
+                data={"source": f"mcp:{tool_name}"},
+            ))
+
+        return result
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except RuntimeError as e:

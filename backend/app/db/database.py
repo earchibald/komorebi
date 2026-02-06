@@ -8,7 +8,7 @@ import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from sqlalchemy import Column, DateTime, Enum, Integer, String, Text, Boolean
+from sqlalchemy import Column, DateTime, Enum, Integer, String, Text, Boolean, Float
 from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
@@ -60,9 +60,26 @@ class ProjectTable(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     context_summary = Column(Text, nullable=True)
+    compaction_depth = Column(Integer, default=0)
+    last_compaction_at = Column(DateTime, nullable=True)
     chunk_count = Column(Integer, default=0)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
+
+
+class EntityTable(Base):
+    """SQLAlchemy model for entities table."""
+    
+    __tablename__ = "entities"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    chunk_id = Column(String(36), nullable=False, index=True)
+    project_id = Column(String(36), nullable=False, index=True)
+    entity_type = Column(String(20), nullable=False, index=True)
+    value = Column(Text, nullable=False)
+    confidence = Column(Float, nullable=False, default=1.0)
+    context_snippet = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)
 
 
 class MCPServerTable(Base):

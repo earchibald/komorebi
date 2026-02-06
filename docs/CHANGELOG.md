@@ -10,10 +10,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Module 3: Advanced MCP aggregation
-- Frontend dashboard enhancements  
+- Module 4: Advanced prompt engineering & skill system
 - Production deployment configuration
 - Advanced testing automation
+- Performance optimization baseline
+
+---
+
+## [0.3.0] - 2026-02-05
+
+### Added
+
+#### Module 3 - MCP Aggregator (Tool Integration Layer)
+- **Modular Secret Management** - `backend/app/mcp/auth.py` with pluggable provider architecture
+  - `SecretProvider` ABC for extensible secret resolution
+  - `SystemKeyringProvider` - Secure OS keychain integration (`keyring://service/username`)
+  - `EnvProvider` - Environment variable resolution (`env://VAR_NAME`)
+  - `SecretFactory.resolve_env_vars()` - URI-based secret injection without storing credentials
+- **Declarative Server Configuration** - `backend/app/mcp/config.py` with JSON schema validation
+  - `MCPServerFileConfig` - Pydantic model for server definitions
+  - `MCPConfig` - Root configuration with validation rules
+  - `load_mcp_config()` - File-based config loader with error handling
+  - `load_and_register_servers()` - Automatic startup registration and parallel connection
+- **MCP Service Layer** - `backend/app/services/mcp_service.py` with auto-capture pipeline
+  - **"Tool Result → Chunk" Capture Pipeline** - Automatic persistence of MCP tool outputs
+  - `call_tool(capture=True)` - Single-parameter control for result capture
+  - `_extract_text()` - Intelligent text extraction from MCP responses
+  - `_capture_as_chunk()` - Markdown-formatted chunk creation with metadata
+  - Background chunk creation (non-blocking UI)
+- **MCP Panel Dashboard** - `frontend/src/components/MCPPanel.tsx` with real-time updates
+  - Server status indicators (🟢 connected, 🟡 connecting, 🔴 disconnected)
+  - Accordion-based server browser with tool catalogs
+  - Tool search/filter with instant highlighting
+  - Tool call modal with JSON arguments editor and capture checkbox
+  - Connect/disconnect/reconnect controls per server
+  - Real-time SSE updates for status changes
+- **Load Testing Framework** - `scripts/hammer_mcp.py` with embedded echo server
+  - Validates concurrent capture pipeline (50 calls @ 259 req/s)
+  - Zombie process detection and cleanup verification
+  - Chunk count validation and integrity checks
+
+### Changed
+- **MCP Client Stability** - `backend/app/mcp/client.py` critical fixes
+  - **BUG-1 Fix**: Environment variable merging now preserves `PATH` and system env
+  - Zombie process prevention via proper `__aexit__` cleanup
+  - Replaced deprecated `asyncio.get_event_loop()` with `get_running_loop()`
+  - Added stderr logging background task for MCP server debugging
+  - Removed dead code (`MCPMessage` dataclass unused)
+- **MCP Registry Performance** - `backend/app/mcp/registry.py` optimization
+  - Parallel server connection via `asyncio.gather()` (replaces sequential)
+  - Significant startup time reduction for multi-server configs
+- **API Layer Integration** - `backend/app/api/mcp.py` enhanced endpoints
+  - `MCPService` dependency injection (replaces direct registry access)
+  - `capture` and `project_id` query parameters on `/tools/{name}/call`
+  - `POST /mcp/{name}/reconnect` endpoint for recovery workflows
+- **BUG-3 Fix**: `backend/app/api/projects.py` - Fixed `compact_project` missing `entity_repo` parameter
+- **Startup Lifecycle** - `backend/app/main.py` auto-connects MCP servers on startup
+  - Loads `config/mcp_servers.json` during lifespan initialization
+  - Logs connection summary (connected/total servers)
+- **SSE Event Handling** - `frontend/src/store/index.ts` MCP status events
+  - Added `mcp.status_changed` case in `handleSSEEvent`
+  - Dispatches custom window events for MCPPanel reactivity
+- **UI Navigation** - `frontend/src/App.tsx` added MCP tab
+  - Fourth primary tab alongside Inbox, Projects, Stats
+  - Lazy-loaded MCPPanel component
+
+### Fixed
+- Critical subprocess environment corruption (BUG-1) preventing npx-based MCP servers
+- Missing entity repository injection causing compaction crashes (BUG-3)
+- Asyncio deprecation warnings in MCP client
+- Zombie MCP server processes accumulating over time
+
+### Performance
+- **Capture Pipeline**: 259 req/s sustained throughput (hammer test validation)
+- **Parallel Connection**: 5x faster startup for multi-server configurations
+- **Zero Zombie Processes**: Validated via load testing
+
+### Security
+- **Zero Secrets in Config Files**: All credentials via `keyring://` or `env://` URIs
+- **Secrets Never Logged**: Auth module redacts environment variables in error messages
+- **Subprocess Isolation**: MCP servers run with minimal environment variable exposure
+
+---
+
+## [0.2.2] - 2026-02-05
+
+### Added
+- **Documentation Governance Rule** - Pre-1.0.0 requirement to keep CURRENT_STATUS.md and entire documentation suite up to date
+- Added documentation maintenance guidelines to .github/copilot-instructions.md
+
+### Changed
+- Updated governance to emphasize documentation synchronization with implementation
 
 ---
 

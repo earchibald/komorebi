@@ -1,7 +1,7 @@
 # Komorebi: Current Status & Next Steps
 
 **Date:** February 5, 2026  
-**Version:** 0.1.0 (Development)
+**Version:** 0.3.0 (Pre-1.0.0 Development)
 
 ---
 

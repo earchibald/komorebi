@@ -98,6 +98,11 @@ This "memory pyramid" approach means you never lose context—you just summarize
 ## Prerequisites
 
 - **Python 3.11+** - Required for the backend and CLI
+- **Ollama** - Local LLM server for intelligent summarization and entity extraction (optional but recommended)
+  - macOS: `brew install ollama` or download from [ollama.com](https://ollama.com)
+  - Linux: `curl -fsSL https://ollama.com/install.sh | sh`
+  - Windows: Download installer from [ollama.com/download](https://ollama.com/download)
+  - After installation: `ollama pull llama3.2`
 - **Node.js 18+** - Required for the React dashboard (optional)
 - **pip** - Python package manager
 

@@ -48,11 +48,29 @@ class MCPRegistry:
             await client.disconnect()
     
     async def connect_all(self) -> dict[UUID, bool]:
-        """Connect to all enabled MCP servers."""
-        results = {}
-        for server_id, config in self._configs.items():
-            if config.enabled:
-                results[server_id] = await self.connect(server_id)
+        """Connect to all enabled MCP servers in parallel."""
+        import asyncio
+
+        eligible = {
+            sid: client
+            for sid, client in self._clients.items()
+            if self._configs[sid].enabled
+        }
+        if not eligible:
+            return {}
+
+        async def _connect_one(sid: UUID, client: MCPClient) -> tuple[UUID, bool]:
+            return sid, await client.connect()
+
+        tasks = [_connect_one(sid, client) for sid, client in eligible.items()]
+        raw = await asyncio.gather(*tasks, return_exceptions=True)
+
+        results: dict[UUID, bool] = {}
+        for item in raw:
+            if isinstance(item, Exception):
+                continue
+            sid, ok = item
+            results[sid] = ok
         return results
     
     async def disconnect_all(self) -> None:

@@ -153,6 +153,13 @@ Update this file after every major module completion.
 * ⏳ Backend / API
 * ❌ Frontend / Dashboard (Blocked by API)
 
+### `CURRENT_STATUS.md` and Documentation Suite
+**Pre-1.0.0 Governance Rule:** Always keep `CURRENT_STATUS.md` up to date along with the entire documentation suite.
+* Update `CURRENT_STATUS.md` version and date on every release.
+* Ensure all documentation in `docs/` reflects the current state of the system.
+* Document new features, fixes, and breaking changes immediately.
+* Keep `CHANGELOG.md`, `CONVENTIONS.md`, `BUILD.md`, and `PROGRESS.md` synchronized with actual implementation.
+
 ---
 
 **End of Directives.**

@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..db import get_db, ChunkRepository, ProjectRepository
+from ..db import get_db, ChunkRepository, ProjectRepository, EntityRepository
 from ..models import Project, ProjectCreate, ProjectUpdate
 from ..core import CompactorService
 from ..core.events import event_bus, ChunkEvent, EventType
@@ -26,6 +26,11 @@ async def get_project_repo(db: AsyncSession = Depends(get_db)) -> ProjectReposit
 async def get_chunk_repo(db: AsyncSession = Depends(get_db)) -> ChunkRepository:
     """Dependency to get chunk repository."""
     return ChunkRepository(db)
+
+
+async def get_entity_repo(db: AsyncSession = Depends(get_db)) -> EntityRepository:
+    """Dependency to get entity repository."""
+    return EntityRepository(db)
 
 
 @router.post("", response_model=Project, status_code=201)
@@ -96,6 +101,7 @@ async def compact_project(
     background_tasks: BackgroundTasks,
     project_repo: ProjectRepository = Depends(get_project_repo),
     chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+    entity_repo: EntityRepository = Depends(get_entity_repo),
 ) -> dict:
     """Compact all processed chunks in a project into a context summary."""
     project = await project_repo.get(project_id)
@@ -109,7 +115,7 @@ async def compact_project(
         data={"project_id": str(project_id)},
     ))
     
-    compactor = CompactorService(chunk_repo, project_repo)
+    compactor = CompactorService(chunk_repo, project_repo, entity_repo)
     context_summary = await compactor.compact_project(project_id)
     
     # Publish compaction completed event

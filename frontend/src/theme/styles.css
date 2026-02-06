@@ -333,3 +333,204 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* ─── MCP Panel ─────────────────────────────── */
+.mcp-panel { margin-top: 1rem; }
+
+.mcp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.mcp-server-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mcp-server-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.mcp-server-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mcp-server-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mcp-command {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.mcp-server-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mcp-server-error {
+  margin-top: 0.5rem;
+  color: var(--accent-pink);
+  font-size: 0.85rem;
+}
+
+.mcp-badge {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+}
+
+.badge-connected { color: var(--accent-green); }
+.badge-connecting { color: var(--accent-yellow); }
+.badge-disconnected, .badge-error { color: var(--accent-pink); }
+
+.mcp-tool-list {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mcp-tool-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.mcp-tool-search {
+  margin-top: 1.5rem;
+}
+
+.mcp-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.mcp-all-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+.btn-secondary:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 { margin-bottom: 0.5rem; }
+.modal-content label { display: block; margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); }
+.modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+.mcp-textarea {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem;
+  resize: vertical;
+}
+
+.mcp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  cursor: pointer;
+}
+
+.mcp-error {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(233, 69, 96, 0.15);
+  border: 1px solid var(--accent-pink);
+  border-radius: 6px;
+  color: var(--accent-pink);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+}
+
+.mcp-result {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

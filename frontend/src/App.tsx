@@ -3,8 +3,9 @@ import { Inbox } from './components/Inbox'
 import { ChunkList } from './components/ChunkList'
 import { Stats } from './components/Stats'
 import { ProjectList } from './components/ProjectList'
+import { MCPPanel } from './components/MCPPanel'
 
-type Tab = 'inbox' | 'all' | 'projects'
+type Tab = 'inbox' | 'all' | 'projects' | 'mcp'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('inbox')
@@ -37,12 +38,19 @@ function App() {
         >
           📁 Projects
         </button>
+        <button
+          className={`tab ${activeTab === 'mcp' ? 'active' : ''}`}
+          onClick={() => setActiveTab('mcp')}
+        >
+          🔌 MCP
+        </button>
       </nav>
 
       <main className="content">
         {activeTab === 'inbox' && <Inbox />}
         {activeTab === 'all' && <ChunkList />}
         {activeTab === 'projects' && <ProjectList />}
+        {activeTab === 'mcp' && <MCPPanel />}
       </main>
 
       <footer className="footer">

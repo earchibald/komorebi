@@ -5,7 +5,7 @@ for data access.
 """
 
 from .database import get_db, init_db, engine, async_session
-from .repository import ChunkRepository, ProjectRepository
+from .repository import ChunkRepository, ProjectRepository, EntityRepository
 
 __all__ = [
     "get_db",
@@ -14,4 +14,5 @@ __all__ = [
     "async_session",
     "ChunkRepository",
     "ProjectRepository",
+    "EntityRepository",
 ]

@@ -6,23 +6,14 @@ for communicating with MCP servers like GitHub, Jira, etc.
 
 import asyncio
 import json
-from dataclasses import dataclass
+import logging
+import os
 from typing import Any, Optional
-from uuid import UUID
 
+from .auth import SecretFactory
 from ..models.mcp import MCPServerConfig, MCPServerStatus, MCPTool
 
-
-@dataclass
-class MCPMessage:
-    """Message in the MCP JSON-RPC protocol."""
-    
-    jsonrpc: str = "2.0"
-    id: Optional[int] = None
-    method: Optional[str] = None
-    params: Optional[dict] = None
-    result: Optional[Any] = None
-    error: Optional[dict] = None
+logger = logging.getLogger(__name__)
 
 
 class MCPClient:
@@ -61,8 +52,11 @@ class MCPClient:
         try:
             self.config.status = MCPServerStatus.CONNECTING
             
-            # Prepare environment
-            env = dict(self.config.env) if self.config.env else {}
+            # Resolve secret URIs and merge with system environment
+            injected_env = SecretFactory.resolve_env_vars(
+                dict(self.config.env) if self.config.env else {}
+            )
+            safe_env = {**os.environ, **injected_env}
             
             # Start the server process
             self._process = await asyncio.create_subprocess_exec(
@@ -71,8 +65,11 @@ class MCPClient:
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                env=env if env else None,
+                env=safe_env,
             )
+            
+            # Start stderr logger
+            asyncio.create_task(self._log_stderr())
             
             # Start reader task
             self._reader_task = asyncio.create_task(self._read_responses())
@@ -90,21 +87,37 @@ class MCPClient:
             return False
     
     async def disconnect(self) -> None:
-        """Disconnect from the MCP server."""
+        """Disconnect from the MCP server and reap the subprocess."""
         if self._reader_task:
             self._reader_task.cancel()
+            try:
+                await self._reader_task
+            except (asyncio.CancelledError, Exception):
+                pass
             self._reader_task = None
         
         if self._process:
-            self._process.terminate()
             try:
+                self._process.terminate()
                 await asyncio.wait_for(self._process.wait(), timeout=5.0)
             except asyncio.TimeoutError:
+                logger.warning(f"MCP server {self.config.name} did not exit gracefully, killing")
                 self._process.kill()
-            self._process = None
+                await self._process.wait()  # Reap zombie
+            except ProcessLookupError:
+                pass  # Already exited
+            finally:
+                self._process = None
         
         self.config.status = MCPServerStatus.DISCONNECTED
         self._tools = []
+
+    async def __aenter__(self):
+        await self.connect()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.disconnect()
     
     async def call_tool(self, tool_name: str, arguments: dict) -> Any:
         """Call a tool on the MCP server."""
@@ -157,7 +170,8 @@ class MCPClient:
         }
         
         # Create future for response
-        future = asyncio.get_event_loop().create_future()
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
         self._pending_requests[request_id] = future
         
         try:
@@ -215,5 +229,18 @@ class MCPClient:
                 except json.JSONDecodeError:
                     continue
                     
+        except asyncio.CancelledError:
+            pass
+
+    async def _log_stderr(self) -> None:
+        """Background task to log stderr from the server process."""
+        if not self._process or not self._process.stderr:
+            return
+        try:
+            while True:
+                line = await self._process.stderr.readline()
+                if not line:
+                    break
+                logger.debug(f"[MCP:{self.config.name}] {line.decode().rstrip()}")
         except asyncio.CancelledError:
             pass

@@ -325,6 +325,11 @@ function handleSSEEvent(event: { type: string; chunk_id: string; data: Record<st
       writeCache(STORAGE_KEYS.chunks, chunks.value)
       scheduleStatsRefresh()
       break
+    case 'mcp.status_changed':
+      // MCP server status update – emit a custom event for MCPPanel to pick up
+      console.log('🔌 MCP status changed:', event.data)
+      window.dispatchEvent(new CustomEvent('mcp:status_changed', { detail: event.data }))
+      break
     default:
       // Other events
       break
