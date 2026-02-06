@@ -15,7 +15,7 @@ from uuid import UUID
 from ..core.ollama_client import KomorebiLLM
 from ..core.similarity import TFIDFService
 from ..db.repository import ChunkRepository, EntityRepository, ProjectRepository
-from ..models import ChunkStatus, EntityType
+from ..models import EntityType
 from ..models.resume import BriefingSection, ProjectBriefing
 
 logger = logging.getLogger(__name__)

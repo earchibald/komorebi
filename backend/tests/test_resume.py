@@ -6,8 +6,7 @@ time window filter, related chunks, project not found, archived deprioritized.
 """
 
 import pytest
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 from httpx import AsyncClient, ASGITransport
@@ -21,10 +20,7 @@ from backend.app.db.repository import (
 )
 from backend.app.models import (
     Chunk,
-    ChunkCreate,
-    ProjectCreate,
     Entity,
-    EntityCreate,
     EntityType,
     ChunkStatus,
 )
