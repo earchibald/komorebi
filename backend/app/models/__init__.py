@@ -16,6 +16,10 @@ from .project import Project, ProjectCreate, ProjectUpdate
 from .entity import Entity, EntityCreate, EntityType
 from .mcp import MCPServerConfig, MCPServerStatus
 from .resume import ProjectBriefing, BriefingSection
+from .oracle import Trace, TraceCreate, TraceUpdate, TraceStatus, TraceSummary
+from .file_event import FileEvent, FileEventCreate, FileEventHistory, CrudOp
+from .cost import ModelUsage, UsageSummary, BudgetConfig
+from .profile import ExecutionProfile, ResolvedProfile, BlockingPolicy
 
 __all__ = [
     "Chunk",
@@ -40,4 +44,19 @@ __all__ = [
     "MCPServerStatus",
     "ProjectBriefing",
     "BriefingSection",
+    "Trace",
+    "TraceCreate",
+    "TraceUpdate",
+    "TraceStatus",
+    "TraceSummary",
+    "FileEvent",
+    "FileEventCreate",
+    "FileEventHistory",
+    "CrudOp",
+    "ModelUsage",
+    "UsageSummary",
+    "BudgetConfig",
+    "ExecutionProfile",
+    "ResolvedProfile",
+    "BlockingPolicy",
 ]
