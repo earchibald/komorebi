@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
+      "env": {},
+      "disabled": false
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "env://GITHUB_TOKEN"
+      },
+      "disabled": true
+    },
+    "gitkraken": {
+      "command": "npx",
+      "args": ["-y", "@gitkraken/mcp-server-gitkraken"],
+      "env": {
+        "GITKRAKEN_API_KEY": "env://GITKRAKEN_API_KEY"
+      },
+      "disabled": true
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "env": {},
+      "disabled": true
+    }
+  }
+}
