@@ -3,9 +3,7 @@
 Tests the TF-IDF service and the GET /api/v1/chunks/{id}/related endpoint.
 """
 
-import pytest
 import pytest_asyncio
-from datetime import datetime
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
@@ -115,7 +113,6 @@ class TestTFIDFService:
         related = svc.find_related("doc1", docs, top_k=3)
         assert len(related) > 0
         # doc2 and doc4 should be more similar to doc1 than doc3
-        related_ids = [r[0] for r in related]
         # doc3 (JS/web) should not be the most similar
         if len(related) >= 2:
             assert related[0][0] != "doc3"

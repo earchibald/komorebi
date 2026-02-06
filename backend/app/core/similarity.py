@@ -8,7 +8,6 @@ corpus sizes up to ~10k documents with < 300ms computation time.
 import math
 import re
 from collections import Counter
-from typing import Optional
 
 
 class TFIDFService:

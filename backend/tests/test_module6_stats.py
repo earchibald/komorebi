@@ -4,15 +4,12 @@ Tests the enhanced stats endpoint with weekly trends,
 insights, and per-project breakdowns.
 """
 
-import pytest
 import pytest_asyncio
-from datetime import datetime, timedelta
-from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-from backend.app.db.database import Base, ChunkTable, ProjectTable, EntityTable
+from backend.app.db.database import Base
 from backend.app.main import app
 from backend.app.db import get_db
 
