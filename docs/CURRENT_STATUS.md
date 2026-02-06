@@ -1,28 +1,47 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 5, 2026  
-**Version:** 0.2.3 (Pre-1.0.0 Development)
+**Date:** February 6, 2026  
+**Version:** 0.2.4 (Pre-1.0.0 Development)
 
 ---
 
-## 🆕 Latest Update: VS Code Prompts & Skills
+## 🆕 Latest Update: Enhanced Prompts & Skills System
 
-### What's New
+### Phase 2 Enhancements
 
-**VS Code Custom Prompts:** 5 prompts for common workflows
+**New Skills (2):**
+- `deep-debugger` (Premium/Opus 4.6) - Advanced async/race condition debugging
+- `research-agent` (Research/Gemini 3 Pro) - Long-context codebase analysis
+
+**New Features:**
+- Prompt aliases (`/impl`, `/test`, `/debug`, `/arch`, `/refactor`, `/docs`, `/review`)
+- MCP telemetry integration (optional centralized tracking)
+- Context awareness analysis and documentation
+- Claude Opus 4.6 specified for premium-tier prompts
+
+**Documentation:**
+- [CONTEXT_AWARENESS_ANALYSIS.md](./CONTEXT_AWARENESS_ANALYSIS.md) - Skill context capabilities
+- [PROMPT_GUIDE.md](./PROMPT_GUIDE.md) - Updated with all 4 skills + aliases
+
+### Previous Update (v0.2.3)
+
+**VS Code Custom Prompts:** 7 prompts for common workflows
 - `/implement-feature` - TDD-driven feature development
 - `/write-tests` - Comprehensive test generation
 - `/debug-issue` - Systematic debugging (Premium tier)
 - `/review-pr` - Security-focused PR reviews
 - `/update-docs` - Documentation sync (Economy tier)
+- `/refactor-code` - Code improvement workflows
+- `/architect-feature` - Complex feature design (Premium tier)
 
-**Agent Skills:** 2 skills with scripts
+**Agent Skills (Initial 2):**
 - `feature-implementer` - Full-stack scaffold generator
 - `code-formatter` - Ruff formatting commands
 
 **Telemetry:** Usage and cost tracking
 - `scripts/telemetry/telemetry_tracker.py`
 - Log, report, and cost analysis commands
+- Optional MCP endpoint integration
 
 **Documentation:**
 - [PROMPT_GUIDE.md](./PROMPT_GUIDE.md) - Quick reference

@@ -25,11 +25,16 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
+import urllib.request
+import urllib.error
 
 
 # Telemetry data file location
 TELEMETRY_DIR = Path.home() / ".komorebi" / "telemetry"
 TELEMETRY_FILE = TELEMETRY_DIR / "usage.jsonl"
+
+# MCP endpoint (if configured)
+MCP_ENDPOINT = os.getenv("KOMOREBI_MCP_TELEMETRY_ENDPOINT")
 
 # Model tier cost multipliers (relative to Haiku = 1x)
 COST_MULTIPLIERS = {
@@ -85,6 +90,29 @@ def ensure_telemetry_dir():
     TELEMETRY_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def send_to_mcp(entry_dict: dict) -> bool:
+    """Send telemetry to MCP endpoint if configured."""
+    if not MCP_ENDPOINT:
+        return False
+    
+    try:
+        data = json.dumps(entry_dict).encode('utf-8')
+        req = urllib.request.Request(
+            MCP_ENDPOINT,
+            data=data,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=2) as response:
+            if response.status == 200:
+                return True
+    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError):
+        # Silently fail - don't block on telemetry
+        pass
+    
+    return False
+
+
 def log_usage(
     prompt_or_skill: str,
     model_tier: str,
@@ -101,10 +129,18 @@ def log_usage(
         success=success,
     )
     
-    with open(TELEMETRY_FILE, "a") as f:
-        f.write(json.dumps(entry.to_dict()) + "\n")
+    entry_dict = entry.to_dict()
     
-    print(f"✅ Logged: {prompt_or_skill} ({model_tier}) - {duration_seconds or 'N/A'}s")
+    # Write to local file
+    with open(TELEMETRY_FILE, "a") as f:
+        f.write(json.dumps(entry_dict) + "\n")
+    
+    # Send to MCP endpoint if configured
+    mcp_sent = send_to_mcp(entry_dict)
+    
+    status = "✅" if success else "❌"
+    mcp_status = " [MCP ✓]" if mcp_sent else ""
+    print(f"{status} Logged: {prompt_or_skill} ({model_tier}) - {duration_seconds or 'N/A'}s{mcp_status}")
 
 
 def load_entries(days: Optional[int] = None) -> list[TelemetryEntry]:

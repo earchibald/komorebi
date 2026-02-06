@@ -27,6 +27,8 @@ This guide explains how to use the custom prompts and agent skills in the Komore
 |-------|------|-------------|
 | `feature-implementer` | Standard | Full-stack feature scaffolding |
 | `code-formatter` | Economy | Format and lint code |
+| `deep-debugger` | Premium | Advanced async/race condition debugging |
+| `research-agent` | Research | Long-context analysis with Gemini 3 Pro |
 
 ---
 
@@ -53,6 +55,24 @@ You can add context after the prompt name:
 ```
 /implement-feature Create a task management API with CRUD operations
 ```
+
+**Prompt Aliases:**
+
+For faster typing, use short aliases:
+- `/impl` → `/implement-feature`
+- `/test` → `/write-tests`
+- `/debug` → `/debug-issue`
+- `/arch` → `/architect-feature`
+- `/refactor` → `/refactor-code`
+- `/docs` → `/update-docs`
+- `/review` → `/review-pr`
+
+Even shorter:
+- `/i` → `/implement-feature`
+- `/t` → `/write-tests`
+- `/d` → `/debug-issue`
+- `/a` → `/architect-feature`
+- `/r` → `/refactor-code`
 
 **Method 2: Command Palette**
 
@@ -133,7 +153,7 @@ Focus on:
 ### `/debug-issue`
 
 **Purpose:** Systematic debugging of complex issues  
-**Model:** Claude Opus 4 (Premium)  
+**Model:** Claude Opus 4.6 (Premium)  
 **Best for:** Race conditions, async bugs, performance issues
 
 **What it does:**
@@ -255,7 +275,7 @@ Extract helper methods for better readability.
 ### `/architect-feature`
 
 **Purpose:** Design complex features before implementation  
-**Model:** Claude Opus 4 (Premium)  
+**Model:** Claude Opus 4.6 (Premium)  
 **Best for:** Multi-layer features, new integrations
 
 **What it does:**
@@ -358,6 +378,67 @@ ruff check --select I --fix .
 
 ---
 
+### `deep-debugger` (Premium Tier)
+
+**Location:** `.github/skills/premium-tier/deep-debugger/`  
+**Purpose:** Advanced debugging for complex system issues
+
+**When to use:**
+- Multi-file race conditions
+- Async/await timing bugs
+- Memory leaks and resource exhaustion
+- Database deadlocks
+- Performance bottlenecks
+
+**What it provides:**
+- System-wide execution mapping
+- Instrumentation strategies (structured logging, timing probes)
+- Hypothesis generation for complex bugs
+- Advanced tools (aiodebug, memory_profiler, aiomonitor)
+- Reproduction script templates
+
+**Example invocation:**
+```
+I have a bug that only appears under high load. Multiple async 
+operations seem to be interfering with each other, causing 
+intermittent database lockups. Standard debugging hasn't helped.
+```
+
+**Model:** Claude Opus 4.6 (Premium)  
+**Cost:** 60x baseline
+
+---
+
+### `research-agent` (Research Tier)
+
+**Location:** `.github/skills/research-tier/research-agent/`  
+**Purpose:** Long-context research and analysis with Gemini 3 Pro
+
+**When to use:**
+- Analyze entire codebase for patterns
+- Comprehend long documents (API specs, research papers)
+- Multi-repository pattern analysis
+- Cross-file dependency mapping
+
+**What it provides:**
+- 1M token context window (can read ~200 Python files at once)
+- Exhaustive pattern search
+- Documentation synthesis from multiple sources
+- Comparison matrices and dependency maps
+
+**Example invocation:**
+```
+Analyze the entire backend codebase. Map how chunks flow 
+from capture through processing to compaction. Identify 
+all async operations and potential race conditions.
+```
+
+**Model:** Gemini 3 Pro (Research)  
+**Context:** 1,000,000 tokens  
+**Cost:** 50x baseline
+
+---
+
 ## Model Tier Strategy
 
 ### Why Different Tiers?
@@ -373,7 +454,7 @@ Different tasks require different capabilities:
 |------|--------|------|----------|
 | Economy | Claude 3.5 Haiku | 1x | Formatting, simple docs |
 | Standard | Auto (Sonnet/GPT-4o) | 5-10x | Features, tests, general |
-| Premium | Claude Opus 4 | 50-75x | Debugging, architecture |
+| Premium | Claude Opus 4.6 | 50-75x | Debugging, architecture |
 | Research | Gemini 3 Pro | 40-60x | Research, long-context |
 
 ### Model Selection in Prompts
@@ -382,7 +463,7 @@ Prompts automatically specify the appropriate model in their frontmatter:
 ```yaml
 ---
 name: debug-issue
-model: Claude Opus 4  # Uses premium model
+model: Claude Opus 4.6  # Uses premium model
 ---
 ```
 
@@ -430,6 +511,25 @@ python scripts/telemetry/telemetry_tracker.py costs --days 30
    economy: 6 (14.3%)
    premium: 6 (14.3%)
 ```
+
+### MCP Integration
+
+Telemetry can optionally send data to an MCP endpoint for centralized tracking:
+
+```bash
+# Set MCP endpoint (optional)
+export KOMOREBI_MCP_TELEMETRY_ENDPOINT=http://localhost:8000/api/v1/telemetry
+
+# Telemetry will now send to both file and MCP
+python scripts/telemetry/telemetry_tracker.py log implement-feature standard --duration 120
+# Output: ✅ Logged: implement-feature (standard) - 120s [MCP ✓]
+```
+
+**MCP endpoint format:**
+- Receives POST requests with JSON body
+- Schema: `{prompt_or_skill, model_tier, duration_seconds, success, timestamp}`
+- Should return 200 OK on success
+- Failures are silently ignored (non-blocking)
 
 ---
 

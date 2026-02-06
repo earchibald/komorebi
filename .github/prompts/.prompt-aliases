@@ -1,0 +1,27 @@
+# Prompt Aliases for Komorebi
+# Format: alias:prompt-file-name
+
+# Quick aliases for common workflows
+impl:implement-feature
+test:write-tests
+debug:debug-issue
+arch:architect-feature
+refactor:refactor-code
+docs:update-docs
+review:review-pr
+
+# Alternative names
+implement:implement-feature
+tests:write-tests
+bug:debug-issue
+design:architect-feature
+clean:refactor-code
+doc:update-docs
+pr:review-pr
+
+# Shorthand
+i:implement-feature
+t:write-tests
+d:debug-issue
+a:architect-feature
+r:refactor-code

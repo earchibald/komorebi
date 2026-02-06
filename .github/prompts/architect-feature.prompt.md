@@ -2,7 +2,7 @@
 name: architect-feature
 description: Designing system architecture for complex features before implementation
 agent: agent
-model: Claude Opus 4
+model: Claude Opus 4.6
 tools: ['search/codebase', 'runTerminalCommand']
 ---
 
