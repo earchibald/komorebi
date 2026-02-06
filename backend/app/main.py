@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import chunks_router, projects_router, mcp_router, sse_router, entities_router
+from .api.targets import router as targets_router
 from .db import init_db
 
 # Configure logging
@@ -39,6 +40,17 @@ async def lifespan(app: FastAPI):
         logging.getLogger(__name__).info(f"MCP startup: {connected} server(s) connected")
     except Exception as exc:
         logging.getLogger(__name__).warning(f"MCP startup skipped: {exc}")
+
+    # Register target adapters
+    try:
+        from .targets.registry import TargetRegistry
+        from .targets.github import GitHubIssueAdapter
+        
+        adapter = GitHubIssueAdapter()
+        TargetRegistry.register(adapter)
+        logging.getLogger(__name__).info(f"Registered target adapter: {adapter.schema.name}")
+    except Exception as exc:
+        logging.getLogger(__name__).warning(f"Target adapter registration failed: {exc}")
 
     yield
 
@@ -69,6 +81,7 @@ app.include_router(projects_router, prefix="/api/v1")
 app.include_router(mcp_router, prefix="/api/v1")
 app.include_router(sse_router, prefix="/api/v1")
 app.include_router(entities_router, prefix="/api/v1")
+app.include_router(targets_router)
 
 
 @app.get("/")
