@@ -1,4 +1,4 @@
-import { selectedChunk, chunkEntities, entitiesLoading, closeDrawer } from '../store'
+import { selectedChunk, chunkEntities, entitiesLoading, closeDrawer, relatedChunks, relatedLoading, selectChunk } from '../store'
 import type { Entity } from '../store'
 
 const ENTITY_TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -145,6 +145,45 @@ export function ChunkDrawer() {
                     {typeEntities.map((entity) => (
                       <EntityBadge key={entity.id} entity={entity} />
                     ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Related Chunks */}
+          <section className="drawer-section">
+            <h4>🔗 Related Chunks</h4>
+            {relatedLoading.value ? (
+              <div className="loading" style={{ padding: '1rem 0' }}>
+                Finding related chunks...
+              </div>
+            ) : relatedChunks.value.length === 0 ? (
+              <p className="drawer-empty">No related chunks found.</p>
+            ) : (
+              <div className="related-chunks-list">
+                {relatedChunks.value.map(rc => (
+                  <div
+                    key={rc.chunk.id}
+                    className="related-chunk-item chunk-item-clickable"
+                    onClick={() => selectChunk(rc.chunk)}
+                  >
+                    <div className="related-chunk-header">
+                      <span className="similarity-badge">
+                        {Math.round(rc.similarity * 100)}%
+                      </span>
+                      <span className={`chunk-status ${rc.chunk.status}`}>{rc.chunk.status}</span>
+                    </div>
+                    <div className="related-chunk-content">
+                      {rc.chunk.content.length > 80 ? rc.chunk.content.slice(0, 80) + '...' : rc.chunk.content}
+                    </div>
+                    {rc.shared_terms.length > 0 && (
+                      <div className="related-chunk-terms">
+                        {rc.shared_terms.map(term => (
+                          <span key={term} className="shared-term">{term}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

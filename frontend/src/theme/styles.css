@@ -960,3 +960,372 @@ body {
   background: var(--accent-pink);
   color: white;
 }
+
+/* ============================================
+   Module 6: Dashboard Stats
+   ============================================ */
+
+.stats-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.dashboard-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+/* Weekly Activity Chart */
+.week-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.week-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.week-bar-label {
+  min-width: 90px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.week-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.week-bar-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.week-bar-count {
+  min-width: 30px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Insights */
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.insight-icon {
+  font-size: 1.1rem;
+}
+
+.insight-item strong {
+  color: var(--text-primary);
+}
+
+/* Project Breakdown */
+.project-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border-radius: 6px;
+}
+
+.project-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.project-count {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   Module 6: Timeline View
+   ============================================ */
+
+.timeline-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.granularity-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.timeline-project-filter {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.timeline-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timeline-summary {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-bucket {
+  border-radius: 6px;
+}
+
+.timeline-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 4px;
+}
+
+.timeline-bar-row:hover {
+  background: var(--bg-secondary);
+}
+
+.timeline-bar-label {
+  min-width: 100px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.timeline-bar-track {
+  flex: 1;
+  height: 22px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timeline-bar-fill {
+  height: 100%;
+  display: flex;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+.timeline-bar-segment {
+  height: 100%;
+}
+
+.timeline-bar-segment.status-inbox {
+  background: var(--accent-yellow);
+}
+
+.timeline-bar-segment.status-processed {
+  background: var(--accent-green);
+}
+
+.timeline-bar-segment.status-compacted {
+  background: var(--accent-blue);
+}
+
+.timeline-bar-segment.status-archived {
+  background: var(--text-secondary);
+}
+
+.timeline-bar-count {
+  min-width: 30px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.timeline-bucket-detail {
+  padding: 0.5rem 0 0.5rem 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.timeline-chunk-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.timeline-chunk-content {
+  color: var(--text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   Module 6: Inbox Enhancements
+   ============================================ */
+
+.inbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.inbox-header-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.inbox-count {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.inbox-oldest {
+  color: var(--text-secondary);
+}
+
+.inbox-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inbox-sort {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.chunk-age-indicator {
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}
+
+.chunk-age-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+/* ============================================
+   Module 6: Related Chunks (Drawer)
+   ============================================ */
+
+.related-chunks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.related-chunk-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.related-chunk-item:hover {
+  border-color: var(--accent-blue);
+}
+
+.related-chunk-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.similarity-badge {
+  background: var(--accent-blue);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+}
+
+.related-chunk-content {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.related-chunk-terms {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.shared-term {
+  background: var(--bg-tertiary);
+  color: var(--accent-blue);
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+}

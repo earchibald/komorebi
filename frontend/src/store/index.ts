@@ -39,6 +39,15 @@ export interface ChunkStats {
   total: number
 }
 
+export interface DashboardStats extends ChunkStats {
+  by_week: Array<{ week_start: string; count: number }>
+  oldest_inbox_age_days: number | null
+  most_active_project: string | null
+  most_active_project_count: number
+  entity_count: number
+  by_project: Array<{ name: string; chunk_count: number; id: string }>
+}
+
 export interface Entity {
   id: number
   chunk_id: string
@@ -66,6 +75,26 @@ export interface SearchFilters {
   entityValue?: string
   createdAfter?: string
   createdBefore?: string
+}
+
+export interface TimelineBucket {
+  bucket_label: string
+  bucket_start: string
+  chunk_count: number
+  by_status: Record<string, number>
+  chunk_ids: string[]
+}
+
+export interface TimelineResponse {
+  granularity: string
+  buckets: TimelineBucket[]
+  total_chunks: number
+}
+
+export interface RelatedChunk {
+  chunk: Chunk
+  similarity: number
+  shared_terms: string[]
 }
 
 // API base URL
@@ -103,12 +132,18 @@ function writeCache<T>(key: string, value: T): void {
 // Signals (reactive state)
 export const chunks = signal<Chunk[]>([])
 export const projects = signal<Project[]>([])
-export const stats = signal<ChunkStats>({
+export const stats = signal<DashboardStats>({
   inbox: 0,
   processed: 0,
   compacted: 0,
   archived: 0,
   total: 0,
+  by_week: [],
+  oldest_inbox_age_days: null,
+  most_active_project: null,
+  most_active_project_count: 0,
+  entity_count: 0,
+  by_project: [],
 })
 export const loading = signal(false)
 export const error = signal<string | null>(null)
@@ -145,9 +180,18 @@ export const selectedChunk = signal<Chunk | null>(null)
 export const chunkEntities = signal<Entity[]>([])
 export const entitiesLoading = signal(false)
 
+// Timeline state
+export const timeline = signal<TimelineResponse | null>(null)
+export const timelineLoading = signal(false)
+export const timelineGranularity = signal<'day' | 'week' | 'month'>('week')
+
+// Related chunks state (loaded per-chunk in drawer)
+export const relatedChunks = signal<RelatedChunk[]>([])
+export const relatedLoading = signal(false)
+
 const cachedChunks = readCache<Chunk[]>(STORAGE_KEYS.chunks)
 const cachedProjects = readCache<Project[]>(STORAGE_KEYS.projects)
-const cachedStats = readCache<ChunkStats>(STORAGE_KEYS.stats)
+const cachedStats = readCache<DashboardStats>(STORAGE_KEYS.stats)
 
 if (cachedChunks) {
   console.log(`📦 Loaded ${cachedChunks.length} chunks from cache`)
@@ -364,13 +408,17 @@ export async function createProject(name: string, description?: string) {
 export function selectChunk(chunk: Chunk): void {
   selectedChunk.value = chunk
   chunkEntities.value = []
+  relatedChunks.value = []
   fetchChunkEntities(chunk.id)
+  fetchRelatedChunks(chunk.id)
 }
 
 export function closeDrawer(): void {
   selectedChunk.value = null
   chunkEntities.value = []
   entitiesLoading.value = false
+  relatedChunks.value = []
+  relatedLoading.value = false
 }
 
 export async function fetchChunkEntities(chunkId: string): Promise<void> {
@@ -384,6 +432,44 @@ export async function fetchChunkEntities(chunkId: string): Promise<void> {
     chunkEntities.value = []
   } finally {
     entitiesLoading.value = false
+  }
+}
+
+export async function fetchRelatedChunks(chunkId: string, limit = 5): Promise<void> {
+  relatedLoading.value = true
+  try {
+    const response = await fetch(`${API_URL}/chunks/${chunkId}/related?limit=${limit}`)
+    if (!response.ok) throw new Error('Failed to fetch related chunks')
+    const data = await response.json()
+    relatedChunks.value = data.related
+  } catch (e) {
+    console.error('Failed to fetch related chunks:', e)
+    relatedChunks.value = []
+  } finally {
+    relatedLoading.value = false
+  }
+}
+
+export async function fetchTimeline(
+  granularity?: string,
+  weeks?: number,
+  projectId?: string
+): Promise<void> {
+  timelineLoading.value = true
+  try {
+    const params = new URLSearchParams()
+    if (granularity) params.set('granularity', granularity)
+    if (weeks) params.set('weeks', String(weeks))
+    if (projectId) params.set('project_id', projectId)
+    
+    const response = await fetch(`${API_URL}/chunks/timeline?${params}`)
+    if (!response.ok) throw new Error('Failed to fetch timeline')
+    timeline.value = await response.json()
+  } catch (e) {
+    console.error('Failed to fetch timeline:', e)
+    timeline.value = null
+  } finally {
+    timelineLoading.value = false
   }
 }
 
