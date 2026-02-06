@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { searchQuery, searchResults, searchLoading, debouncedSearch, clearSearch, isSearchActive } from '../store'
+import { searchQuery, searchResults, searchLoading, debouncedSearch, clearSearch, isSearchActive, triggerImmediateSearch } from '../store'
 
 export function SearchBar() {
   const [localQuery, setLocalQuery] = useState(searchQuery.value)
@@ -21,6 +21,14 @@ export function SearchBar() {
     setLocalQuery(val)
     searchQuery.value = val
     debouncedSearch()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      // Immediate search on Enter — cancel debounce and fire now
+      triggerImmediateSearch()
+    }
   }
 
   const handleClear = () => {
@@ -43,6 +51,7 @@ export function SearchBar() {
           placeholder="Search chunks by content..."
           value={localQuery}
           onChange={handleInput}
+          onKeyDown={handleKeyDown}
           autoComplete="off"
         />
         {isActive && (

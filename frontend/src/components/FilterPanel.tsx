@@ -10,8 +10,7 @@ import { searchFilters, projects, debouncedSearch, clearSearch } from '../store'
 export function FilterPanel() {
   const [isExpanded, setIsExpanded] = useState(false)
 
-  // Local state bridges for all filter inputs
-  const [localStatus, setLocalStatus] = useState(searchFilters.value.status || '')
+  // Local state bridges for filter inputs (status dropdown removed — ChunkList tabs handle status)
   const [localProjectId, setLocalProjectId] = useState(searchFilters.value.projectId || '')
   const [localEntityType, setLocalEntityType] = useState(searchFilters.value.entityType || '')
   const [localEntityValue, setLocalEntityValue] = useState(searchFilters.value.entityValue || '')
@@ -21,7 +20,6 @@ export function FilterPanel() {
   // Sync signal → local state when signal changes externally (e.g., clearSearch)
   useEffect(() => {
     const filters = searchFilters.value
-    setLocalStatus(filters.status || '')
     setLocalProjectId(filters.projectId || '')
     setLocalEntityType(filters.entityType || '')
     setLocalEntityValue(filters.entityValue || '')
@@ -68,24 +66,7 @@ export function FilterPanel() {
       {isExpanded && (
         <div className="filter-content">
           <div className="filter-grid">
-            {/* Status Filter */}
-            <div className="filter-field">
-              <label htmlFor="filter-status">Status</label>
-              <select
-                id="filter-status"
-                value={localStatus}
-                onChange={(e) => {
-                  setLocalStatus(e.target.value)
-                  updateFilter('status', e.target.value as any || undefined)
-                }}
-              >
-                <option value="">All</option>
-                <option value="inbox">Inbox</option>
-                <option value="processed">Processed</option>
-                <option value="compacted">Compacted</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
+            {/* Status filter removed — ChunkList tabs handle status filtering */}
 
             {/* Project Filter */}
             <div className="filter-field">

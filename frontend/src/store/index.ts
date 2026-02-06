@@ -300,6 +300,15 @@ export function clearSearch() {
   }
 }
 
+export function triggerImmediateSearch(limit = 100, offset = 0) {
+  // Cancel pending debounce and fire search immediately
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+    searchDebounceTimer = null
+  }
+  fetchSearchResults(limit, offset)
+}
+
 export async function fetchStats() {
   // Debounce: return existing promise if fetch is in progress
   if (fetchStatsPromise) return fetchStatsPromise
