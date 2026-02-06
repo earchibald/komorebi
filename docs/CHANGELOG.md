@@ -17,6 +17,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-02-06
+
+### Added
+
+#### VS Code Prompts & Skills System
+- **7 Custom Prompts** - Workflow templates for common development tasks
+  - `implement-feature` (Standard/Sonnet) - TDD-driven feature development
+  - `write-tests` (Standard/Sonnet) - Comprehensive test generation
+  - `debug-issue` (Premium/Opus 4.6) - Systematic debugging workflow
+  - `review-pr` (Standard/Sonnet) - Security-focused PR reviews
+  - `update-docs` (Economy/Haiku) - Documentation sync with governance
+  - `refactor-code` (Standard/Sonnet) - Code improvement patterns
+  - `architect-feature` (Premium/Opus 4.6) - Complex feature design
+- **Prompt Aliases** - 15+ shortcuts for faster typing (`/impl`, `/test`, `/debug`, etc.)
+- **4 Agent Skills** - Specialized workflows with progressive loading
+  - `feature-implementer` (Standard) - Full-stack scaffold generator with scripts
+  - `code-formatter` (Economy) - Ruff formatting and linting commands
+  - `deep-debugger` (Premium) - Advanced async/race condition debugging
+  - `research-agent` (Research) - Long-context analysis with Gemini 3 Pro (1M tokens)
+
+#### Infrastructure
+- **Scaffold Generator** - `generate_scaffold.py` creates complete feature boilerplate
+  - Generates Pydantic schemas, repositories, API routes, tests, React components
+  - Follows project conventions automatically
+  - Configurable backend-only/frontend-only modes
+- **Feature Validator** - `validate_feature.py` checks convention compliance
+- **Telemetry System** - Usage and cost tracking with optional MCP integration
+  - Local JSONL storage (`~/.komorebi/telemetry/usage.jsonl`)
+  - MCP endpoint support via `KOMOREBI_MCP_TELEMETRY_ENDPOINT`
+  - Report generation: usage patterns, cost analysis, time savings
+
+#### Documentation
+- **PROMPTS_AND_SKILLS_PROPOSAL.md** - 33KB comprehensive strategy document
+  - Model tier analysis and cost-benefit calculations
+  - Implementation roadmap and best practices
+- **PROMPTS_SKILLS_AUDIT.md** - 22KB audit report with pros/cons
+- **PROMPT_GUIDE.md** - Complete usage guide for all prompts and skills
+- **CONTEXT_AWARENESS_ANALYSIS.md** - How skills derive information automatically
+- **IMPLEMENTATION_SUMMARY.md** - Quick reference for the entire system
+
+### Changed
+- **Model Specifications** - Updated premium prompts to use Claude Opus 4.6
+- **CURRENT_STATUS.md** - Version bumped to 0.3.0 with latest features
+- **PROGRESS.md** - Added Phase 6: Developer Experience
+
+### Technical Details
+- All scripts use `#!/usr/bin/env python3` for proper venv support
+- Prompts follow VS Code frontmatter format with correct model names
+- Skills use progressive loading (metadata → SKILL.md → resources)
+- F-string syntax corrected in scaffold generator
+- MCP telemetry integration with graceful failure handling
+
+---
+
 ## [0.2.2] - 2026-02-05
 
 ### Added
