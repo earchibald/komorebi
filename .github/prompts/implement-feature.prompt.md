@@ -2,7 +2,7 @@
 name: implement-feature
 description: Fast-track feature implementation from specification to working code using TDD workflow. Use for new CRUD features, API endpoints, React components.
 agent: agent
-tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'fetch', 'githubRepo']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'gitkraken/*', 'github/*', 'vscode.mermaid-chat-features/renderMermaidDiagram', 'pylance-mcp-server/*']
 ---
 
 # Implement Feature

@@ -3,7 +3,7 @@ name: architect-feature
 description: Designing system architecture for complex features before implementation
 agent: agent
 model: Claude Opus 4.6
-tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'fetch', 'githubRepo']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'gitkraken/*', 'github/*', 'vscode.mermaid-chat-features/renderMermaidDiagram', 'pylance-mcp-server/*']
 ---
 
 # Architecture Agent

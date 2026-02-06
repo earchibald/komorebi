@@ -2,7 +2,7 @@
 name: integrate-feature
 description: Finalize implemented features through testing, versioning, documentation, and commit workflow. Use for transitioning code from feature branch to develop/main.
 agent: agent
-tools: ["search/*", "edit/*", "runTerminalCommand", "web/githubRepo", "web/fetch", "listFiles", "read/readFile"]
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'gitkraken/*', 'github/*', 'vscode.mermaid-chat-features/renderMermaidDiagram', 'pylance-mcp-server/*']
 ---
 
 # Integrate Feature

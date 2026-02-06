@@ -3,7 +3,7 @@ name: debug-issue
 description: Systematic debugging workflow for complex issues using hypothesis-driven approach. Use for race conditions, async bugs, performance issues.
 agent: agent
 model: Claude Opus 4.6
-tools: ['search/codebase', 'editFiles', 'runTerminalCommand', 'githubRepo', 'fetch']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'gitkraken/*', 'github/*', 'vscode.mermaid-chat-features/renderMermaidDiagram', 'pylance-mcp-server/*']
 ---
 
 # Debug Issue
