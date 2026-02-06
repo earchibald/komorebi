@@ -360,6 +360,29 @@ curl -X POST http://localhost:8000/api/v1/mcp/servers \
 }
 ```
 
+**GitKraken:**
+```json
+{
+  "name": "GitKraken",
+  "server_type": "gitkraken",
+  "command": "npx",
+  "args": ["-y", "@gitkraken/mcp-server-gitkraken"],
+  "env": {"GITKRAKEN_API_KEY": "env://GITKRAKEN_API_KEY"},
+  "disabled": true
+}
+```
+
+**Playwright:**
+```json
+{
+  "name": "Playwright",
+  "server_type": "playwright",
+  "command": "npx",
+  "args": ["-y", "@playwright/mcp@latest"],
+  "disabled": true
+}
+```
+
 **Memory:**
 ```json
 {

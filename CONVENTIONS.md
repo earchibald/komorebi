@@ -646,7 +646,39 @@ release: v0.3.0 - recursive compaction complete
 
 ---
 
-## 13. Resources & References
+## 13. MCP Tool Ecosystem
+
+Komorebi integrates with external MCP servers for agentic tool access. Configuration lives in `config/mcp_servers.json` using `env://` URI references for secrets.
+
+### Registered MCP Servers
+
+| Server | Package | Purpose | Secrets |
+|--------|---------|---------|--------|
+| **GitHub** | `@modelcontextprotocol/server-github` | Repository ops, issues, PRs, code search | `GITHUB_TOKEN` |
+| **GitKraken** | `@gitkraken/mcp-server-gitkraken` | Advanced Git operations, visual diffs, repo management | `GITKRAKEN_API_KEY` |
+| **Playwright** | `@playwright/mcp@latest` | Browser automation, E2E testing, visual verification | None |
+| **Filesystem** | `@modelcontextprotocol/server-filesystem` | Local file read/write in sandboxed directories | None |
+
+### Security Rules
+- NEVER hardcode MCP server tokens in config files or source code
+- Use `env://VARIABLE_NAME` pattern in `config/mcp_servers.json` for secret injection
+- Secrets are resolved at runtime from environment variables only
+- New servers start `disabled: true` until explicitly enabled
+
+### VS Code Prompt Tools
+
+All prompts have access to the full builtin tool set:
+- `search/codebase` — Semantic codebase search
+- `editFiles` — File creation and editing
+- `runTerminalCommand` — Terminal command execution
+- `githubRepo` — GitHub repository operations (issues, PRs)
+- `fetch` — HTTP requests for external resources
+
+MCP servers (GitHub, GitKraken, Playwright, Filesystem) are available as additional tools when configured and enabled.
+
+---
+
+## 14. Resources & References
 
 - See [copilot-instructions.md](.github/copilot-instructions.md) for project vision and directives
 - [VERSIONING.md](VERSIONING.md) - Complete versioning governance
@@ -654,7 +686,8 @@ release: v0.3.0 - recursive compaction complete
 - SQLAlchemy Async: https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 - Preact Signals: https://preactjs.com/guide/v10/signals/
 - React 18 Docs: https://react.dev/
+- MCP Specification: https://modelcontextprotocol.io/specification/2025-11-25
 
 ---
 
-**Last Updated:** February 5, 2026
+**Last Updated:** February 7, 2026

@@ -14,19 +14,24 @@ Successfully implemented a comprehensive VS Code Copilot customization system fo
 
 ## Deliverables
 
-### Prompts (7 Total)
+### Prompts (8 Total)
 
-| Prompt | Alias | Model | Purpose |
-|--------|-------|-------|---------|
-| implement-feature | /impl, /i | Sonnet | TDD-driven feature development |
-| write-tests | /test, /t | Sonnet | Comprehensive test generation |
-| debug-issue | /debug, /d | Opus 4.6 | Complex debugging |
-| architect-feature | /arch, /a | Opus 4.6 | System architecture design |
-| refactor-code | /refactor, /r | Sonnet | Code improvement |
-| update-docs | /docs | Haiku | Documentation sync |
-| review-pr | /review | Sonnet | Security-focused PR review |
+| Prompt | Alias | Model | Tools | Purpose |
+|--------|-------|-------|-------|---------||
+| implement-feature | /impl, /i | Sonnet | Full | TDD-driven feature development |
+| write-tests | /test, /t | Sonnet | Full | Comprehensive test generation |
+| debug-issue | /debug, /d | Opus 4.6 | Full | Complex debugging |
+| architect-feature | /arch, /a | Opus 4.6 | Full | System architecture design |
+| refactor-code | /refactor, /r | Sonnet | Full | Code improvement |
+| update-docs | /docs | Haiku | Full | Documentation sync |
+| review-pr | /review | Sonnet | Full | Security-focused PR review |
+| integrate-feature | /integrate, /int | Sonnet | Full | Finalize, version, and ship features |
 
 **Location:** `.github/prompts/*.prompt.md`
+
+**Full Tool Set:** `search/codebase`, `editFiles`, `runTerminalCommand`, `githubRepo`, `fetch`
+
+**MCP Tools Available:** GitHub, GitKraken, Playwright, Filesystem (via `config/mcp_servers.json`)
 
 ### Skills (4 Total)
 
@@ -104,6 +109,7 @@ Fast typing shortcuts configured in `.github/prompts/.prompt-aliases`:
 - `/refactor` → refactor-code
 - `/docs` → update-docs
 - `/review` → review-pr
+- `/integrate` → integrate-feature
 
 **Ultra-short aliases:**
 - `/i` → implement-feature
@@ -111,6 +117,7 @@ Fast typing shortcuts configured in `.github/prompts/.prompt-aliases`:
 - `/d` → debug-issue
 - `/a` → architect-feature
 - `/r` → refactor-code
+- `/int` → integrate-feature
 
 ### 2. Model Tier Strategy
 
@@ -336,9 +343,11 @@ name: prompt-name
 description: When to use this prompt
 agent: agent
 model: Claude Opus 4.6
-tools: ['search/codebase', 'editFiles', 'runTerminalCommand']
+tools: ['search/codebase', 'editFiles', 'runTerminalCommand', 'githubRepo', 'fetch']
 ---
 ```
+
+All prompts now include the full builtin tool set (`search/codebase`, `editFiles`, `runTerminalCommand`, `githubRepo`, `fetch`). MCP tools (GitHub, GitKraken, Playwright, Filesystem) are available via `config/mcp_servers.json` when configured.
 
 Skills use progressive loading:
 1. Metadata always loaded
@@ -381,12 +390,13 @@ All systems tested:
 
 ## File Counts
 
-- **Prompts:** 7 files + 1 alias config
+- **Prompts:** 8 files + 1 alias config
 - **Skills:** 4 SKILL.md files
 - **Scripts:** 3 Python scripts
 - **Documentation:** 6 markdown files (4 new, 2 updated)
+- **MCP Config:** 4 registered servers (GitHub, GitKraken, Playwright, Filesystem)
 
-**Total artifacts:** 21 files
+**Total artifacts:** 22 files
 
 ---
 

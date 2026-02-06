@@ -1,7 +1,7 @@
 # Komorebi Prompts & Skills Guide
 
-**Version:** 1.0.0  
-**Last Updated:** February 5, 2026
+**Version:** 1.1.0  
+**Last Updated:** February 7, 2026
 
 This guide explains how to use the custom prompts and agent skills in the Komorebi project.
 
@@ -20,6 +20,7 @@ This guide explains how to use the custom prompts and agent skills in the Komore
 | Update Docs | `/update-docs` | Haiku | Documentation updates |
 | Refactor Code | `/refactor-code` | Sonnet | Improving code structure |
 | Architect Feature | `/architect-feature` | Opus | Complex feature design |
+| Integrate Feature | `/integrate-feature` | Sonnet | Finalize, version, and ship features |
 
 ### Available Skills
 
@@ -66,6 +67,7 @@ For faster typing, use short aliases:
 - `/refactor` → `/refactor-code`
 - `/docs` → `/update-docs`
 - `/review` → `/review-pr`
+- `/integrate` → `/integrate-feature`
 
 Even shorter:
 - `/i` → `/implement-feature`
@@ -73,6 +75,7 @@ Even shorter:
 - `/d` → `/debug-issue`
 - `/a` → `/architect-feature`
 - `/r` → `/refactor-code`
+- `/int` → `/integrate-feature`
 
 **Method 2: Command Palette**
 
@@ -299,6 +302,38 @@ Design the MCP Tool Browser feature:
 - System design (components, API, data model)
 - Trade-off documentation
 - Task breakdown with estimates
+- ARCHITECTURE_HANDOFF.md for implementation phase
+
+---
+
+### `/integrate-feature`
+
+**Purpose:** Finalize, version, and ship completed features  
+**Model:** Claude Sonnet 4 (Standard)  
+**Best for:** Post-implementation integration, versioning, PR creation
+
+**What it does:**
+1. Validates implementation against handoff document
+2. Runs full test suite and lint checks
+3. Syncs all documentation (CHANGELOG, CURRENT_STATUS, PROGRESS)
+4. Bumps version using semantic versioning governance
+5. Creates or prepares PR for merge
+
+**Example usage:**
+```
+/integrate-feature
+
+Ship the chunk search feature. Implementation is complete,
+all tests pass. Need to version bump, update docs, and
+prepare PR to develop.
+```
+
+**Output includes:**
+- Full verification results
+- Documentation sync across all governance files
+- Version bump with changelog entry
+- INTEGRATION_HANDOFF.md summary
+- PR-ready branch state
 
 ---
 
