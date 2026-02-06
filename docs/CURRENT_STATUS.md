@@ -1,7 +1,30 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 5, 2026  
+**Date:** February 6, 2026  
 **Version:** 0.3.0 (Pre-1.0.0 Development)
+
+---
+
+## 🆕 Latest Updates
+
+### Module 3 & Developer Experience (v0.3.0)
+
+**Developer Tooling - VS Code Prompts & Skills:**
+- 7 custom prompts with 15+ aliases (`/impl`, `/test`, `/debug`, `/arch`, `/refactor`, `/docs`, `/review`)
+- 4 agent skills across all tiers:
+  - `feature-implementer` (Standard) - Full-stack scaffold generator
+  - `code-formatter` (Economy) - Ruff formatting
+  - `deep-debugger` (Premium/Opus 4.6) - Advanced async debugging
+  - `research-agent` (Research/Gemini 3 Pro) - Long-context analysis
+- Telemetry system with optional MCP integration
+- Complete documentation suite (PROMPT_GUIDE.md, CONTEXT_AWARENESS_ANALYSIS.md, etc.)
+
+**Module 3 - MCP Aggregator:**
+- Modular secret management (keyring, environment variables)
+- Declarative configuration system (`config/mcp_servers.json`)
+- "Tool Result → Chunk" capture pipeline
+- MCPPanel dashboard with real-time server status
+- Production-ready with 259 req/s validated
 
 ---
 

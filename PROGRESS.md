@@ -53,7 +53,32 @@
 - ✅ hammer_gen.py runs successfully against backend
 - ✅ All 53 requests successful, 0 failures
 
-### Phase 6: Module 1 - Core Intelligence (Ollama Integration)
+### Phase 6: Developer Experience - VS Code Prompts & Skills
+- ✅ Created VS Code custom prompts (`.github/prompts/`)
+  - `implement-feature.prompt.md` - Full-stack TDD workflow (Standard tier)
+  - `write-tests.prompt.md` - Pytest patterns and coverage (Standard tier)
+  - `debug-issue.prompt.md` - 6-phase debugging (Premium/Opus 4.6 tier)
+  - `review-pr.prompt.md` - Comprehensive PR review (Standard tier)
+  - `update-docs.prompt.md` - Documentation governance (Economy/Haiku tier)
+  - `refactor-code.prompt.md` - Code improvement workflows (Standard tier)
+  - `architect-feature.prompt.md` - Complex feature design (Premium/Opus 4.6 tier)
+- ✅ Created agent skills (`.github/skills/`)
+  - `feature-implementer` (Standard) - Scaffold generator with validation scripts
+  - `code-formatter` (Economy) - Ruff formatting and linting commands
+  - `deep-debugger` (Premium) - Advanced async/race condition debugging
+  - `research-agent` (Research) - Long-context codebase analysis with Gemini 3 Pro
+- ✅ Created telemetry infrastructure (`scripts/telemetry/`)
+  - Usage tracking with cost analysis
+  - Report generation by time period
+  - Optional MCP endpoint integration
+- ✅ Comprehensive documentation
+  - `docs/PROMPTS_AND_SKILLS_PROPOSAL.md` - Full strategy document
+  - `docs/PROMPTS_SKILLS_AUDIT.md` - Audit and recommendations
+  - `docs/PROMPT_GUIDE.md` - Usage guide for all prompts/skills
+  - `docs/CONTEXT_AWARENESS_ANALYSIS.md` - Context derivation capabilities
+  - `docs/IMPLEMENTATION_SUMMARY.md` - Quick reference
+
+### Phase 7: Module 1 - Core Intelligence (Ollama Integration)
 - ✅ Added `ollama` dependency to pyproject.toml
 - ✅ Created `backend/app/core/ollama_client.py` with KomorebiLLM class
   - Async AsyncClient initialization with host/model from environment
