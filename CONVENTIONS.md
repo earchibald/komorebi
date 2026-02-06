@@ -60,6 +60,18 @@ class Chunk(BaseModel):
 
 ## 2. State Management (Frontend)
 
+### Auto-Tracking Import (CRITICAL)
+`@preact/signals-react` v2 requires the auto-tracking import as the **first line** of `main.tsx`. Without it, `.value` reads in components are plain property accesses with NO subscription — components will never re-render when signals change.
+
+```typescript
+// main.tsx — MUST be first import, before React/ReactDOM/components
+import '@preact/signals-react/auto'
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+```
+
 ### Preact Signals Pattern
 Use Preact Signals for fine-grained reactivity without context providers or heavy state management:
 

@@ -160,3 +160,44 @@ const displayChunks = useMemo(() => {
 
 **Files Changed:** `ChunkList.tsx`, `FilterPanel.tsx`, `SearchBar.tsx`, `store/index.ts`
 **Regression Tests:** `e2e/search-regression.spec.ts` (5 Playwright tests)
+
+---
+
+## [2026-02-05] Fixed: Signal auto-tracking never installed — search completely broken
+
+**Context:** Despite the previous fix moving `.value` reads to render body, search STILL did not work. The component never re-rendered when signals changed.
+
+### Root Cause: Missing `@preact/signals-react/auto` import
+
+`@preact/signals-react` v2 has TWO modes of operation:
+1. **Auto-tracking** — import `@preact/signals-react/auto` which calls `installAutoSignalTracking()` to monkey-patch React internals. Signal `.value` reads in any component are automatically tracked.
+2. **Manual tracking** — call `useSignals()` hook at the top of every component that reads signals.
+
+**Neither was done.** The store imported `signal` and `computed` from `@preact/signals-react`, but without the auto-tracking setup, reading `.value` in render bodies had zero effect on reactivity. Components rendered once and never re-rendered when signals changed.
+
+The only reason initial chunk data displayed at all was because `useEffect(() => { fetchChunks() }, [])` triggered a state update via the fetch cycle, not via signal subscriptions.
+
+**Fix:** Added `import '@preact/signals-react/auto'` as the **first import** in `main.tsx`, before React, ReactDOM, or any component import. This is a one-line fix that enables global auto-tracking.
+
+**Verified with Playwright:**
+- Before fix: Search for "content 5" → 10 chunks (no filtering)
+- After fix: Search for "content 5" → 1 chunk (correct!)
+- Clear search → 10 chunks restored
+- Gibberish search → 0 chunks + empty state
+- All signal-dependent features (tabs, search status badge, clear button) now work reactively
+
+**Additional work:**
+- Added `komorebi search` CLI command with text, status, entity, date range filters, pagination, verbose/JSON output modes
+- Added 10 new backend search regression tests (partial match, pagination overlap, distinct results, combined filters, date ranges)
+- 85 tests pass, 3 skipped, 0 failures
+
+**Lesson:** When using `@preact/signals-react` v2, the auto-tracking import is **mandatory** for signal reactivity. Without it, `.value` reads are plain property accesses with no subscription magic. This is the #1 setup step that must not be missed.
+
+```tsx
+// main.tsx — MUST be first import
+import '@preact/signals-react/auto'  // ← THIS LINE IS ESSENTIAL
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+```

@@ -35,6 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clearing filters leaves no results** — Same root cause as above; `clearSearch()` correctly reset signals but `useMemo` never re-evaluated.
 - **Status filter hides tab buttons** — `FilterPanel` status dropdown set `isSearchActive=true`, hiding ChunkList's 5 status tab buttons. Fix: removed duplicate status dropdown from FilterPanel; ChunkList tabs now always visible and apply client-side on top of search results.
 - **Enter key does nothing in search** — Added `onKeyDown` handler and `triggerImmediateSearch()` store function for instant search on Enter (cancels debounce timer).
+- **Signal auto-tracking never installed** — `@preact/signals-react` v2 requires `import '@preact/signals-react/auto'` in `main.tsx` to enable signal reactivity in React components. Without this one-line import, `.value` reads had no subscription effect and components never re-rendered when signals changed. This was the true root cause of all search/filter UI failures.
+
+### Added (v0.7.0 continued)
+- **CLI `search` command** — `komorebi search "query"` with text, status, entity, date range filters, verbose/JSON output. Diagnostic tool for verifying search end-to-end.
+- **10 new backend search tests** — Covers distinct results, partial matching, pagination no-overlap, combined filters, date ranges, response shape validation.
 
 ### Technical
 - 7 new Pydantic models: `DashboardStats`, `WeekBucket`, `TimelineGranularity`, `TimelineBucket`, `TimelineResponse`, `RelatedChunk`, `RelatedChunksResponse`
