@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Module 7: Context Resume ("The Save Point")** — LLM-synthesized project briefings for resuming work context
+  - `ProjectBriefing` and `BriefingSection` Pydantic models (`backend/app/models/resume.py`)
+  - `ResumeService` aggregation service (`backend/app/services/resume_service.py`) — gathers chunks, decisions, TF-IDF related context, and synthesizes via LLM
+  - `GET /projects/{id}/resume?hours=48` endpoint with configurable time window
+  - Graceful degradation: template-based fallback when Ollama is unavailable
+  - `KomorebiLLM.generate()` general-purpose text generation method
+  - `EntityRepository.list_by_project()` now accepts `since` datetime filter
+  - `ResumeCard.tsx` frontend component with skeleton loading, error/retry, and data states
+  - Resume toggle button ("▶ Resume") on each project card in ProjectList
+  - `briefing`, `briefingLoading`, `briefingError` signals + `fetchBriefing()` in store
+  - 12 new tests (5 API endpoint + 5 service unit + 2 model validation)
+
 ### Planned
 - Module 5: Implementation — Docker deployment, bulk operations feature
 - Performance optimization baseline

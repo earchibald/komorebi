@@ -1,11 +1,31 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 8, 2026  
-**Version:** 0.7.0 (Pre-1.0.0 Development)
+**Date:** February 5, 2026  
+**Version:** 0.8.0-dev (Pre-1.0.0 Development)
 
 ---
 
 ## 🆕 Latest Updates
+
+### Module 7: Context Resume ("The Save Point")
+
+**New Feature: Context Resume Briefings**
+- `GET /projects/{id}/resume?hours=48` generates LLM-synthesized "Morning Briefing"
+- 3-bullet format: Where you left off, Key context, Suggested next step
+- Aggregates recent chunks, decision entities (time-windowed), and TF-IDF related context
+- Graceful degradation: template fallback when Ollama is offline (`ollama_available` flag)
+- New `KomorebiLLM.generate()` method for general-purpose text generation
+- `EntityRepository.list_by_project()` extended with `since` datetime parameter
+
+**Frontend:**
+- "▶ Resume" button on each project card in ProjectList
+- `ResumeCard` component with skeleton loading, error+retry, and full briefing display
+- Jump-to-chunk navigation (opens ChunkDrawer from Resume)
+- New signals: `briefing`, `briefingLoading`, `briefingError`
+
+**Testing:**
+- 12 new tests: 5 API endpoint, 5 service unit (mocked), 2 model validation
+- Total suite: 97 passed, 3 skipped, 0 failures
 
 ### v0.7.0 Release - Module 6: User Data API & Search Fix
 

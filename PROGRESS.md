@@ -2,6 +2,20 @@
 
 ## Completed ✅
 
+### Module 7: Context Resume ("The Save Point")
+- ✅ Pydantic models (`backend/app/models/resume.py`)
+  - `ProjectBriefing` with summary, sections, recent_chunks, decisions, related_context
+  - `BriefingSection` with heading, content, optional chunk_id link
+- ✅ `ResumeService` (`backend/app/services/resume_service.py`)
+  - Read-only aggregation from chunks, entities, TF-IDF, LLM
+  - Template fallback when Ollama unavailable
+  - System anchor injection for LLM context grounding
+- ✅ API endpoint `GET /projects/{id}/resume?hours=48`
+- ✅ `KomorebiLLM.generate()` general-purpose method
+- ✅ `EntityRepository.list_by_project()` `since` parameter
+- ✅ Frontend `ResumeCard` component + store signals
+- ✅ 12 new tests (97 total passed, 3 skipped)
+
 ### Phase 1: Backend Service (FastAPI)
 - ✅ Pydantic models (`backend/app/models/`)
   - Chunk model with status enum (INBOX, PROCESSED, COMPACTED, ARCHIVED)
