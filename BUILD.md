@@ -101,6 +101,7 @@ komorebi/
 | **M3: MCP Aggregator** | v0.3.0 | ✅ Complete | 10 (MCP management) + 2 (SSE) | 10 |
 | **M4: Search & Filtering** | v0.4.0 | ✅ Complete | 1 (GET /chunks/search) | 8 |
 | **M5: Bulk Operations** | v0.6.0 | 🔲 Designed | 5 planned | — |
+| **M6: User Data API** | v0.7.0 | 🔲 Designed | 2 new + 1 enhanced | — |
 
 **Total:** 30 API endpoints, 4 database tables, 45 backend tests
 
