@@ -111,7 +111,7 @@ class FeatureValidator:
                     continue
                 results.append(ValidationResult(
                     passed=False,
-                    message=f"Incomplete TODO comment",
+                    message="Incomplete TODO comment",
                     line=i
                 ))
         
@@ -274,7 +274,7 @@ def print_results(results: list[ValidationResult], file_path: Path) -> int:
         print(f"❌ VALIDATION FAILED: {len(failed)} issue(s) found")
         return 1
     else:
-        print(f"✅ VALIDATION PASSED: All checks passed")
+        print("✅ VALIDATION PASSED: All checks passed")
         return 0
 
 

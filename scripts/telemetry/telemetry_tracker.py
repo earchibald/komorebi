@@ -212,19 +212,19 @@ def generate_usage_report(days: Optional[int] = None):
     print(f"\n📊 Telemetry Report ({period})")
     print("=" * 60)
     
-    print(f"\n📈 Overview")
+    print("\n📈 Overview")
     print(f"   Total invocations: {len(entries)}")
     print(f"   Success rate: {success_count / len(entries) * 100:.1f}%")
     if total_duration:
         print(f"   Total time: {total_duration / 60:.1f} minutes")
         print(f"   Avg time per task: {total_duration / len(entries):.1f} seconds")
     
-    print(f"\n🔧 By Prompt/Skill")
+    print("\n🔧 By Prompt/Skill")
     for name, count in sorted(by_prompt.items(), key=lambda x: -x[1]):
         pct = count / len(entries) * 100
         print(f"   {name}: {count} ({pct:.1f}%)")
     
-    print(f"\n🎯 By Model Tier")
+    print("\n🎯 By Model Tier")
     for tier, count in sorted(by_tier.items(), key=lambda x: -x[1]):
         pct = count / len(entries) * 100
         print(f"   {tier}: {count} ({pct:.1f}%)")
@@ -265,22 +265,22 @@ def generate_cost_report(days: Optional[int] = None):
     print(f"\n💰 Cost Analysis ({period})")
     print("=" * 60)
     
-    print(f"\n📊 Cost by Tier (relative units)")
+    print("\n📊 Cost by Tier (relative units)")
     for tier, count in sorted(by_tier.items(), key=lambda x: -x[1]):
         multiplier = COST_MULTIPLIERS.get(tier, 7.0)
         tier_cost = count * multiplier
         print(f"   {tier}: {count} invocations × {multiplier}x = {tier_cost:.0f} units")
     
-    print(f"\n💵 Cost Summary")
+    print("\n💵 Cost Summary")
     print(f"   Actual cost (optimized): {actual_cost_units:.0f} units")
     print(f"   Hypothetical (all premium): {premium_cost_units:.0f} units")
     print(f"   Savings: {(1 - actual_cost_units / premium_cost_units) * 100:.1f}%")
     
-    print(f"\n⏱️ Time Savings")
+    print("\n⏱️ Time Savings")
     print(f"   Estimated time saved: {estimated_time_saved:.0f} minutes ({estimated_time_saved / 60:.1f} hours)")
     print(f"   (Assumes {BASELINE_TASK_TIME / 60} min context setup per task without prompts)")
     
-    print(f"\n📈 Efficiency Metrics")
+    print("\n📈 Efficiency Metrics")
     if actual_cost_units > 0:
         efficiency = estimated_time_saved / actual_cost_units * 60  # minutes per cost unit
         print(f"   Time saved per cost unit: {efficiency:.2f} minutes")

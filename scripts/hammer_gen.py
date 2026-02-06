@@ -12,7 +12,6 @@ Usage:
 import argparse
 import asyncio
 import random
-import string
 import time
 from dataclasses import dataclass
 from typing import Optional

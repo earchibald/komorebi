@@ -15,7 +15,7 @@ from pathlib import Path
 # Add backend to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from backend.app.db.database import DATABASE_URL, engine, Base
+from backend.app.db.database import DATABASE_URL
 
 
 async def migrate():

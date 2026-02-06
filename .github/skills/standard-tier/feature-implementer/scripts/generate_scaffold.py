@@ -14,10 +14,7 @@ Example:
 """
 
 import argparse
-import os
-import re
 from pathlib import Path
-from datetime import datetime
 
 
 def to_pascal_case(snake_str: str) -> str:
@@ -887,12 +884,12 @@ def generate_scaffold(
     print("📋 Next steps:")
     print(f"   1. Write tests: Edit {tests_path}/test_{feature_plural}.py")
     print(f"   2. Run tests (Red): pytest backend/tests/test_{feature_plural}.py")
-    print(f"   3. Implement: Fill in the TODO sections in generated files")
+    print("   3. Implement: Fill in the TODO sections in generated files")
     print(f"   4. Run tests (Green): pytest backend/tests/test_{feature_plural}.py")
-    print(f"   5. Register router in backend/app/main.py:")
+    print("   5. Register router in backend/app/main.py:")
     print(f"      from backend.app.api.{feature_plural} import router as {feature_plural}_router")
     print(f"      app.include_router({feature_plural}_router, prefix=\"/api/v1\")")
-    print(f"   6. Update CHANGELOG.md and PROGRESS.md")
+    print("   6. Update CHANGELOG.md and PROGRESS.md")
 
 
 def main():

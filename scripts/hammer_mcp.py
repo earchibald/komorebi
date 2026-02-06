@@ -13,7 +13,6 @@ Usage:
 
 import argparse
 import asyncio
-import json
 import os
 import signal
 import subprocess
@@ -135,11 +134,6 @@ async def main(count: int, base_url: str):
 
         successes = sum(1 for r in results if not isinstance(r, Exception) and r[0] == 200)
         failures = count - successes
-        chunk_ids = [
-            r[1].get("chunk_id")
-            for r in results
-            if not isinstance(r, Exception) and r[0] == 200 and "chunk_id" in r[1]
-        ]
 
         print(f"   ✅ {successes} OK  ❌ {failures} failed  ⏱ {elapsed:.2f}s  ({count/elapsed:.0f} req/s)")
 
