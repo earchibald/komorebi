@@ -1,13 +1,38 @@
 # Komorebi: Current Status & Next Steps
 
-**Date:** February 5, 2026  
-**Version:** 0.9.0
+**Date:** February 6, 2026  
+**Version:** 0.9.0 (Context Oracle feature branch)
 
 ---
 
 ## 🆕 Latest Updates
 
-### Module 8: Modular Target Delivery System - v0.8.1
+### Context Oracle: Modules 9-11 — v0.9.0 (feature/context-oracle)
+
+**Phase 1: Security & Profiles**
+- `RedactionService` — 9 compiled regex patterns scrub secrets (AWS, GitHub PAT, PEM, Slack, Stripe, OpenAI, Bearer) before cloud LLM calls
+- `ProfileManager` — YAML-based execution profiles with inheritance chains, cycle detection, dangerous env var blocking (`LD_PRELOAD`, `DYLD_INSERT_LIBRARIES`)
+- Pydantic models: `BlockingPolicy`, `ExecutionProfile`, `ResolvedProfile`
+
+**Phase 2: MCP Server & Trace Lifecycle**
+- `KomorebiMCPServer` — MCP 2024-11-05 stdio server with 4 tools: `search_context`, `get_active_trace`, `read_file_metadata`, `get_related_decisions`
+- `TraceRepository` + `FileEventRepository` — Full CRUD with active-trace switching and path-history queries
+- 3 new database tables: `traces`, `file_events`, `llm_usage` + `trace_id` on `chunks`
+- 6 trace API endpoints + 2 file event endpoints
+- CLI: `komorebi mcp-serve`, `komorebi switch <name>`, `komorebi trace rename`, `komorebi watch start/status`
+
+**Phase 3: Cost Governance & File Watcher**
+- `CostService` — Token counting (len/4 heuristic), per-model cost estimation, budget enforcement with auto-downgrade to local models
+- `FileWatcherDaemon` — `watchdog`-based daemon with ignore rules (`.git`, `__pycache__`, `node_modules`) and `~/.komorebi/watchers.json` registration
+- `BillingDashboard` + `WatcherStatus` frontend components
+- API: `GET /llm/usage`, `GET /llm/budget`, `PUT /llm/budget`
+- New "Billing" and "Watcher" tabs in main navigation
+
+**Testing:**
+- 102 new tests (37 + 36 + 29), all passing
+- 224 total tests passing, 3 pre-existing skips
+- Zero regressions
+- Ruff lint clean
 
 **New Feature: Schema-Driven Target Dispatch**
 - Unified interface for sending data to external tools (GitHub, Jira, Slack, Linear, etc.)

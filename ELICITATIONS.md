@@ -256,3 +256,64 @@ import App from './App'
 **Implementation Estimate:** 12 hours (6h backend, 3h frontend, 3h testing)
 
 **Next Phase:** Implementation via `/implement-feature` following [FEATURE_MODULAR_TARGETS.md](FEATURE_MODULAR_TARGETS.md) task breakdown.
+
+---
+
+## [2026-02-06] Module 9-11: Context Oracle, Security & Cost Governance — Architecture Decisions
+
+**Context:** Designing Komorebi's transformation from passive capture tool to active MCP Server ("Context Oracle"), plus filesystem awareness, execution profiles, secret redaction, and LLM cost governance. Full architecture in [CONTEXT_ORACLE_ARCHITECTURE.md](CONTEXT_ORACLE_ARCHITECTURE.md).
+
+**Technical Decisions Made:**
+
+1. **MCP Server Transport: stdio vs SSE**
+   - **Chose:** `stdio` transport (agent spawns `komorebi mcp-serve` subprocess)
+   - **Rationale:** All existing MCP client implementations (Claude Code, Cursor, VS Code) expect `stdio`. SSE has limited client support. Decouples MCP server from web API lifecycle.
+   - **Trade-off:** Slightly heavier per-connection (subprocess), but standard and compatible.
+   - **Reversibility:** Medium — SSE can be added as a second transport later.
+
+2. **Trace ↔ Project Relationship: 1:1 vs Orthogonal**
+   - **Chose:** Orthogonal — traces and projects are independent axes
+   - **Rationale:** A trace (e.g., "Prod-Fire-1") can span multiple projects. Chunks link to both `project_id` and `trace_id` independently. This is more flexible and matches real-world incident/task workflows.
+   - **Trade-off:** More complex queries (two optional FKs on chunks), but much more expressive.
+   - **Status:** Needs review — if team strongly prefers 1:1, FK constraint can be added.
+
+3. **Trace-Chunk Association: Foreign Key vs Tag-Based**
+   - **Chose:** Foreign key (`trace_id` column on chunks table)
+   - **Rationale:** Traces are first-class concepts. FK gives query performance, referential integrity, and clean JOINs.
+   - **Trade-off:** Requires schema migration (nullable column addition).
+   - **Reversibility:** Hard — once data uses FK, switching to tags requires data migration.
+
+4. **Filesystem Watcher: In-Process vs Separate Daemon**
+   - **Chose:** Separate daemon (CLI-managed background process)
+   - **Rationale:** Watching is a long-running concern orthogonal to the API server. Users may want to watch without running the dashboard. Daemon writes FileEvent chunks via REST API.
+   - **Trade-off:** Requires IPC (HTTP calls), but keeps failure domains isolated.
+   - **Reversibility:** Easy — can move in-process later since it communicates via HTTP.
+
+5. **Token Counting: tiktoken vs Heuristic**
+   - **Chose:** Character heuristic (len/4) for MVP, tiktoken as optional upgrade
+   - **Rationale:** Primarily uses Ollama (local) where exact counts don't matter. Heuristic is close enough for budget alerting (~15-20% error). CostService abstracts counting behind an interface.
+   - **Reversibility:** Easy — swap implementation in CostService.
+
+6. **Profile Security: Env Var Blacklist vs Whitelist**
+   - **Chose:** Blacklist (block LD_PRELOAD, DYLD_INSERT_LIBRARIES, etc.) with explicit override in config.yaml
+   - **Rationale:** Users define profiles for their own environments. Blacklist catches known dangerous vars while remaining flexible. Power users can opt-in to blocked vars.
+   - **Reversibility:** Easy — switching to whitelist is additive.
+
+7. **MCP Server Auth: Authenticated vs Open**
+   - **Chose:** No auth for MVP (local-only stdio transport)
+   - **Rationale:** stdio transport is inherently local (agent spawns subprocess). Auth adds complexity for zero security benefit on a local pipe. Auth should be added when SSE transport is implemented in v2.
+   - **Status:** Revisit for SSE transport in v2.
+
+8. **Watcher Persistence: In-Memory vs JSON File**
+   - **Chose:** JSON file (`~/.komorebi/watchers.json`)
+   - **Rationale:** Watchers should survive server restart. A simple JSON file is sufficient for MVP (no database round-trip needed for watcher config).
+   - **Reversibility:** Easy — migrate to DB table if needed.
+
+**New Dependencies:**
+- `watchdog` — filesystem event monitoring (cross-platform: FSEvents/inotify/ReadDirectoryChangesW)
+- `pyyaml` — profile configuration parsing
+- `tiktoken` — optional, for exact OpenAI token counting
+
+**Implementation Estimate:** 30 hours (18h backend, 7h CLI, 4h frontend, 1h integration)
+
+**Next Phase:** Implementation via `/implement-feature`, starting with Phase 1 (Security & Profiles).

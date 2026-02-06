@@ -102,8 +102,13 @@ komorebi/
 | **M4: Search & Filtering** | v0.4.0 | ✅ Complete | 1 (GET /chunks/search) | 8 |
 | **M5: Bulk Operations** | v0.6.0 | 🔲 Designed | 5 planned | — |
 | **M6: User Data API** | v0.7.0 | 🔲 Designed | 2 new + 1 enhanced | — |
+| **M9: Context Oracle (MCP Server)** | v1.0.0 | 🔲 Designed | 8 (traces + file events) | — |
+| **M10: Security & Profiles** | v1.0.0 | 🔲 Designed | 0 (CLI only) | — |
+| **M11: Cost Governance** | v1.0.0 | 🔲 Designed | 3 (usage + budget) | — |
 
-**Total:** 30 API endpoints, 4 database tables, 45 backend tests
+**Total:** 30 API endpoints + 11 planned, 4 database tables + 3 planned, 45 backend tests
+
+**Architecture:** See [CONTEXT_ORACLE_ARCHITECTURE.md](CONTEXT_ORACLE_ARCHITECTURE.md) for M9-M11 design.
 
 ---
 

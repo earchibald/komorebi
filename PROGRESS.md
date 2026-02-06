@@ -2,6 +2,57 @@
 
 ## Completed ✅
 
+### Context Oracle: Modules 9-11 (Security, MCP Server, Cost Governance)
+
+**Phase 1: Security & Profiles**
+- ✅ `RedactionService` (`backend/app/core/redaction.py`)
+  - 9 compiled regex patterns for secret scrubbing
+  - `redact()`, `contains_secrets()`, `scan()` methods
+  - Custom pattern support via constructor
+- ✅ `ProfileManager` (`backend/app/core/profiles.py`)
+  - YAML profile loading with multi-level inheritance
+  - Cycle detection, dangerous env var blocking (`LD_PRELOAD`, `DYLD_INSERT_LIBRARIES`)
+  - `load()`, `resolve()`, `build_env()` methods
+- ✅ Pydantic models (`backend/app/models/profile.py`)
+  - `BlockingPolicy`, `ExecutionProfile`, `ResolvedProfile`
+- ✅ 37 tests passing (`backend/tests/test_phase1_security.py`)
+
+**Phase 2: MCP Server & Traces**
+- ✅ `KomorebiMCPServer` (`backend/app/mcp/server.py`)
+  - MCP 2024-11-05 stdio server with JSON-RPC handling
+  - 4 tools: `search_context`, `get_active_trace`, `read_file_metadata`, `get_related_decisions`
+  - `run_stdio()` event loop
+- ✅ Database tables (`backend/app/db/database.py`)
+  - `TraceTable`, `FileEventTable`, `LLMUsageTable` + `trace_id` on `ChunkTable`
+- ✅ `TraceRepository` (`backend/app/db/trace_repository.py`)
+  - CRUD + `activate()`, `get_active()`, `get_summary()`, `search_by_name()`
+- ✅ `FileEventRepository` (`backend/app/db/file_event_repository.py`)
+  - CRUD + `path_history()`, `count_by_trace()`
+- ✅ Migration script (`scripts/migrate_v1_oracle.py`)
+- ✅ API routes (`backend/app/api/traces.py`, `file_events.py`)
+  - 6 trace endpoints + 2 file event endpoints
+- ✅ CLI commands (`cli/main.py`)
+  - `mcp-serve`, `switch`, `trace rename`, `watch start`, `watch status`
+- ✅ 36 tests passing (`backend/tests/test_phase2_oracle.py`)
+
+**Phase 3: Cost Governance & Watcher**
+- ✅ `CostService` (`backend/app/services/cost_service.py`)
+  - Token counting heuristic (len/4), per-model cost estimation
+  - Budget enforcement with auto-downgrade, `BudgetExceeded` exception
+- ✅ `FileWatcherDaemon` (`backend/app/core/watcher.py`)
+  - `watchdog`-based filesystem watching with ignore rules
+  - Registration in `~/.komorebi/watchers.json`
+- ✅ Billing API (`backend/app/api/billing.py`)
+  - `GET /llm/usage`, `GET /llm/budget`, `PUT /llm/budget`
+- ✅ Frontend signals store (`frontend/src/store/oracle.ts`)
+  - `llmUsage`, `budgetConfig`, `activeTrace`, `traces`, `recentFileEvents` signals
+  - Computed: `totalCost`, `isThrottled`
+- ✅ `BillingDashboard` component (`frontend/src/components/BillingDashboard.tsx`)
+- ✅ `WatcherStatus` component (`frontend/src/components/WatcherStatus.tsx`)
+- ✅ App.tsx updated with Billing and Watcher tabs
+- ✅ 29 tests passing (`backend/tests/test_phase3_cost.py`)
+- ✅ Documentation updates (CHANGELOG, CURRENT_STATUS, PROGRESS)
+
 ### Module 8: Modular Target Delivery System
 - ✅ Core abstractions (`backend/app/targets/`)
   - `TargetAdapter` ABC with schema, MCP tool mapping, argument transformation

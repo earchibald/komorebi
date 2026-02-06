@@ -9,7 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-*(No changes yet)*
+### Added
+- **Context Oracle: Security & Profiles (Phase 1)**
+  - `RedactionService` — 9 compiled regex patterns for secret scrubbing (AWS, GitHub PAT, PEM keys, Slack, Stripe, OpenAI, Bearer tokens)
+  - `ProfileManager` — YAML-based execution profiles with inheritance, cycle detection, dangerous env var blocking
+  - Pydantic models: `BlockingPolicy`, `ExecutionProfile`, `ResolvedProfile`
+  - 37 new tests for redaction and profile management
+
+- **Context Oracle: MCP Server & Traces (Phase 2)**
+  - `KomorebiMCPServer` — MCP 2024-11-05 stdio server exposing 4 tools: `search_context`, `get_active_trace`, `read_file_metadata`, `get_related_decisions`
+  - `TraceRepository` — CRUD + active-trace lifecycle management for multi-session awareness
+  - `FileEventRepository` — CRUD + path-history queries for filesystem events
+  - Database tables: `traces`, `file_events`, `llm_usage` + `trace_id` column on `chunks`
+  - Migration script: `scripts/migrate_v1_oracle.py` (idempotent)
+  - API endpoints: 6 trace routes, 2 file event routes
+  - CLI commands: `mcp-serve`, `switch`, `trace rename`, `watch start`, `watch status`
+  - 36 new tests for repositories, MCP server protocol, and API routes
+
+- **Context Oracle: Cost Governance & Watcher (Phase 3)**
+  - `CostService` — Token counting heuristic, per-model cost estimation, budget enforcement with auto-downgrade
+  - `FileWatcherDaemon` — `watchdog`-based filesystem watcher with ignore rules and registration in `~/.komorebi/watchers.json`
+  - `BillingDashboard` component — Usage table, budget editor, throttle alert
+  - `WatcherStatus` component — Active trace display, recent file events
+  - API endpoints: `GET /llm/usage`, `GET /llm/budget`, `PUT /llm/budget`
+  - Frontend signals store (`oracle.ts`) for billing and watcher state
+  - New tabs: "Billing" and "Watcher" in main navigation
+  - 29 new tests for cost service, watcher utils, billing API, and models
+
+### Changed
+- `pyproject.toml` — Added `pyyaml>=6.0` and `watchdog>=4.0.0` dependencies
+- `App.tsx` — Added billing and watcher tab routes
+- Module exports updated across `models/`, `db/`, `api/`, `core/` packages
+- `main.py` — Included traces, file_events, billing routers with `/api/v1` prefix
+
+### Technical
+- 102 new tests (37 + 36 + 29), 224 total passing, 3 pre-existing skips
+- Zero regressions on existing test suite
+- Ruff lint clean across backend/ and cli/
 
 ---
 
