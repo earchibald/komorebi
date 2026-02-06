@@ -78,3 +78,13 @@ class Chunk(BaseModel):
             ]
         }
     }
+
+
+class SearchResult(BaseModel):
+    """Search result wrapper with pagination metadata."""
+    
+    items: list[Chunk] = Field(default_factory=list, description="Matching chunks")
+    total: int = Field(..., description="Total number of matching chunks")
+    limit: int = Field(..., description="Page size used")
+    offset: int = Field(..., description="Page offset used")
+    query: Optional[str] = Field(None, description="Search query used")

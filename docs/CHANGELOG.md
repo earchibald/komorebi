@@ -10,10 +10,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Module 4: Advanced prompt engineering & skill system
+- Module 4 Frontend: SearchBar and FilterPanel components with debounced input
+- Advanced prompt engineering & skill system
 - Production deployment configuration
 - Advanced testing automation
 - Performance optimization baseline
+
+---
+
+## [0.4.0] - 2026-02-05
+
+### Added
+- **Module 4: Search & Entity Filtering API** — Server-side search endpoint with text queries, entity filters, date ranges, and pagination
+- **GET /api/v1/chunks/search** — Unified search endpoint with 7 query parameters (q, status, project_id, entity_type, entity_value, created_after, created_before)
+- **SearchResult model** — Pydantic wrapper containing search results with pagination metadata (items, total, limit, offset, query)
+- **ChunkRepository.search()** — Repository method using LIKE queries for text search and EXISTS subquery for entity filtering
+- **Text Search** — Case-insensitive partial matching in chunk content using SQLite LIKE operator
+- **Entity Filtering Infrastructure** — EXISTS subquery pattern ready for filtering by entity type/value (tests skipped pending manual entity creation)
+- **Date Range Filters** — Support for `created_after` and `created_before` timestamp filtering
+- **Search Test Suite** — 8 tests (5 active, 3 skipped) covering text search, pagination, response structure, and entity filtering
+
+### Technical Improvements
+- **Database cleanup fixture** — Search tests properly dispose engine connections before database file removal
+- **Module-level test fixtures** — test_search.py uses local fixture for database isolation
+- **Type hint fixes** — Python 3.11 compatibility using `Tuple[List[Chunk], int]` from typing module
+- **Linting cleanup** — Fixed 22 unused import and variable issues
 
 ---
 

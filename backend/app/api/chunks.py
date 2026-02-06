@@ -4,14 +4,15 @@ Provides fast capture and management of chunks - the
 fundamental unit of information in Komorebi.
 """
 
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db, ChunkRepository, ProjectRepository, EntityRepository
-from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
+from ..models import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus, SearchResult
 from ..core import CompactorService
 from ..core.events import event_bus, ChunkEvent, EventType
 
@@ -85,6 +86,49 @@ async def _process_chunk_background(chunk_id: UUID) -> None:
                 chunk_id=chunk_id,
                 data=result.model_dump(mode="json"),
             ))
+
+
+@router.get("/search", response_model=SearchResult)
+async def search_chunks(
+    q: Optional[str] = Query(None, description="Text search query (case-insensitive)"),
+    status: Optional[ChunkStatus] = Query(None, description="Filter by chunk status"),
+    project_id: Optional[UUID] = Query(None, description="Filter by project ID"),
+    entity_type: Optional[str] = Query(None, description="Filter by entity type (error, url, tool_id, decision, code_ref)"),
+    entity_value: Optional[str] = Query(None, description="Filter by entity value (partial match)"),
+    created_after: Optional[datetime] = Query(None, description="Filter chunks created after this timestamp"),
+    created_before: Optional[datetime] = Query(None, description="Filter chunks created before this timestamp"),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of results to return"),
+    offset: int = Query(0, ge=0, description="Number of results to skip"),
+    chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+) -> SearchResult:
+    """Search chunks with text, entity, and date filters.
+    
+    Supports:
+    - Text search: Case-insensitive partial matching in content
+    - Entity filtering: Find chunks with specific entity types/values
+    - Date range: Filter by creation date
+    - Status/Project: Standard filtering
+    - Pagination: limit and offset parameters
+    """
+    chunks, total = await chunk_repo.search(
+        search_query=q,
+        status=status,
+        project_id=project_id,
+        entity_type=entity_type,
+        entity_value=entity_value,
+        created_after=created_after,
+        created_before=created_before,
+        limit=limit,
+        offset=offset,
+    )
+    
+    return SearchResult(
+        items=chunks,
+        total=total,
+        limit=limit,
+        offset=offset,
+        query=q,
+    )
 
 
 @router.get("", response_model=list[Chunk])

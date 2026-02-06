@@ -6,7 +6,7 @@ This module provides the core data models following Pydantic v2 conventions:
 - MCPServerConfig: Configuration for external MCP servers
 """
 
-from .chunk import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus
+from .chunk import Chunk, ChunkCreate, ChunkUpdate, ChunkStatus, SearchResult
 from .project import Project, ProjectCreate, ProjectUpdate
 from .entity import Entity, EntityCreate, EntityType
 from .mcp import MCPServerConfig, MCPServerStatus
@@ -16,6 +16,7 @@ __all__ = [
     "ChunkCreate", 
     "ChunkUpdate",
     "ChunkStatus",
+    "SearchResult",
     "Project",
     "ProjectCreate",
     "ProjectUpdate",

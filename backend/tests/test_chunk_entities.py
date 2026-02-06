@@ -6,7 +6,10 @@ TDD Step 1 (Red): Tests for the Chunk Detail Drawer backend support.
 """
 
 import pytest
+from httpx import AsyncClient, ASGITransport
 
+from backend.app.main import app
+from backend.app.db import init_db
 from backend.app.models import (
     Entity,
     EntityCreate,
@@ -15,6 +18,15 @@ from backend.app.models import (
     ChunkCreate,
 )
 from backend.app.db.repository import EntityRepository, ChunkRepository, ProjectRepository
+
+
+@pytest.fixture
+async def client():
+    """Create an async test client."""
+    await init_db()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
 
 
 # ============================================================================

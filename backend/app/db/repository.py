@@ -5,7 +5,7 @@ enabling easy testing and potential backend swaps.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Tuple, List
 from uuid import UUID
 
 from sqlalchemy import select, func
@@ -84,6 +84,81 @@ class ChunkRepository:
         
         result = await self.session.execute(query)
         return [self._to_model(row) for row in result.scalars().all()]
+    
+    async def search(
+        self,
+        search_query: Optional[str] = None,
+        status: Optional[ChunkStatus] = None,
+        project_id: Optional[UUID] = None,
+        entity_type: Optional[str] = None,
+        entity_value: Optional[str] = None,
+        created_after: Optional[datetime] = None,
+        created_before: Optional[datetime] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Tuple[List[Chunk], int]:
+        """Search chunks with text, entity, and date filters.
+        
+        Returns:
+            Tuple of (matching chunks, total count)
+        """
+        from sqlalchemy import exists
+        
+        # Base query
+        query = select(ChunkTable)
+        count_query = select(func.count(ChunkTable.id))
+        
+        # Text search (case-insensitive LIKE)
+        if search_query:
+            search_filter = ChunkTable.content.ilike(f"%{search_query}%")
+            query = query.where(search_filter)
+            count_query = count_query.where(search_filter)
+        
+        # Status filter
+        if status:
+            query = query.where(ChunkTable.status == status.value)
+            count_query = count_query.where(ChunkTable.status == status.value)
+        
+        # Project filter
+        if project_id:
+            query = query.where(ChunkTable.project_id == str(project_id))
+            count_query = count_query.where(ChunkTable.project_id == str(project_id))
+        
+        # Entity filter (EXISTS subquery)
+        if entity_type or entity_value:
+            entity_exists = select(EntityTable).where(
+                EntityTable.chunk_id == ChunkTable.id
+            )
+            if entity_type:
+                entity_exists = entity_exists.where(EntityTable.entity_type == entity_type)
+            if entity_value:
+                entity_exists = entity_exists.where(EntityTable.value.ilike(f"%{entity_value}%"))
+            
+            entity_filter = exists(entity_exists)
+            query = query.where(entity_filter)
+            count_query = count_query.where(entity_filter)
+        
+        # Date range filters
+        if created_after:
+            query = query.where(ChunkTable.created_at >= created_after)
+            count_query = count_query.where(ChunkTable.created_at >= created_after)
+        if created_before:
+            query = query.where(ChunkTable.created_at <= created_before)
+            count_query = count_query.where(ChunkTable.created_at <= created_before)
+        
+        # Get total count
+        count_result = await self.session.execute(count_query)
+        total = count_result.scalar_one()
+        
+        # Apply ordering and pagination
+        query = query.order_by(ChunkTable.created_at.desc())
+        query = query.limit(limit).offset(offset)
+        
+        # Execute and return results
+        result = await self.session.execute(query)
+        chunks = [self._to_model(row) for row in result.scalars().all()]
+        
+        return chunks, total
     
     async def update(self, chunk_id: UUID, chunk_update: ChunkUpdate) -> Optional[Chunk]:
         """Update a chunk."""

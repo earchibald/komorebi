@@ -1,17 +1,18 @@
 """Pytest configuration and fixtures."""
 
-import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from httpx import AsyncClient, ASGITransport
 
-from backend.app.main import app
 from backend.app.db.database import Base
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def test_db():
-    """Create a test database session."""
+    """Create an in-memory test database session.
+    
+    This fixture is useful for repository-level tests that don't need
+    the full FastAPI app.
+    """
     # Use in-memory SQLite for tests
     engine = create_async_engine(
         "sqlite+aiosqlite:///:memory:",
@@ -36,11 +37,5 @@ async def test_db():
     await engine.dispose()
 
 
-@pytest_asyncio.fixture
-async def client():
-    """Create an async test client."""
-    from backend.app.db import init_db
-    await init_db()
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
+# Note: The client fixture is defined per-test-file to allow custom cleanup strategies.
+# See test_search.py for an example of database cleanup between tests.

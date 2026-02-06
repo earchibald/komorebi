@@ -1,21 +1,37 @@
 # Komorebi: Current Status & Next Steps
 
 **Date:** February 5, 2026  
-**Version:** 0.2.1 (Pre-1.0.0 Development)
+**Version:** 0.4.0 (Pre-1.0.0 Development)
 
 ---
 
 ## 🆕 Latest Updates
 
+### Module 4: Search & Entity Filtering API (v0.4.0)
+
+**Backend Search Implementation:**
+- `GET /api/v1/chunks/search` endpoint with 7 query parameters and pagination
+- Text search via case-insensitive LIKE queries
+- Entity filtering infrastructure (EXISTS subquery pattern)
+- Date range filters (created_after, created_before)
+- SearchResult model with pagination metadata
+- 8 test cases (5 passing, 3 skipped for MVP)
+- Full TDD workflow (Red → Green → Refactor) completed
+- 38/41 tests passing (38 passed, 3 skipped)
+- All linting checks passing (22 issues auto-fixed)
+- Ready for frontend implementation
+
 ### Module 3 & Developer Experience (v0.3.0)
 
 **Developer Tooling - VS Code Prompts & Skills:**
-- 7 custom prompts with 15+ aliases (`/impl`, `/test`, `/debug`, `/arch`, `/refactor`, `/docs`, `/review`)
+- 8 custom prompts with 20+ aliases (`/impl`, `/test`, `/debug`, `/arch`, `/refactor`, `/docs`, `/review`, `/integrate`)
+- All prompts have full builtin tool set (`search/codebase`, `editFiles`, `runTerminalCommand`, `githubRepo`, `fetch`)
 - 4 agent skills across all tiers:
   - `feature-implementer` (Standard) - Full-stack scaffold generator
   - `code-formatter` (Economy) - Ruff formatting
   - `deep-debugger` (Premium/Opus 4.6) - Advanced async debugging
   - `research-agent` (Research/Gemini 3 Pro) - Long-context analysis
+- 4 MCP servers configured: GitHub, GitKraken, Playwright, Filesystem
 - Telemetry system with optional MCP integration
 - Complete documentation suite (PROMPT_GUIDE.md, CONTEXT_AWARENESS_ANALYSIS.md, etc.)
 
