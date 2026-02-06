@@ -1,13 +1,13 @@
 # Komorebi: Current Status & Next Steps
 
 **Date:** February 5, 2026  
-**Version:** 0.8.0-dev (Pre-1.0.0 Development)
+**Version:** 0.8.0
 
 ---
 
 ## 🆕 Latest Updates
 
-### Module 7: Context Resume ("The Save Point")
+### Module 7: Context Resume ("The Save Point") - v0.8.0
 
 **New Feature: Context Resume Briefings**
 - `GET /projects/{id}/resume?hours=48` generates LLM-synthesized "Morning Briefing"

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+*(No changes yet)*
+
+---
+
+## [0.8.0] - 2026-02-05
+
 ### Added
 - **Module 7: Context Resume ("The Save Point")** — LLM-synthesized project briefings for resuming work context
   - `ProjectBriefing` and `BriefingSection` Pydantic models (`backend/app/models/resume.py`)
@@ -22,9 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `briefing`, `briefingLoading`, `briefingError` signals + `fetchBriefing()` in store
   - 12 new tests (5 API endpoint + 5 service unit + 2 model validation)
 
-### Planned
-- Module 5: Implementation — Docker deployment, bulk operations feature
-- Performance optimization baseline
+### Technical
+- 97 tests passing (12 new), 3 skipped (pre-existing search entity filters)
+- Backend linting clean (ruff check)
+- Frontend build clean (tsc + vite)
 
 ---
 
