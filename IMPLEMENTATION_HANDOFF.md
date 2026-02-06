@@ -1,53 +1,170 @@
-# Implementation Handoff: Context Resume Feature (Module 7)
+# Implementation Handoff: Modular Target Delivery System (Module 8)
 
 **Date:** 2026-02-05  
-**Version:** 0.8.0  
-**Branch:** `copilot/implement-backend-service-cli-dashboard`
+**Version:** 0.8.1  
+**Status:** ✅ COMPLETE (Core Implementation)
 
 ---
 
 ## Feature Summary
 
-The Context Resume feature provides on-demand project briefings that synthesize recent activity into an actionable summary. Users can click "Resume" on any project to get:
+The Modular Target Delivery System enables users to dispatch data to external tools (GitHub, Jira, Slack) via a unified interface. Schema-driven forms mean adding new targets requires only a Python adapter—zero frontend changes.
 
-- **AI-Generated Summary** — LLM synthesis of recent chunks, decisions, and related context
-- **Graceful Fallback** — Template-based summary when Ollama is unavailable
-- **Time-Windowed Decisions** — Recent DECISION entities (default: 48 hours)
-- **TF-IDF Related Context** — Semantically related chunks via TFIDFService
-- **Jump-to-Chunk** — Direct navigation from briefing to source chunks
+**Key Innovation**: Schema → Form → MCP Tool (no hardcoded UI)
 
 ---
 
-## Architecture Reference
+## What Was Implemented
 
-See [FEATURE_CONTEXT_RESUME.md](docs/FEATURE_CONTEXT_RESUME.md) for detailed architecture decisions.
+### Backend (Python)
+- **TargetAdapter** ABC: Interface for delivery targets
+- **TargetRegistry**: Singleton managing all adapters
+- **GitHubIssueAdapter**: Maps forms to `github.create_issue` MCP tool
+- **API Endpoints**: 
+  - GET `/api/v1/targets/schemas` (list all)
+  - GET `/api/v1/targets/{name}/schema` (get specific)
+  - POST `/api/v1/dispatch` (dispatch to target)
+- **25 Tests Passing**: 19 unit + 6 integration
+
+### Frontend (React + TypeScript)
+- **Signals Store**: Reactive state (availableTargets, formData, dispatch state)
+- **DynamicForm**: Schema-driven renderer (6 field types)
+- **StagingArea**: Target selector + dispatch interface
+- **📤 Dispatch Tab**: New navigation entry in main App
+- **Builds Successfully**: No TypeScript errors
 
 ---
 
-## Acceptance Criteria
+## File Structure
 
-| Criterion | Status | Evidence |
-|-----------|--------|----------|
-| GET /projects/{id}/resume returns ProjectBriefing | ✅ | `test_resume_with_data`, `test_resume_response_model_complete` |
-| 404 when project not found | ✅ | `test_resume_project_not_found` |
-| `hours` query param filters decisions | ✅ | `test_resume_time_window`, `since` param in EntityRepository |
-| Fallback mode when Ollama offline | ✅ | `test_service_ollama_unavailable` |
-| TF-IDF related context included | ✅ | `test_service_related_chunks` |
-| Frontend displays briefing with loading states | ✅ | ResumeCard.tsx with skeleton/error/data states |
-| Jump-to-chunk navigation works | ✅ | "Open last chunk" button calls `selectChunk()` |
+### Backend
+```
+backend/app/targets/
+  __init__.py          # Package exports
+  base.py             # TargetAdapter ABC, schemas
+  registry.py         # TargetRegistry singleton
+  github.py           # GitHubIssueAdapter
+
+backend/app/api/targets.py      # API endpoints
+backend/app/models/dispatch.py  # DispatchRequest/Response
+
+backend/tests/
+  test_targets.py     # 19 unit tests
+  test_dispatch.py    # 6 integration tests
+```
+
+### Frontend
+```
+frontend/src/store/targets.ts                    # Signals store
+frontend/src/components/DynamicForm.tsx          # Form renderer
+frontend/src/components/StagingArea.tsx          # Dispatch UI
+frontend/src/App.tsx                             # Integration (dispatch tab)
+```
 
 ---
 
-## Files Changed
+## How to Add a New Target (30 min)
 
-### Backend — New Files
+```python
+# backend/app/targets/jira.py
+class JiraTicketAdapter(TargetAdapter):
+    @property
+    def schema(self) -> TargetSchema:
+        return TargetSchema(
+            name="jira_ticket",
+            display_name="Jira Ticket",
+            fields=[
+                FieldSchema(name="summary", type=FieldType.TEXT, required=True),
+                FieldSchema(name="description", type=FieldType.MARKDOWN, required=True),
+            ]
+        )
+    
+    @property
+    def mcp_tool_name(self) -> str:
+        return "jira.create_ticket"
+    
+    def map_arguments(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "project_key": data.get("project_key"),
+            "summary": data["summary"],
+            "description": data["description"]
+        }
+```
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `backend/app/models/resume.py` | ~67 | ProjectBriefing + BriefingSection Pydantic models |
-| `backend/app/services/resume_service.py` | ~270 | ResumeService: LLM synthesis, fallback, TF-IDF |
-| `backend/tests/test_resume.py` | ~460 | 12 test cases (API, service, model) |
+Register in `backend/app/main.py` lifespan:
+```python
+adapter = JiraTicketAdapter()
+TargetRegistry.register(adapter)
+```
 
+Frontend automatically generates form from schema! ✨
+
+---
+
+## Tests: 25/25 Passing
+
+### Unit Tests (19)
+- FieldType enum ✅
+- FieldSchema/TargetSchema validation ✅
+- TargetRegistry (register, get, list, clear) ✅
+- GitHubIssueAdapter (schema, mapping, arg splitting) ✅
+- Abstract adapter enforcement ✅
+
+### Integration Tests (6)
+- GET /targets/schemas ✅
+- GET /targets/{name}/schema ✅
+- GET /targets/{name}/schema 404 ✅
+- POST /dispatch success ✅
+- POST /dispatch invalid target 400 ✅
+- POST /dispatch MCP error 500 ✅
+
+### Full Suite
+- 98 passed, 3 skipped (unrelated), 0 failed ✅
+
+---
+
+## Git History (9 Commits)
+
+1. test: Add failing tests (Red phase)
+2. feat: Implement core abstractions
+3. feat: Add API endpoints + models
+4. feat: Wire into main app
+5. feat: Add frontend signals store
+6. feat: Add dynamic form + staging UI
+7. feat: Integrate into App.tsx
+8. fix: Remove unused import
+9. (All pushed to main)
+
+---
+
+## Verification Checklist
+
+✅ Backend tests pass: `pytest backend/tests/test_targets.py backend/tests/test_dispatch.py`  
+✅ Frontend builds: `npm run build` (no errors)  
+✅ Servers running: Backend 8000, Frontend 3000/5173  
+✅ All commits pushed to `origin/main`  
+✅ No uncommitted changes  
+
+---
+
+## Ready For
+
+- ✅ Code review
+- ✅ E2E testing (Playwright)
+- ✅ Additional adapter implementations (Jira, Linear, Slack)
+- ✅ OAuth/prerequisite validation
+- ✅ Undo/rollback features
+
+---
+
+## Non-Critical Future Work
+
+- [ ] E2E tests for dispatch flow
+- [ ] Jira/Linear/Slack adapters
+- [ ] Prerequisite validation (MCP server health)
+- [ ] Tool-specific features per adapter
+- [ ] Dispatch history/audit log
+- [ ] Undo capability
 ### Backend — Modified Files
 
 | File | Changes |
