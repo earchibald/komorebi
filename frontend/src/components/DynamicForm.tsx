@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { currentTargetSchema, formData, updateFormField, type FieldSchema, type FieldType } from '../store/targets'
+import { currentTargetSchema, formData, updateFormField, type FieldSchema } from '../store/targets'
 
 export function DynamicForm() {
   const schema = currentTargetSchema.value
