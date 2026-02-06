@@ -1,11 +1,38 @@
 # Komorebi: Current Status & Next Steps
 
 **Date:** February 5, 2026  
-**Version:** 0.8.0
+**Version:** 0.8.1
 
 ---
 
 ## 🆕 Latest Updates
+
+### Module 8: Modular Target Delivery System - v0.8.1
+
+**New Feature: Schema-Driven Target Dispatch**
+- Unified interface for sending data to external tools (GitHub, Jira, Slack, Linear, etc.)
+- Schema-first architecture: add new targets via Python adapter only (zero frontend changes)
+- `GET /api/v1/targets/schemas` — list all registered target schemas
+- `GET /api/v1/targets/{name}/schema` — get specific schema for dynamic form rendering
+- `POST /api/v1/dispatch` — dispatch form data to target with MCP tool invocation
+- Dynamic form renderer supporting 6 field types (TEXT, MARKDOWN, TEXTAREA, NUMBER, SELECT, CHECKBOX)
+
+**Backend:**
+- `TargetAdapter` ABC with schema, MCP tool mapping, and argument transformation
+- `TargetRegistry` singleton pattern managing adapter lifecycle
+- `GitHubIssueAdapter` — Maps forms to `github.create_issue` with label/assignee array splitting
+- Error handling: 400 (invalid target), 500 (MCP tool failure)
+
+**Frontend:**
+- Signals store with reactive state (availableTargets, formData, dispatchState)
+- `DynamicForm` component — schema-driven field rendering with validation
+- `StagingArea` component — target selector + form editor + dispatch interface
+- New "📤 Dispatch" tab in main navigation
+
+**Testing:**
+- 25 new tests: 19 unit + 6 integration
+- Test coverage: Schema validation, adapter registration, API endpoints, MCP dispatching
+- All tests passing; no regressions
 
 ### Module 7: Context Resume ("The Save Point") - v0.8.0
 

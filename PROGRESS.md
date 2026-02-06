@@ -2,6 +2,38 @@
 
 ## Completed ✅
 
+### Module 8: Modular Target Delivery System
+- ✅ Core abstractions (`backend/app/targets/`)
+  - `TargetAdapter` ABC with schema, MCP tool mapping, argument transformation
+  - `FieldSchema` and `TargetSchema` Pydantic models for declarative definitions
+  - `FieldType` enum (TEXT, MARKDOWN, TEXTAREA, NUMBER, SELECT, CHECKBOX)
+- ✅ `TargetRegistry` singleton
+  - `register()`, `get()`, `list_schemas()`, `get_schema()` methods
+  - Design enables runtime adapter discovery (zero frontend hardcoding)
+- ✅ `GitHubIssueAdapter` implementation
+  - Maps form data to `github.create_issue` MCP tool arguments
+  - Array splitting for labels and assignees
+  - Prerequisite validation (stub for future OAuth)
+- ✅ API endpoints (`backend/app/api/targets.py`)
+  - `GET /api/v1/targets/schemas` - list all
+  - `GET /api/v1/targets/{name}/schema` - get specific
+  - `POST /api/v1/dispatch` - dispatch to target with MCP invocation
+  - Comprehensive error handling (404, 400, 500)
+- ✅ Frontend signals store (`frontend/src/store/targets.ts`)
+  - `availableTargets`, `formData`, `dispatchState` signals
+  - `fetchSchemas()`, `updateFormField()`, `dispatch()` functions
+- ✅ UI components (`frontend/src/components/`)
+  - `DynamicForm` - Schema-driven form renderer with field state
+  - `StagingArea` - Target selector + form editor + dispatch interface
+  - Integration into main `App.tsx` with new "Dispatch" tab
+- ✅ 25 tests passing (19 unit + 6 integration)
+  - Schema validation, registry lifecycle, adapter enforcement
+  - API endpoint testing, MCP error handling, response models
+- ✅ Documentation updates
+  - CHANGELOG.md updated with Module 8 entry
+  - CURRENT_STATUS.md updated with v0.8.1 entry
+  - PROGRESS.md updated with completion status
+
 ### Module 7: Context Resume ("The Save Point")
 - ✅ Pydantic models (`backend/app/models/resume.py`)
   - `ProjectBriefing` with summary, sections, recent_chunks, decisions, related_context

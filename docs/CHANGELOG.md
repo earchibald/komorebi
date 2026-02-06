@@ -13,6 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.1] - 2026-02-05
+
+### Added
+- **Module 8: Modular Target Delivery System** — Schema-driven dispatch to external tools (GitHub, Jira, Slack)
+  - **TargetAdapter ABC** — Base interface for all delivery targets with schema, MCP tool mapping, and argument transformation
+  - **TargetRegistry** — Singleton pattern managing adapter lifecycle; zero hardcoded tool references in frontend
+  - **GitHubIssueAdapter** — Maps form data to `github.create_issue` MCP tool with label/assignee array splitting
+  - **API Endpoints**:
+    - `GET /api/v1/targets/schemas` — List all registered target schemas
+    - `GET /api/v1/targets/{name}/schema` — Get specific target schema for dynamic form rendering
+    - `POST /api/v1/dispatch` — Dispatch data to target with error handling
+  - **Frontend Signals Store** — Reactive state for `availableTargets`, `formData`, `dispatchState`
+  - **DynamicForm component** — Schema-driven renderer supporting 6 field types (TEXT, MARKDOWN, TEXTAREA, NUMBER, SELECT, CHECKBOX)
+  - **StagingArea component** — Target selector + form editor + dispatch interface
+  - **Dispatch Tab** — New navigation entry for delivery workflow
+  - **25 new tests** — 19 unit + 6 integration, all passing
+
+### Technical
+- Schema-first architecture enables new adapters without frontend changes (30-min adapter implementation)
+- FieldSchema validation with required fields, descriptions, and defaults
+- MCP tool invocation with automatic error handling (400/500 responses)
+- Zero breaking changes; fully backward compatible
+
+---
+
 ## [0.8.0] - 2026-02-05
 
 ### Added
