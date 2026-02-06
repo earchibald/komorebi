@@ -9,8 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Module 4 Frontend: Search UI** — Complete search interface with SearchBar, FilterPanel, and ChunkList integration
+- **SearchBar component** — Real-time text search with 300ms debouncing, result count display, and clear button
+- **FilterPanel component** — Collapsible advanced filters panel with 6 filter fields (status, project, entity type/value, date range)
+- **Search store** — Preact signals for search state management (searchQuery, searchFilters, searchResults, isSearchActive)
+- **Debounced search** — Auto-triggers search 300ms after user stops typing to reduce API calls
+- **Seamless integration** — ChunkList automatically switches between regular chunks and search results based on `isSearchActive`
+- **Search result count** — Badge showing total results and query term when search is active
+- **Filter count badge** — Visual indicator showing number of active filters on FilterPanel toggle
+- **Search CSS styling** — Responsive dark-theme styles for search bar, filters, and status indicators
+
 ### Planned
-- Module 4 Frontend: SearchBar and FilterPanel components with debounced input
+- Module 4 Hammer testing: Load test search endpoint with `--mode search` and varied queries
 - Advanced prompt engineering & skill system
 - Production deployment configuration
 - Advanced testing automation

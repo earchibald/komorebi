@@ -264,6 +264,90 @@
   - PROGRESS.md: Phase 11 milestone complete
   - ELICITATIONS.md: Pending technical decisions documentation
 
+### Phase 12: Module 4 Frontend — Search UI (Feb 5, 2026)
+
+✅ **Complete search interface implementation** using TDD + Agentic Integration workflow
+
+#### Frontend Components Created
+- ✅ **SearchBar component** (`frontend/src/components/SearchBar.tsx`):
+  - Real-time text input connected to searchQuery signal
+  - 300ms debouncing via debouncedSearch() to reduce API calls
+  - Result count badge with query term display (e.g., "42 results for 'error'")
+  - Clear button (✕) to reset search state
+  - Loading spinner during search execution
+  - 🔍 search icon for visual clarity
+
+- ✅ **FilterPanel component** (`frontend/src/components/FilterPanel.tsx`):
+  - Collapsible panel with expand/collapse toggle (▲/▼)
+  - Filter count badge showing active filter count
+  - 6 filter fields in responsive grid layout:
+    - Status dropdown (all, inbox, processed, compacted, archived)
+    - Project dropdown (populated from projects signal)
+    - Entity type dropdown (error, url, tool_id, decision, code_ref)
+    - Entity value text input (e.g., "ConnectionTimeout")
+    - Created after datetime picker
+    - Created before datetime picker
+  - "Clear All Filters" button when filters active
+  - Auto-triggers debounced search on filter changes
+
+- ✅ **ChunkList integration** (`frontend/src/components/ChunkList.tsx`):
+  - Imported SearchBar and FilterPanel at top of component
+  - Smart chunk display switching: uses searchResults when isSearchActive=true, falls back to chunks + client-side filtering otherwise
+  - Hide status tabs when search is active (replaced by search results)
+  - Updated loading states: "Searching..." vs "Loading chunks..."
+  - Updated empty states: "No results found. Try adjusting your search." vs "No chunks found with filter: {filter}"
+  - Preserved existing chunk card rendering (drawer integration, summary, tags, metadata)
+
+#### Store Extensions
+- ✅ **Search state management** (added to `frontend/src/store/index.ts`):
+  - **Types**: SearchResult interface (items, total, limit, offset, query), SearchFilters interface
+  - **Signals**: searchQuery, searchFilters, searchResults, searchLoading
+  - **Computed**: isSearchActive (true if query or filters present)
+  - **Functions**:
+    - `fetchSearchResults(limit, offset)`: Async function to call /chunks/search API
+    - `debouncedSearch(limit, offset)`: 300ms debounced wrapper around fetchSearchResults
+    - `clearSearch()`: Reset all search state and clear debounce timer
+  - **Debounce tracking**: searchDebounceTimer global to prevent rapid API calls
+
+#### Styling
+- ✅ **Search CSS** (added to `frontend/src/theme/styles.css`):
+  - `.search-bar`, `.search-input-wrapper`: Dark theme input with focus states
+  - `.search-icon`, `.search-input`, `.search-clear`: Icon, input field, clear button styling
+  - `.search-status`, `.result-count`, `.result-query`: Result display styling
+  - `.spinner` with keyframe animation for loading state
+  - `.filter-panel`, `.filter-toggle`, `.filter-content`: Collapsible panel with borders
+  - `.filter-grid`: Responsive grid layout (auto-fit, minmax(200px, 1fr))
+  - `.filter-field`: Label, select, input styling with focus states
+  - `.filter-badge`: Pill badge for active filter count (pink background)
+  - `.clear-filters-btn`: Outlined button with hover transition
+  - All styles follow existing CSS variable patterns (--bg-primary, --accent-pink, --text-secondary, etc.)
+
+#### Quality Gates
+- ✅ **Frontend build**: `npm run build` passes with no TypeScript errors
+- ✅ **Backend tests**: 38 passed, 3 skipped (unchanged from Phase 11)
+- ✅ **Type safety**: All components properly typed with React.ChangeEvent, signal types, etc.
+- ✅ **Reactivity**: Preact signals automatically trigger re-renders on state changes
+
+#### Integration Workflow
+- ✅ All components integrated into existing ChunkList flow
+- ✅ Search and regular chunk browsing coexist seamlessly (no breaking changes)
+- ✅ Debouncing prevents excessive API calls during typing
+- ✅ Clear functions properly reset state and cleanup timers
+
+#### Files Changed (6 files)
+1. **frontend/src/store/index.ts**: +65 lines (search types, signals, functions)
+2. **frontend/src/components/SearchBar.tsx**: +58 lines (new file)
+3. **frontend/src/components/FilterPanel.tsx**: +145 lines (new file)
+4. **frontend/src/components/ChunkList.tsx**: +29 lines added, 13 modified (integration)
+5. **frontend/src/theme/styles.css**: +200 lines (search and filter styling)
+6. **docs/CHANGELOG.md**: Updated Unreleased section with frontend features
+
+#### Next Steps
+- [ ] **Hammer load testing**: Update `scripts/hammer_gen.py` with `--mode search` to test concurrent search queries
+- [ ] **Optional entity creation endpoint**: `POST /api/v1/entities` to unblock 3 skipped entity tests
+- [ ] **Performance monitoring**: Add search latency metrics to Stats dashboard
+- [ ] **Future FTS5 migration**: When >10k chunks, switch to SQLite FTS5 for relevance ranking (transparent upgrade, no breaking changes)
+
 ## Benchmark Results
 
 ### Module 2 - Recursive Compaction

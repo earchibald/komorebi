@@ -1,6 +1,16 @@
 import { useEffect, useState, useMemo } from 'react'
-import { chunks, loading, fetchChunks, selectChunk } from '../store'
+import { 
+  chunks, 
+  loading, 
+  fetchChunks, 
+  selectChunk, 
+  searchResults, 
+  searchLoading, 
+  isSearchActive 
+} from '../store'
 import type { Chunk } from '../store'
+import { SearchBar } from './SearchBar'
+import { FilterPanel } from './FilterPanel'
 
 type StatusFilter = 'all' | 'inbox' | 'processed' | 'compacted' | 'archived'
 
@@ -12,38 +22,60 @@ export function ChunkList() {
     fetchChunks(undefined, 500) // Fetch up to 500 chunks
   }, []) // Only runs once on mount
 
-  // Client-side filtering - instant, no network call
-  const filteredChunks = useMemo(() => {
+  // Determine which chunks to display
+  const displayChunks = useMemo(() => {
+    // If search is active, use search results
+    if (isSearchActive.value && searchResults.value) {
+      return searchResults.value.items
+    }
+    
+    // Otherwise, use client-side filtered chunks
     if (filter === 'all') return chunks.value
     return chunks.value.filter(c => c.status === filter)
-  }, [chunks.value, filter])
+  }, [chunks.value, filter, isSearchActive.value, searchResults.value])
+
+  const isLoading = isSearchActive.value ? searchLoading.value : (loading.value && chunks.value.length === 0)
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        {(['all', 'inbox', 'processed', 'compacted', 'archived'] as StatusFilter[]).map(status => (
-          <button
-            key={status}
-            className={`tab ${filter === status ? 'active' : ''}`}
-            onClick={() => setFilter(status)}
-            style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-          >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
-      </div>
+      {/* Search UI */}
+      <SearchBar />
+      <FilterPanel />
 
-      {/* Show loader only if we have no data at all and are loading */}
-      {loading.value && chunks.value.length === 0 ? (
-        <div className="loading">Loading chunks...</div>
-      ) : filteredChunks.length === 0 ? (
+      {/* Status Tabs - Only show when search is NOT active */}
+      {!isSearchActive.value && (
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', marginTop: '1rem' }}>
+          {(['all', 'inbox', 'processed', 'compacted', 'archived'] as StatusFilter[]).map(status => (
+            <button
+              key={status}
+              className={`tab ${filter === status ? 'active' : ''}`}
+              onClick={() => setFilter(status)}
+              style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="loading">
+          {isSearchActive.value ? 'Searching...' : 'Loading chunks...'}
+        </div>
+      ) : displayChunks.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">📋</div>
-          <p>No chunks found with filter: {filter}</p>
+          <p>
+            {isSearchActive.value 
+              ? 'No results found. Try adjusting your search.'
+              : `No chunks found with filter: ${filter}`
+            }
+          </p>
         </div>
       ) : (
         <div className="chunk-list">
-          {filteredChunks.map((chunk: Chunk) => (
+          {displayChunks.map((chunk: Chunk) => (
             <div key={chunk.id} className="chunk-item chunk-item-clickable" onClick={() => selectChunk(chunk)}>
               <div className="chunk-header">
                 <span className="chunk-id">{chunk.id.slice(0, 8)}...</span>

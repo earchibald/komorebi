@@ -50,6 +50,24 @@ export interface Entity {
   created_at: string
 }
 
+export interface SearchResult {
+  items: Chunk[]
+  total: number
+  limit: number
+  offset: number
+  query: string | null
+}
+
+export interface SearchFilters {
+  query: string
+  status?: 'inbox' | 'processed' | 'compacted' | 'archived'
+  projectId?: string
+  entityType?: 'error' | 'url' | 'tool_id' | 'decision' | 'code_ref'
+  entityValue?: string
+  createdAfter?: string
+  createdBefore?: string
+}
+
 // API base URL
 const API_URL = '/api/v1'
 
@@ -95,9 +113,22 @@ export const stats = signal<ChunkStats>({
 export const loading = signal(false)
 export const error = signal<string | null>(null)
 
+// Search state
+export const searchQuery = signal('')
+export const searchFilters = signal<Omit<SearchFilters, 'query'>>({})
+export const searchResults = signal<SearchResult | null>(null)
+export const searchLoading = signal(false)
+
+// Computed: Is search active?
+export const isSearchActive = computed(() => 
+  searchQuery.value.trim().length > 0 || 
+  Object.keys(searchFilters.value).length > 0
+)
+
 // Debounce tracking
 let fetchChunksPromise: Promise<void> | null = null
 let fetchStatsPromise: Promise<void> | null = null
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 let fetchProjectsPromise: Promise<void> | null = null
 
 // Computed values
@@ -164,6 +195,65 @@ export async function fetchChunks(status?: string, limit = 100) {
   })()
   
   return fetchChunksPromise
+}
+
+export async function fetchSearchResults(limit = 100, offset = 0) {
+  searchLoading.value = true
+  error.value = null
+  
+  try {
+    const params = new URLSearchParams()
+    
+    // Text query
+    const query = searchQuery.value.trim()
+    if (query) params.set('q', query)
+    
+    // Filters
+    const filters = searchFilters.value
+    if (filters.status) params.set('status', filters.status)
+    if (filters.projectId) params.set('project_id', filters.projectId)
+    if (filters.entityType) params.set('entity_type', filters.entityType)
+    if (filters.entityValue) params.set('entity_value', filters.entityValue)
+    if (filters.createdAfter) params.set('created_after', filters.createdAfter)
+    if (filters.createdBefore) params.set('created_before', filters.createdBefore)
+    
+    // Pagination
+    params.set('limit', String(limit))
+    params.set('offset', String(offset))
+    
+    const response = await fetch(`${API_URL}/chunks/search?${params}`)
+    if (!response.ok) throw new Error('Search failed')
+    
+    searchResults.value = await response.json()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Search error'
+    searchResults.value = null
+  } finally {
+    searchLoading.value = false
+  }
+}
+
+export function debouncedSearch(limit = 100, offset = 0) {
+  // Clear existing timer
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  
+  // Set new timer (300ms debounce)
+  searchDebounceTimer = setTimeout(() => {
+    fetchSearchResults(limit, offset)
+  }, 300)
+}
+
+export function clearSearch() {
+  searchQuery.value = ''
+  searchFilters.value = {}
+  searchResults.value = null
+  error.value = null
+  
+  // Clear debounce timer
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+    searchDebounceTimer = null
+  }
 }
 
 export async function fetchStats() {

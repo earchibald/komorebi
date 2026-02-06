@@ -7,9 +7,18 @@
 
 ## 🆕 Latest Updates
 
-### Module 4: Search & Entity Filtering API (v0.4.0)
+### Module 4: Search & Entity Filtering — Full Stack Complete
 
-**Backend Search Implementation:**
+**Frontend Search UI (Phase 12 - Feb 5, 2026):**
+- SearchBar component with 300ms debounced input, result count display, and clear button
+- FilterPanel component with 6 advanced filters (status, project, entity type/value, date range)
+- ChunkList seamlessly switches between search results and regular chunks based on isSearchActive signal
+- Search store with Preact signals (searchQuery, searchFilters, searchResults, searchLoading)
+- Complete CSS styling with dark theme (search bar, filter panel, badges, animations)
+- Frontend builds successfully with no TypeScript errors
+- Ready for Hammer load testing (`--mode search`)
+
+**Backend Search API (Phase 11 - v0.4.0):**
 - `GET /api/v1/chunks/search` endpoint with 7 query parameters and pagination
 - Text search via case-insensitive LIKE queries
 - Entity filtering infrastructure (EXISTS subquery pattern)
@@ -19,7 +28,6 @@
 - Full TDD workflow (Red → Green → Refactor) completed
 - 38/41 tests passing (38 passed, 3 skipped)
 - All linting checks passing (22 issues auto-fixed)
-- Ready for frontend implementation
 
 ### Module 3 & Developer Experience (v0.3.0)
 

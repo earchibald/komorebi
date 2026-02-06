@@ -759,3 +759,204 @@ body {
   color: var(--text-secondary);
   font-style: italic;
 }
+/* Search Bar */
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+  border-color: var(--accent-blue);
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.search-clear:hover {
+  color: var(--accent-pink);
+  background: var(--bg-secondary);
+}
+
+.search-status {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-status.loading {
+  color: var(--accent-yellow);
+}
+
+.search-status.results {
+  color: var(--text-secondary);
+}
+
+.result-count {
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+.result-query {
+  color: var(--text-secondary);
+}
+
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Filter Panel */
+.filter-panel {
+  margin-bottom: 1rem;
+}
+
+.filter-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.filter-toggle:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+}
+
+.filter-toggle.expanded {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.filter-badge {
+  background: var(--accent-pink);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: 600;
+}
+
+.toggle-icon {
+  margin-left: auto;
+  color: var(--text-secondary);
+}
+
+.filter-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 1rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-field label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.filter-field select,
+.filter-field input[type="text"],
+.filter-field input[type="datetime-local"] {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.filter-field select:focus,
+.filter-field input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.clear-filters-btn {
+  background: transparent;
+  border: 1px solid var(--accent-pink);
+  color: var(--accent-pink);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.clear-filters-btn:hover {
+  background: var(--accent-pink);
+  color: white;
+}
