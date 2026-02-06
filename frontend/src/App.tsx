@@ -6,8 +6,9 @@ import { TimelineView } from './components/TimelineView'
 import { ProjectList } from './components/ProjectList'
 import { MCPPanel } from './components/MCPPanel'
 import { ChunkDrawer } from './components/ChunkDrawer'
+import { StagingArea } from './components/StagingArea'
 
-type Tab = 'inbox' | 'all' | 'dashboard' | 'timeline' | 'projects' | 'mcp'
+type Tab = 'inbox' | 'all' | 'dashboard' | 'timeline' | 'projects' | 'mcp' | 'dispatch'
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('inbox')
@@ -56,6 +57,12 @@ function App() {
         >
           🔌 MCP
         </button>
+        <button
+          className={`tab ${activeTab === 'dispatch' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dispatch')}
+        >
+          📤 Dispatch
+        </button>
       </nav>
 
       <main className="content">
@@ -65,6 +72,7 @@ function App() {
         {activeTab === 'timeline' && <TimelineView />}
         {activeTab === 'projects' && <ProjectList />}
         {activeTab === 'mcp' && <MCPPanel />}
+        {activeTab === 'dispatch' && <StagingArea />}
       </main>
 
       <footer className="footer">
