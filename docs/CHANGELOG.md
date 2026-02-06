@@ -10,11 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Module 4 Hammer testing: Load test search endpoint with `--mode search` and varied queries
-- Advanced prompt engineering & skill system enhancements
-- Production deployment configuration
-- Advanced testing automation
+- Module 6: User Data API — Contextual query features, search improvements, data exploration UI
+- Module 5: Implementation — Docker deployment, bulk operations feature
 - Performance optimization baseline
+
+---
+
+## [0.6.0] - 2026-02-07
+
+### Added
+- **FEATURE_MODULE5_v0.6.0_DESIGN.md** — Comprehensive architecture for Production Deployment + Bulk Operations
+  - Single-container Docker deployment (Uvicorn + StaticFiles)
+  - Module 5: Bulk tag/archive/delete operations with audit log and undo (30-min window)
+  - SQLite persistence on Docker volumes
+  - Railway.app deployment target (PaaS recommended path)
+- **BUILD.md** — Populated from empty blueprint, now includes quick start, project structure, module inventory, configuration reference
+- **Documentation** — 5 trade-off analyses with reversibility assessments, implementation sprints (20-28 hours), quality gates
+
+### Documentation
+- Architecture design complete for v0.6.0 feature set (deployment + bulk ops)
+- Implementation plan: 2 sprints with detailed task breakdown
+- Known constraints documented (SQLite JSON limitations, concurrent writes, undo window per-action)
+- Blockers identified (Railway persistent volume testing, Ollama connectivity from Docker, SSE reconnection)
 
 ---
 

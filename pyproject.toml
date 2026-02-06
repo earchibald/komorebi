@@ -1,6 +1,6 @@
 [project]
 name = "komorebi"
-version = "0.5.0"
+version = "0.6.0"
 description = "Cognitive infrastructure for capture, compaction, and context management"
 requires-python = ">=3.11"
 dependencies = [
