@@ -46,6 +46,7 @@ class ChunkTable(Base):
     status = Column(String(20), default="inbox", index=True)
     source = Column(String(100), nullable=True)
     token_count = Column(Integer, nullable=True)
+    trace_id = Column(String(36), nullable=True, index=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -95,6 +96,48 @@ class MCPServerTable(Base):
     enabled = Column(Boolean, default=True)
     status = Column(String(20), default="disconnected")
     last_error = Column(Text, nullable=True)
+
+
+class TraceTable(Base):
+    """SQLAlchemy model for traces — named context sessions."""
+
+    __tablename__ = "traces"
+
+    id = Column(String(36), primary_key=True)
+    name = Column(String(255), nullable=False, index=True)
+    status = Column(String(20), nullable=False, default="active", index=True)
+    meta_summary = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+
+
+class FileEventTable(Base):
+    """SQLAlchemy model for filesystem change events."""
+
+    __tablename__ = "file_events"
+
+    id = Column(String(36), primary_key=True)
+    trace_id = Column(String(36), nullable=False, index=True)
+    path = Column(Text, nullable=False, index=True)
+    crud_op = Column(String(20), nullable=False)
+    size_bytes = Column(Integer, nullable=True)
+    hash_prefix = Column(String(64), nullable=True)
+    mime_type = Column(String(100), nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+
+class LLMUsageTable(Base):
+    """SQLAlchemy model for LLM token usage tracking."""
+
+    __tablename__ = "llm_usage"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    model_name = Column(String(100), nullable=False, index=True)
+    input_tokens = Column(Integer, nullable=False, default=0)
+    output_tokens = Column(Integer, nullable=False, default=0)
+    estimated_cost = Column(Float, nullable=False, default=0.0)
+    request_type = Column(String(50), nullable=True)
+    created_at = Column(DateTime, nullable=False, index=True)
 
 
 async def init_db() -> None:
