@@ -3,7 +3,7 @@ name: refactor-code
 description: Refactoring existing code while maintaining behavior and improving structure
 agent: agent
 model: Claude Sonnet 4
-tools: ['search/codebase', 'editFiles', 'runTerminalCommand']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'fetch', 'githubRepo']
 ---
 
 # Refactoring Agent

@@ -3,7 +3,7 @@ name: review-pr
 description: Comprehensive pull request review covering security, conventions, tests, and documentation. Use for code review before merging.
 agent: agent
 model: Claude Sonnet 4
-tools: ['search/codebase', 'githubRepo']
+tools: ['search/codebase', 'editFiles', 'runTerminalCommand', 'githubRepo', 'fetch']
 ---
 
 # Review Pull Request

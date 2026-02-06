@@ -3,7 +3,7 @@ name: architect-feature
 description: Designing system architecture for complex features before implementation
 agent: agent
 model: Claude Opus 4.6
-tools: ['search/codebase', 'runTerminalCommand']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'fetch', 'githubRepo']
 ---
 
 # Architecture Agent
@@ -268,6 +268,86 @@ Architecture deliverables:
 2. **Update CONVENTIONS.md** - If new patterns introduced
 3. **Create feature doc** - For complex features: `docs/FEATURE_NAME.md`
 4. **Log decisions** - Add to `ELICITATIONS.md` if blocking questions arose
+
+## Handoff Document
+
+At the end of architecture phase, create `ARCHITECTURE_HANDOFF.md` in the feature branch root:
+
+```markdown
+# Architecture Handoff: [Feature Name]
+
+## Feature Overview
+[1-2 sentence description of what will be built]
+
+## Architecture Summary
+[2-3 sentences: key components, tech decisions, why this design]
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Pydantic Models Required
+- `NewEntity` - [brief purpose]
+- `NewEntityCreate` - [required fields]
+- `NewEntityUpdate` - [optional fields]
+
+## API Endpoints
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| POST | /api/v1/... | - | Create |
+| GET | /api/v1/... | - | List |
+| GET | /api/v1/.../id | - | Retrieve |
+
+## Frontend Components
+- `ComponentName` - [purpose], [signals/state used]
+- `ComponentName` - [purpose], [signals/state used]
+
+## Database Schema
+- New tables: [table names]
+- Migrations needed: [yes/no, path if yes]
+- Indexes: [if critical paths identified]
+
+## External Integrations
+| Service | Protocol | Purpose | Fallback |
+|---------|----------|---------|----------|
+| [name] | [type] | [what] | [how if unavailable] |
+
+## Implementation Tasks (estimated)
+### Backend (X hours)
+- [ ] Models
+- [ ] Repository
+- [ ] Service
+- [ ] API routes
+- [ ] Tests
+
+### Frontend (X hours)
+- [ ] Components/Store
+- [ ] Integration with API
+- [ ] Tests
+
+### Integration (X hours)
+- [ ] E2E testing
+- [ ] Documentation
+
+## Key Trade-off Decisions
+1. **[Decision Name]**: Chose [Option A] over [Option B] because...
+2. **[Decision Name]**: Chose [Option A] over [Option B] because...
+
+## Known Constraints
+- [Constraint 1]: [Impact]
+- [Constraint 2]: [Impact]
+
+## Blockers or Open Questions
+- [Question] - Needs clarification from [stakeholder]
+- [Blocker] - Depends on [external commitment]
+
+## Next Phase
+Code is ready for implementation via `/implement-feature` prompt.
+All design decisions documented above. No further architectural questions.
+```
+
+Create this document at the feature branch level (same as README) and reference it when handing off to implementation.
 
 ## Output Format
 

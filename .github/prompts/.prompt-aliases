@@ -19,9 +19,15 @@ clean:refactor-code
 doc:update-docs
 pr:review-pr
 
+# Integration workflow
+integrate:integrate-feature
+finalize:integrate-feature
+ship:integrate-feature
+
 # Shorthand
 i:implement-feature
 t:write-tests
 d:debug-issue
 a:architect-feature
 r:refactor-code
+int:integrate-feature

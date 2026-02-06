@@ -45,6 +45,24 @@ This section documents the _target_ architecture. Implementation notes below ind
 ### Protocol
 * **MCP:** Model Context Protocol (2025-11-25 Spec) for all external tool aggregations.
 
+### MCP Tool Ecosystem
+Komorebi integrates with external MCP servers for agentic tool access. Configured servers live in `config/mcp_servers.json` using `env://` URI references for secrets.
+
+**Registered MCP Servers:**
+
+| Server | Package | Purpose | Secrets |
+|--------|---------|---------|--------|
+| **GitHub** | `@modelcontextprotocol/server-github` | Repository ops, issues, PRs, code search | `GITHUB_TOKEN` |
+| **GitKraken** | `@gitkraken/mcp-server-gitkraken` | Advanced Git operations, visual diffs, repo management | `GITKRAKEN_API_KEY` |
+| **Playwright** | `@playwright/mcp@latest` | Browser automation, E2E testing, visual verification | None |
+| **Filesystem** | `@modelcontextprotocol/server-filesystem` | Local file read/write in sandboxed directories | None |
+
+**Security Rules:**
+* NEVER hardcode MCP server tokens in config files or source code.
+* Use `env://VARIABLE_NAME` pattern in `config/mcp_servers.json` for secret injection.
+* Secrets are resolved at runtime from environment variables only.
+* New servers start `disabled: true` until explicitly enabled.
+
 ---
 
 ## 3. The Git Workflow (Feature → Develop → Main)
@@ -130,6 +148,8 @@ See [CONVENTIONS.md](../CONVENTIONS.md) for detailed code patterns and examples.
 * **Security:** NEVER hardcode API keys.
 * **Pattern:** Use `backend/app/mcp/auth.py`.
 * **Injection:** Secrets are environment variables injected *only* into the `subprocess.Popen` `env` dict.
+* **Servers:** Configured declaratively in `config/mcp_servers.json`. Available: GitHub MCP, GitKraken MCP, Playwright MCP, Filesystem MCP.
+* **VS Code Prompt MCP Tools:** Prompts can leverage MCP servers for GitHub operations (`githubRepo` builtin or GitHub MCP), visual testing (Playwright MCP), and Git workflows (GitKraken MCP).
 
 ### UI State Management
 * **Rule:** If data changes > 1/sec (e.g., Token Usage, Latency), use **Signals**.

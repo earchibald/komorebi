@@ -2,7 +2,7 @@
 name: implement-feature
 description: Fast-track feature implementation from specification to working code using TDD workflow. Use for new CRUD features, API endpoints, React components.
 agent: agent
-tools: ['search/codebase', 'editFiles', 'runTerminalCommand']
+tools: ['agent', 'edit', 'execute', 'read', 'search', 'todo', 'vscode', 'web', 'fetch', 'githubRepo']
 ---
 
 # Implement Feature
@@ -660,7 +660,105 @@ Run: `pytest backend/tests/test_items.py` → **Tests pass** ✅
 - Favorite flag for items (PATCH /items/{id}/favorite)
 ```
 
-Done! Feature complete with tests, implementation, and docs.
+## Handoff Document
+
+At the end of implementation phase, create `IMPLEMENTATION_HANDOFF.md` in the feature branch root:
+
+```markdown
+# Implementation Handoff: [Feature Name]
+
+## Feature Summary
+[What was built, what problems it solves]
+
+## Architecture Used
+[Referenced from ARCHITECTURE_HANDOFF.md]
+
+## Acceptance Criteria
+- [x] Criterion 1 - [evidence]
+- [x] Criterion 2 - [evidence]
+- [x] Criterion 3 - [evidence]
+
+## Files Changed
+List all modified/created files with line range pointers:
+
+### Backend
+- `backend/app/models/new_entity.py` [L1-L50] - Pydantic models
+- `backend/app/db/repository.py` [L150-L250] - Repository methods
+- `backend/app/api/new_feature.py` [L1-L150] - API endpoints
+- `backend/tests/test_new_feature.py` [L1-L300] - Test suite
+
+### Frontend
+- `frontend/src/store/newFeatureStore.ts` [L1-L100] - Signals store
+- `frontend/src/components/NewFeatureComponent.tsx` [L1-L200] - Component
+- `frontend/src/App.tsx` [L45-L50] - Route/integration point
+
+### Database/Migrations
+- Migration file: `scripts/migrate_v0.3.0.py`
+OR
+- Manual steps: [list if no migration file]
+
+## Test Coverage
+- Unit tests (backend): X tests passing
+  - Test file: `backend/tests/test_new_feature.py`
+  - Coverage: X%
+  - Critical paths: [list 2-3 key test cases]
+  
+- Integration tests: X tests passing
+  
+- Stress test results (hammer_gen.py):
+  - Requests per second: X
+  - Failures: X (target: 0)
+  - P95 latency: Xms
+  - Memory peak: XMB
+
+## API Endpoints Implemented
+- POST /api/v1/endpoint - Create
+- GET /api/v1/endpoint - List
+- GET /api/v1/endpoint/{id} - Retrieve
+- PATCH /api/v1/endpoint/{id} - Update
+- DELETE /api/v1/endpoint/{id} - Delete
+
+## Frontend Features Implemented
+- Component: [Name] - Renders collection with [state/signal]
+- Signals store: [file] - Exports [signal names]
+- Integration: Fetches from [API endpoint] on [trigger]
+
+## Known Limitations or TODOs
+- [Limitation 1]: [Why] - Will address in v[x.x]
+- [Limitation 2]: [Why] - Blocked by [dependency]
+- None documented ✅
+
+## Performance Metrics
+- API latency: [before → after]
+  - Example: GET /api/v1/items: 5ms → 8ms (acceptable increase due to filtering)
+- Database query complexity: [O(n) with index → O(log n)]
+- Memory impact: [negligible / +Xmb for in-memory cache]
+
+## Breaking Changes
+- ❌ None - Fully backward compatible
+OR
+- ⚠️ Field removed: `old_field` from Entity schema
+  - Migration: Consumers should use `new_field` instead
+  - Deprecation period: [date of removal]
+
+## Verification Checklist
+- [x] All tests pass locally (pytest)
+- [x] Linting clean (ruff check)
+- [x] No hardcoded secrets or credentials
+- [x] Type hints complete (mypy/pyright clean)
+- [x] Imports organized (stdlib → third-party → local)
+- [x] No incomplete TODO comments
+- [x] 80%+ coverage on new code
+- [x] Stress test passes without failures
+
+## Next Phase
+Ready for `/integrate-feature` workflow:
+1. Create PR to develop with this handoff document
+2. Integrate tests and documentation sync
+3. Version bump and release
+```
+
+Create this document at the feature branch level and attach/reference it in pull request.
 
 ---
 
