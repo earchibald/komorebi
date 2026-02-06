@@ -160,32 +160,3 @@ def calculate_token_efficiency(raw_text: str, token_count: int):
 * [NVIDIA GenAI-Perf](https://developer.nvidia.com/blog/llm-benchmarking-fundamental-concepts/): Benchmarking metrics for TTFT and TPS.
 * [TanStack Query](https://tanstack.com/query/latest): Managing server state and async data.
 * [Build a task manager AI agent using LLM (Video)](https://www.youtube.com/watch?v=HfXMkoUCTyE)
-
-## 7. Context as a Programmable Environment (Python REPL)
-In high-pressure operations, a static summary might miss the specific error code you need. To solve this, Komorebi implements the "Agentic REPL" pattern.
-
-### The Concept: Dynamic Retrieval
-Instead of providing a massive text wall, we provide the LLM with a Python REPL tool. The model can "query" its own history recursively.
-
-**Logic: The REPL Handshake**
-1. The LLM receives a query: "What happened the last time the NLP parser crashed?"
-2. Instead of searching, the LLM writes a Python snippet to call `komorebi.search()` and `komorebi.summarize()`.
-3. The system executes the code and returns the precise result, keeping the context window lean and the accuracy high.
-
-```python
-# backend/app/core/repl_evaluator.py
-class ContextREPL:
-    """
-    Exposes a safe subset of Python to the LLM.
-    Allows the model to 'auto-adapt' its retrieval strategy.
-    """
-    async def execute_search(self, query_code: str):
-        # The LLM might write: 
-        # "results = search(text='NLP crash', limit=5); return summarize(results)"
-        local_scope = {
-            "search": self.db_vector_search,
-            "summarize": self.recursive_summarizer,
-            "get_raw": self.get_document_by_id
-        }
-        # Execute the model's 'thought process' as code
-        return eval(query_code, {"__builtins__": {}}, local_scope)
